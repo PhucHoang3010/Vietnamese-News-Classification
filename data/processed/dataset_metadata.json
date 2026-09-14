@@ -1,0 +1,52 @@
+{
+  "dataset_version": "v1.0.0",
+  "source": null,
+  "license": null,
+  "format": "csv",
+  "total_samples": 262,
+  "original_samples": 300,
+  "num_classes": 5,
+  "categories": [
+    "GIÁO DỤC",
+    "GIẢI TRÍ",
+    "KINH TẾ",
+    "PHÁP LUẬT",
+    "THỂ THAO"
+  ],
+  "columns": {
+    "input": [
+      "id",
+      "title",
+      "content",
+      "label"
+    ],
+    "optional": [
+      "url"
+    ],
+    "generated": [
+      "text",
+      "clean_text"
+    ]
+  },
+  "split": {
+    "train": 183,
+    "validation": 39,
+    "test": 40,
+    "test_size": 0.15,
+    "val_size": 0.15,
+    "random_state": 42
+  },
+  "preprocessing": {
+    "unicode_normalization": "NFC",
+    "html_strip": true,
+    "remove_script_style": true,
+    "control_char_removal": true,
+    "whitespace_normalization": true,
+    "teencode_normalization": false
+  },
+  "tokenizer": {
+    "name": null,
+    "version": null
+  },
+  "generated_at": "2026-09-14T17:20:37.935599+00:00"
+}

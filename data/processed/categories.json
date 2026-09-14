@@ -1,0 +1,12 @@
+{
+  "dataset_version": "v1.0.0",
+  "categories": [
+    "GIÁO DỤC",
+    "GIẢI TRÍ",
+    "KINH TẾ",
+    "PHÁP LUẬT",
+    "THỂ THAO"
+  ],
+  "num_classes": 5,
+  "label_column": "label"
+}
