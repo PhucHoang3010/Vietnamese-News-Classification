@@ -39,18 +39,21 @@ HF_SPLIT = "train"
 DEFAULT_OUTPUT = Path("data/raw/uvn1_news.csv")
 DEFAULT_DATASET_VERSION = "uvn1-v1.0.0"
 
-EXPECTED_NUM_CATEGORIES = 10
+EXPECTED_NUM_CATEGORIES = 13
 EXPECTED_CATEGORIES = {
-    "Thời sự",
-    "Thế giới",
-    "Kinh doanh",
-    "Giải trí",
-    "Thể thao",
-    "Pháp luật",
+    "Công đoàn",
     "Giáo dục",
-    "Sức khỏe",
-    "Đời sống",
+    "Giải trí",
     "Khoa học",
+    "Kinh doanh",
+    "Pháp luật",
+    "Sức khỏe",
+    "Thế giới",
+    "Thể thao",
+    "Thời sự",
+    "Xe",
+    "Xã hội",
+    "Đời sống",
 }
 
 OUTPUT_COLUMNS = ["id", "title", "content", "label", "url"]

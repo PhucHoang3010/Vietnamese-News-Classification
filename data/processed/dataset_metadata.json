@@ -1,17 +1,25 @@
 {
-  "dataset_version": "v1.0.0",
+  "dataset_version": "uvn1-v1.0.0",
   "source": null,
   "license": null,
   "format": "csv",
-  "total_samples": 262,
-  "original_samples": 300,
-  "num_classes": 5,
+  "total_samples": 3246,
+  "original_samples": 3268,
+  "num_classes": 13,
   "categories": [
-    "GIÁO DỤC",
-    "GIẢI TRÍ",
-    "KINH TẾ",
-    "PHÁP LUẬT",
-    "THỂ THAO"
+    "Công đoàn",
+    "Giáo dục",
+    "Giải trí",
+    "Khoa học",
+    "Kinh doanh",
+    "Pháp luật",
+    "Sức khỏe",
+    "Thế giới",
+    "Thể thao",
+    "Thời sự",
+    "Xe",
+    "Xã hội",
+    "Đời sống"
   ],
   "columns": {
     "input": [
@@ -29,9 +37,9 @@
     ]
   },
   "split": {
-    "train": 183,
-    "validation": 39,
-    "test": 40,
+    "train": 2272,
+    "validation": 487,
+    "test": 487,
     "test_size": 0.15,
     "val_size": 0.15,
     "random_state": 42
@@ -48,5 +56,5 @@
     "name": null,
     "version": null
   },
-  "generated_at": "2026-09-14T17:20:37.935599+00:00"
+  "generated_at": "2026-09-14T17:56:42.565144+00:00"
 }

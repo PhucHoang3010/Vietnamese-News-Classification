@@ -1,0 +1,189 @@
+# P2 Vietnamese Stopwords
+# Version: vi-v1.0.0
+# License: MIT (curated from public sources)
+# Sources referenced:
+#   - https://github.com/stopwords-iso/stopwords-vi
+#   - https://github.com/duyet/vietnamese-stopwords
+#   - underthesea built-in (for cross-check)
+#
+# Strategy: function words only — NOT high-frequency words.
+# Target: ~149 candidates before dedup.
+#
+# RULES:
+#   - Remove: pronouns, prepositions, conjunctions, particles,
+#             generic time/quantity words, empty verbs
+#   - Keep:   domain-specific nouns, classification-meaningful words,
+#             words appearing in 13 UVN-1 categories
+#
+# CRITICAL — DO NOT REMOVE (13 category keywords):
+#   công đoàn, giáo dục, giải trí, khoa học, kinh doanh,
+#   pháp luật, sức khỏe, thế giới, thể thao, thời sự,
+#   xe, xã hội, đời sống
+#
+# CRITICAL — DO NOT REMOVE (news signal words):
+#   tin, thông tin, cho biết, đưa tin, đưa, nói
+#
+# ============================================================
+
+# --- NHÓM 1 — ĐẠI TỪ NHÂN XƯNG ---
+tôi
+tớ
+mình
+chúng tôi
+chúng ta
+chúng mình
+chúng nó
+bạn
+cậu
+anh
+chị
+em
+ông
+bà
+họ
+nó
+hắn
+ta
+chúng
+ai
+gì
+nào
+
+# --- NHÓM 2 — CHỈ ĐỊNH TỪ ---
+này
+kia
+đó
+ấy
+nọ
+đấy
+kìa
+vậy
+thế
+
+# --- NHÓM 3 — GIỚI TỪ ---
+của
+cho
+với
+về
+từ
+đến
+tại
+trong
+ngoài
+trên
+dưới
+trước
+sau
+giữa
+bằng
+theo
+qua
+sang
+vào
+ra
+lên
+xuống
+đi
+để
+
+# --- NHÓM 4 — LIÊN TỪ ---
+và
+hoặc
+hay
+nhưng
+mà
+nếu
+thì
+vì
+nên
+do
+bởi
+rằng
+là
+
+# --- NHÓM 5 — TRỢ TỪ / TÌNH THÁI TỪ ---
+à
+ạ
+ừ
+ờ
+nhé
+nha
+nhỉ
+đâu
+chứ
+thôi
+đã
+đang
+sẽ
+vừa
+mới
+còn
+cũng
+đều
+vẫn
+chỉ
+
+# --- NHÓM 6 — TỪ CHỈ THỜI GIAN CHUNG ---
+hôm nay
+hôm qua
+hôm kia
+ngày mai
+ngày kia
+tuần này
+tuần trước
+tuần sau
+tháng này
+tháng trước
+tháng sau
+năm nay
+năm ngoái
+năm sau
+hiện nay
+hiện tại
+gần đây
+sắp tới
+vừa qua
+trước đây
+
+# --- NHÓM 7 — TỨ CHỈ SỐ LƯỢNG CHUNG ---
+một
+hai
+ba
+bốn
+sáu
+bảy
+tám
+chín
+mười
+trăm
+nghìn
+triệu
+tỷ
+vài
+dăm
+mấy
+chục
+nhiều
+ít
+mọi
+các
+những
+mỗi
+từng
+toàn bộ
+tất cả
+cả
+
+# --- NHÓM 8 — ĐỘNG TỪ "RỖNG" ---
+# KHÔNG bao gồm: tin, thông tin, cho biết, đưa tin, đưa, nói
+có
+được
+bị
+phải
+nên
+cần
+muốn
+biết
+thấy
+cho rằng
+dẫn

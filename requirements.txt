@@ -27,3 +27,6 @@ pytest>=7.4.0
 
 # Dataset download (UVN-1)
 datasets>=2.14.0
+
+# Phase 2 — Vietnamese NLP
+underthesea>=6.8.0

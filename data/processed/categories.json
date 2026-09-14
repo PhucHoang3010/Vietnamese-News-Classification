@@ -1,12 +1,20 @@
 {
-  "dataset_version": "v1.0.0",
+  "dataset_version": "uvn1-v1.0.0",
   "categories": [
-    "GIÁO DỤC",
-    "GIẢI TRÍ",
-    "KINH TẾ",
-    "PHÁP LUẬT",
-    "THỂ THAO"
+    "Công đoàn",
+    "Giáo dục",
+    "Giải trí",
+    "Khoa học",
+    "Kinh doanh",
+    "Pháp luật",
+    "Sức khỏe",
+    "Thế giới",
+    "Thể thao",
+    "Thời sự",
+    "Xe",
+    "Xã hội",
+    "Đời sống"
   ],
-  "num_classes": 5,
+  "num_classes": 13,
   "label_column": "label"
 }

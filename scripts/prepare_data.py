@@ -56,13 +56,9 @@ DEFAULT_DATASET_VERSION = "v1.0.0"
 #     "body": "content",
 #     "headline": "title",
 # }
-FIELD_MAPPING: dict[str, str] = {
-    "category": "label",  # UVN-1 dùng "category", pipeline cần "label"
-    "title": "title",      # Giữ nguyên
-    "content": "content",  # Giữ nguyên
-    "id": "id",            # Giữ nguyên
-    "url": "url",          # Giữ nguyên
-}
+FIELD_MAPPING: dict[str, str] = {}
+# UVN-1 đã được chuẩn hóa schema bởi download_uvn1.py
+# Không cần mapping thêm.
 
 REQUIRED_COLUMNS = ["id", "title", "content", "label"]
 OPTIONAL_COLUMNS = ["url"]
