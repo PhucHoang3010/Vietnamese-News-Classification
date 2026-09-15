@@ -1,14 +1,11 @@
 from datetime import datetime
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from src.db.deduplication import generate_content_hash, normalize_url
 from src.db.models import News
-from src.db.deduplication import (
-    generate_content_hash,
-    normalize_url,
-)
 
 
 class NewsRepository:
@@ -170,3 +167,90 @@ class NewsRepository:
             # A concurrent transaction may have inserted
             # the same URL/content hash after our existence check.
             return None, "DUPLICATE_CONSTRAINT"
+
+    async def list_latest_news(
+        self,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[News]:
+        stmt = (
+            select(News)
+            .order_by(
+                News.published_at.desc().nullslast(),
+                News.crawled_at.desc(),
+            )
+            .limit(limit)
+            .offset(offset)
+        )
+
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def list_news_by_category(
+        self,
+        category: str,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[News]:
+        stmt = (
+            select(News)
+            .where(News.category == category)
+            .order_by(
+                News.published_at.desc().nullslast(),
+                News.crawled_at.desc(),
+            )
+            .limit(limit)
+            .offset(offset)
+        )
+
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def list_news_by_published_range(
+        self,
+        start_at: datetime,
+        end_at: datetime,
+        limit: int = 100,
+        offset: int = 0,
+    ) -> list[News]:
+        stmt = (
+            select(News)
+            .where(
+                News.published_at >= start_at,
+                News.published_at < end_at,
+            )
+            .order_by(
+                News.published_at.asc(),
+                News.id.asc(),
+            )
+            .limit(limit)
+            .offset(offset)
+        )
+
+        result = await self.session.execute(stmt)
+        return list(result.scalars().all())
+
+    async def count_news_by_category(
+        self,
+        start_at: datetime | None = None,
+        end_at: datetime | None = None,
+    ) -> list[tuple[str, int]]:
+        stmt = select(
+            News.category,
+            func.count(News.id),
+        )
+
+        if start_at is not None:
+            stmt = stmt.where(News.published_at >= start_at)
+
+        if end_at is not None:
+            stmt = stmt.where(News.published_at < end_at)
+
+        stmt = (
+            stmt
+            .group_by(News.category)
+            .order_by(func.count(News.id).desc(), News.category.asc())
+        )
+
+        result = await self.session.execute(stmt)
+        return [(category, count) for category, count in result.all()]
