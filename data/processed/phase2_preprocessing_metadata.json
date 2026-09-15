@@ -1,0 +1,48 @@
+{
+  "dataset_version": "uvn1-v1.0.0",
+  "train_samples": 2272,
+  "validation_samples": 487,
+  "test_samples": null,
+  "test_status": "LOCKED — not loaded in Phase 2",
+  "num_classes": 13,
+  "underthesea_version": "9.5.0",
+  "stopwords_version": "vi-v1.0.0",
+  "stopwords_count": 145,
+  "cache_format_version": "cache-v2.0.0",
+  "punctuation_removal": true,
+  "experiments": [
+    "E0",
+    "E1",
+    "E2",
+    "E3"
+  ],
+  "e3_grid_size": 18,
+  "val_macro_f1_e0_to_e3": {
+    "E0": 0.6607031652345456,
+    "E1": 0.6607031652345456,
+    "E2": 0.6625861820619048,
+    "E3_best": 0.6672909910716954
+  },
+  "val_accuracy_e0_to_e3": {
+    "E0": 0.8275154004106776,
+    "E1": 0.8275154004106776,
+    "E2": 0.8275154004106776,
+    "E3_best": 0.8295687885010267
+  },
+  "best_tfidf_config": {
+    "ngram_range": [
+      "(",
+      "1",
+      ",",
+      " ",
+      "1",
+      ")"
+    ],
+    "min_df": 5,
+    "sublinear_tf": false,
+    "features": 4547,
+    "macro_f1": 0.6672909910716954,
+    "accuracy": 0.8295687885010267
+  },
+  "random_seed": 42
+}

@@ -1,0 +1,52 @@
+{
+  "dataset_version": "uvn1-v1.0.0",
+  "random_seed": 42,
+  "primary_metric": "Macro-F1",
+  "test_status": "LOCKED",
+  "stages": [
+    {
+      "stage": "E0",
+      "component": "Raw baseline",
+      "macro_f1": 0.7062
+    },
+    {
+      "stage": "E1",
+      "component": "+ Underthesea",
+      "macro_f1": 0.7129
+    },
+    {
+      "stage": "E2",
+      "component": "+ Vietnamese stopwords",
+      "macro_f1": 0.7107
+    },
+    {
+      "stage": "E3",
+      "component": "+ TF-IDF tuning",
+      "macro_f1": 0.7232
+    },
+    {
+      "stage": "E4",
+      "component": "+ Classifier tuning",
+      "macro_f1": 0.7381
+    },
+    {
+      "stage": "E5",
+      "component": "Final configuration",
+      "macro_f1": 0.7381
+    }
+  ],
+  "final_configuration": {
+    "tokenization": "Underthesea",
+    "stopwords": "Vietnamese custom stopwords",
+    "tfidf_ngram_range": [
+      1,
+      2
+    ],
+    "tfidf_min_df": 1,
+    "tfidf_sublinear_tf": false,
+    "classifier": "LinearSVC",
+    "class_weight": "balanced",
+    "validation_macro_f1": 0.7381,
+    "validation_accuracy": 0.8665
+  }
+}

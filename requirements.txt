@@ -30,3 +30,6 @@ datasets>=2.14.0
 
 # Phase 2 — Vietnamese NLP
 underthesea>=6.8.0
+
+# Database
+python-dotenv>=1.0.0
