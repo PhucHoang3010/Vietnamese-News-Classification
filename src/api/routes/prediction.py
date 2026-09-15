@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 
-from api.schemas import (
+from src.api.schemas import (
     PredictionRequest,
     PredictionResponse,
     BatchPredictionRequest,

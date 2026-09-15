@@ -2,8 +2,8 @@ from contextlib import asynccontextmanager
 
 from fastapi import FastAPI
 
-from predictor.predictor import VietnameseNewsPredictor
-from api.routes.prediction import router as prediction_router
+from src.predictor.predictor import VietnameseNewsPredictor
+from src.api.routes.prediction import router as prediction_router
 
 
 @asynccontextmanager
