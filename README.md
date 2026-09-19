@@ -4,9 +4,9 @@
 
 ## ⚠️ Trạng thái
 
-- ✅ Phase 1: Data preparation
-- ⏳ Phase 2: Preprocessing + Tokenization + TF-IDF *(chưa bắt đầu)*
-- ⏳ Phase 3+: ML + Backend + Crawler + Frontend *(chưa bắt đầu)*
+-  Phase 1: Data preparation
+-  Phase 2: Preprocessing + Tokenization + TF-IDF 
+-  Phase 3+: ML + Backend + Crawler + Frontend 
 
 **Lưu ý**: Dataset hiện tại là **SYNTHETIC**, chỉ dùng để test pipeline. Dataset chính thức sẽ được chọn sau khi Phase 1 synthetic PASS.
 
