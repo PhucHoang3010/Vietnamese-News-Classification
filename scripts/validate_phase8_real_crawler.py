@@ -12,7 +12,7 @@ from src.db.database import AsyncSessionLocal
 from src.db.repository import NewsRepository
 
 
-API_BASE_URL = "http://127.0.0.1:8000"
+API_BASE_URL = "http://fastapi:8000"
 
 
 async def main() -> None:

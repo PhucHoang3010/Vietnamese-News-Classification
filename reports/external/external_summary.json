@@ -1,0 +1,49 @@
+{
+  "test_rows": 5500,
+  "accuracy": 0.7085454545454546,
+  "macro_precision": 0.6340451706146829,
+  "macro_recall": 0.5995384615384616,
+  "macro_f1": 0.5933313761391159,
+  "weighted_precision": 0.7493261107264435,
+  "weighted_recall": 0.7085454545454546,
+  "weighted_f1": 0.7012098081644098,
+  "correct": 3897,
+  "errors": 1603,
+  "margin_distribution": {
+    "<0.10": {
+      "total": 681,
+      "correct": 290,
+      "errors": 391,
+      "accuracy": 0.42584434654919234,
+      "error_rate": 0.5741556534508077
+    },
+    "0.10–0.20": {
+      "total": 537,
+      "correct": 243,
+      "errors": 294,
+      "accuracy": 0.45251396648044695,
+      "error_rate": 0.547486033519553
+    },
+    "0.20–0.30": {
+      "total": 487,
+      "correct": 269,
+      "errors": 218,
+      "accuracy": 0.5523613963039015,
+      "error_rate": 0.44763860369609854
+    },
+    "0.30–0.50": {
+      "total": 774,
+      "correct": 504,
+      "errors": 270,
+      "accuracy": 0.6511627906976745,
+      "error_rate": 0.3488372093023256
+    },
+    ">=0.50": {
+      "total": 3021,
+      "correct": 2591,
+      "errors": 430,
+      "accuracy": 0.8576630254882489,
+      "error_rate": 0.14233697451175106
+    }
+  }
+}

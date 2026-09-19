@@ -1,0 +1,150 @@
+﻿id,title,source_category,ground_truth,prediction,correct,margin
+60114,Liên minh châu Âu xem xét lệnh cấm TikTok,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0019306870211902
+54803,6 sai lầm khi sử dụng email có thể khiến bạn mất việc,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0148992635408156
+63802,Tính năng bảo mật khiến MacBook cũ thành rác công nghệ,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0159213605752124
+183883,Tín chỉ carbon và câu chuyện mục tiêu kép chuyển đổi số bền vững,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0169292285977139
+57817,FPT Techday 2024 hướng đến công nghệ tương lai,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0204503513315695
+58293,Giá bộ nhớ DRAM sắp tăng mạnh,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0206864515282773
+55547,Vì sao Apple tổ chức sự kiện ra mắt iPhone 16 sớm hơn thường lệ,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0308988941753506
+59749,Microsoft đang không hài lòng với Xbox,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0407411674396378
+17476,Phần mềm tự phát triển giúp hàng không Nga vô sự trước sự cố CrowdStrike,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0459323829893097
+60880,Một phút 'rớt mạng' gây thiệt hại ra sao?,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0569456845920378
+65205,Ngành kho hàng tăng cường áp dụng công nghệ RFID,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.058718256926824
+56334,Microsoft đầu tư vào công ty khởi nghiệp chip AI,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0622011500447617
+186310,‘Tám chữ vàng’ trong bảo vệ cơ sở hạ tầng thông tin trọng yếu,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0642887603752469
+186722,Bộ phận dịch vụ toàn cầu của Boeing bị tấn công mạng,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0703429143822929
+59643,MeKo trở thành nhà phân phối phụ kiện công nghệ của ESR tại Việt Nam,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0753462499566429
+55662,Diablo IV lập kỷ lục trò chơi bán chạy nhất mọi thời đại của Blizzard,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0782339442946244
+56470,Minh Tuấn Mobile mở cửa hàng trải nghiệm loa cao cấp,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0820574687658545
+57395,Google không muốn công khai thuật toán AI,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0926130368845556
+65266,Không gian mạng là 'mặt trận chiến lược mới',Khoa học công nghệ,Khoa học,Kinh doanh,False,0.0930144495681328
+57802,Windows 11 chiếm gần 30% tổng số máy tính Windows,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.097526541938209
+53097,Tuần lễ Blockchain GM Vietnam thu hút sự quan tâm của giới công nghệ,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1171839883206384
+63365,Trailer đầu tiên của GTA 6 sẽ phát hành vào ngày 5.12,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1266804040648815
+64593,"VTV 'mất kênh' trên nền tảng OTT, khán giả chịu thiệt",Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1318853183586805
+62822,Việt Nam sắp có khung năng lực AI quốc gia đầu tiên,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1345467192981731
+181431,Elon Musk dọa kiện Apple,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1360598343315867
+64762,Một startup AI tại Việt Nam muốn đi trước tầm nhìn của tỉ phú Elon Musk,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1440408289167721
+64267,Samsung sẵn sàng tung sản phẩm đối đầu Vision Pro,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1484221594612357
+185453,CMC Cloud đồng hành DotB bứt phá công nghệ giáo dục,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1580679048853521
+184182,Quảng Ninh phát huy tối đa sức mạnh của tổ công nghệ số cộng đồng,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1611232699439522
+184082,Ứng dụng công nghệ số để làm nhiều việc hữu ích hơn,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1615784269013992
+183095,Chấn chỉnh việc lạm dụng yêu cầu bản sao chứng thực khi làm thủ tục hành chính,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1771352692940224
+187652,iPhone 18 sẽ không ra mắt vào năm sau?,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1793498640585937
+64458,CEO Grab Việt Nam: Giá dịch vụ phải ngày càng phù hợp hơn với người dùng,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1800970848395768
+181626,OpenAI sẵn sàng nhảy vào nếu Google bị ép bán Chrome,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.1995143661428835
+182542,"Cần ưu tiên đầu tư hạ tầng số, nền tảng số, dữ liệu, giải tỏa hạn chế",Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2062949489705069
+63735,‘Ghostrunner 2’ chốt ngày phát hành vào cuối tháng 10,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2134468643011063
+183030,Tân Quang trong hành trình hướng tới “xã thông minh”,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2154469773422248
+63267,Nhân viên ngân hàng làm lộ dữ liệu người dùng,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2190886628068221
+183326,Đồng Nai đẩy mạnh chuyển đổi số ngành nông nghiệp,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2193181952516557
+181265,Thụy Sỹ hỗ trợ doanh nghiệp Việt sản xuất UAV đạt chuẩn Quốc tế,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2243773872858004
+17088,"AWS, CloudFlare là gì mà mỗi lần 'sập' khiến cả cộng đồng mạng dậy sóng?",Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2303181380619827
+65303,Trao giải Sáng tạo nội dung số Việt Nam 2024,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2333065520369742
+59767,Tương lai khó đoán của dòng Samsung Galaxy S26 với mẫu Pro mới,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2427965003624634
+65191,Những lợi ích của việc ứng dụng tự động hóa vận hành kho hàng,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2459631657675846
+186396,Thủ tướng Phạm Minh Chính yêu cầu bảo đảm ATTT mạng mức cao nhất,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2621906604631713
+188354,"Startup AI của một 9x được rót 14,3 tỷ USD, Musk hối hận vì chỉ trích ông Trump",Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2632487507585908
+188151,61% người Việt lo mất việc hoặc không tìm được việc làm do AI,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2687397656561151
+55743,Thời điểm iPhone 16 đến tay người tiêu dùng,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2695924606109192
+184571,Dân xã miền núi Nghệ An phấn khởi khi giải quyết thủ tục qua mã QR-Code,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2783339144480746
+60533,Ngân hàng Quốc gia Úc 'tẩy chay' các sàn tiền số,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2890540767909608
+183913,Bà Rịa-Vũng Tàu vận hành mini app Zalo giúp người dân tiếp cận các dịch vụ công,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2903419170545408
+184737,Luật Giao dịch điện tử sửa đổi tạo “đường băng” để chuyển đổi số “cất cánh”,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.2968049426313305
+16966,Một lãnh đạo doanh nghiệp đề xuất 3 nguyên tắc để Việt Nam thành quốc gia công nghệ,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.336690740715775
+186980,Sự cố tấn công mạng vào hệ thống tại Việt Nam giảm gần 47%,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.3493622357048289
+59204,Nhiều giải pháp công nghệ mới trình diễn tại Viettel IoT Day 2023,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.3518782254585825
+59633,Grab kỷ niệm hành trình 10 năm hoạt động tại Việt Nam,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.3640660955013841
+181612,Hành trình 10 năm Xiaomi ghi dấu ấn ở phân khúc cao cấp,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.3648550456838023
+184299,Hiệu quả từ mô hình “Tuổi trẻ Thành phố đồng hành cùng dịch vụ công trực tuyến”,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.3665429129307661
+183463,Hiệu quả từ công tác chuyển đổi số ở huyện Hàm Tân,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.3734132375617603
+57987,Đánh thuế tiêu thụ đặc biệt với game online gây nhiều lo ngại,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.3737315449264076
+185619,Siêu ưu đãi MobiFone: gói cước 30GB giá 30 ngàn đồng,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.3886631208363053
+64208,Nokia đã nghĩ gì sau khi Apple ra mắt iPhone đầu tiên?,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.3937505170615877
+182459,6 nguyên tắc vàng trong quản trị dữ liệu số,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.3961990677263005
+17604,Khai mạc Tuần lễ chuyển đổi số TP.HCM 2023,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.3979209562485395
+181460,Một cửa hàng Apple sẽ đóng cửa vĩnh viễn vào tháng tới,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.4038572108927296
+65180,Schneider Electric và Van Der Leun hợp tác 'xanh hóa' ngành đóng tàu,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.4140142029198526
+59071,Ngành pin Hàn Quốc lạc quan sau chiến thắng của ông Donald Trump,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.4176668947620547
+186379,Mã độc mã hóa dữ liệu tống tiền LockBit 3.0 tấn công VNDIRECT nguy hiểm thế nào?,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.4250025989291637
+184097,"Chatbot mắng khách hàng, hãng chuyển phát vô hiệu hóa chức năng AI khẩn cấp",Khoa học công nghệ,Khoa học,Kinh doanh,False,0.4281429926137315
+181398,CT Group - 33 năm tự hào trong hành trình 80 năm Ý chí và Trí tuệ Việt Nam,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.4539384578315654
+185070,Việt Nam tăng tiếp 2 bậc trên toàn cầu về chuyển đổi sang địa chỉ Internet IPv6,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.4644903599261678
+182478,Hiệu quả bước đầu triển khai một cửa liên thông,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.4702039017793918
+182600,"Rikkeisoft tuyên bố IPO tại Nhật, hướng tới trở thành kỳ lân công nghệ Việt Nam",Khoa học công nghệ,Khoa học,Kinh doanh,False,0.4705103367020642
+60059,Máy giặt sấy của LG 'cháy hàng' tại Việt Nam,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.4736252593148603
+182242,Đằng sau cú bắt tay của Xiaomi và Thế Giới Di Động,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.496439121328738
+65368,CMC giải bài toán tối ưu hóa hoạt động doanh nghiệp tại Vietnam - Asia DX Summit,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.502216188218576
+184007,Sau 2 năm chuyển đổi số toàn diện ở thị xã Quảng Yên,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.5089751127661235
+62259,Tỉ phú Bill Gates khiến Microsoft 'bốc hơi' 400 tỉ USD,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.5097825474559132
+61658,Sony công bố doanh số 'khủng' của PS5,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.5117202406120214
+181408,Internet Công nghiệp - Chìa khóa để doanh nghiệp Việt bứt phá,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.5583259781858475
+65121,Ứng dụng AI vào lưới điện thông minh: Động lực mới cho phát triển bền vững,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.5605805697044809
+65018,Klook: du khách quốc tế đến Việt Nam đang gia tăng,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.5629038508454044
+55768,Yếu tố nào quyết định việc vận chuyển thiết bị công nghệ đến khách hàng nhanh chóng?,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.5646560551695259
+184406,Hạ Long tăng cường chuyển đổi số trong giải quyết TTHC,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.5666001159894926
+181815,CEO Samsung: Hãy xem thử thách là cơ hội tái sinh,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.569981701324753
+185698,Số phận hơn 14 tỷ USD Bitcoin bị Mỹ tịch thu của trùm lừa đảo Campuchia Chen Zhi,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.5782687342276134
+182462,"CMC ra mắt hệ sinh thái chuyển đổi số toàn diện cấp phường, xã",Khoa học công nghệ,Khoa học,Kinh doanh,False,0.5786619863399095
+181933,Quan hệ ‘độc tôn’ giữa SK Hynix và Nvidia bị phá vỡ,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.5818169515975004
+57990,Toyota cảnh báo rò rỉ dữ liệu một số khách hàng,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.600554083384313
+56325,Những giá trị ưu việt của hóa đơn điện tử khởi tạo từ máy tính tiền SInvoice,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6054804923765137
+55545,Phong Vũ bị tố bán laptop đã qua sửa chữa cho người tiêu dùng,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.606622644481419
+183133,Doanh nghiệp Việt loay hoay tăng thu giảm chi bằng chuyển đổi số,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6098350735913695
+181997,Apple yêu cầu các đại lý uỷ quyền không bán iPhone trên TikTok Shop,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6109806416510939
+65326,"Dùng công nghệ 'bếp đám mây', chủ tiệm bánh chinh phục các Shark Tank",Khoa học công nghệ,Khoa học,Kinh doanh,False,0.614682833594597
+185694,Đường đi dòng tiền bẩn 14 tỷ USD Bitcoin của 'trùm lừa đảo' Campuchia Chen Zhi,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6324461351912724
+185822,CMC Telecom đưa kinh nghiệm thực chiến toàn cầu về bảo vệ doanh nghiệp Việt,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6423609620727552
+61466,Công ty Trung Quốc thưởng keycap bằng vàng khối cho nhân viên,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6569045738208865
+61559,Facilitated Work Hub vào Top 5 công ty IT tốt nhất Việt Nam 2023,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6591073155779963
+185305,Bước ngoặt ngành công nghiệp Data Center (DC) Việt Nam,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6639964884149686
+59704,Ubisoft thông báo trì hoãn một trò chơi lớn đến năm sau,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6715109541322175
+52823,"VBA, KuCoin và 1Matrix hợp tác phát triển blockchain và tài sản số tại Việt Nam",Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6745817367042961
+61022,Công ty tiên phong về robot hút bụi tuyên bố phá sản,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6864593969030799
+181927,Mỹ mở cuộc điều tra chống độc quyền nhằm vào Nvidia,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.6956704900777034
+53388,Giá MacBook Air M2 giảm sâu,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.7191179138385655
+52999,Cần sớm luật hóa khái niệm về tài sản ảo theo cam kết quốc tế,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.7359788141431672
+181393,Mạng viễn thông số SkyX của Leeon Group ra mắt nền tảng X-Phone,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.7386507266986828
+181710,CMC Telecom - doanh nghiệp đầu tiên tại Việt Nam đạt MEF SASE SD-WAN 3.0,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.7428530698092237
+58365,Mỹ miễn thuế điện thoại nhưng nhắm đến thuế bán dẫn,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.7712979390744763
+181269,Lệnh trừng phạt của Mỹ giúp ‘thần đồng’ AI Trung Quốc trở thành tỷ phú 23 tỷ USD,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.781318647364049
+185367,Mời đấu giá “băng tần vàng” 2500 MHz - 2600 MHz cho 5G,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.7884624791264018
+185902,CMC chính thức lên tiếng về vụ bị mã độc tống tiền tấn công,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.7973903443486681
+182202,CellphoneS: Giá iPhone 15 từ 20 triệu đồng,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.8023178686575984
+182879,Thúc đẩy hình thành doanh nghiệp công nghệ số Việt có năng lực nội sinh mạnh mẽ,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.8134582404704515
+181325,Extreme Networks hướng tới mở rộng sản xuất ở Việt Nam,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.8164188258829764
+61309,HP lên kế hoạch sản xuất laptop tại Việt Nam,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.8185478141029853
+182425,Thanh toán không dùng tiền mặt - thói quen tiêu dùng hiện đại,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.8562693773055974
+181225,Bước tiến mới của Digiworld và H3C trong cuộc đua phân phối giải pháp hạ tầng số,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.9282777820246294
+184601,Ứng dụng công nghệ phát triển nông nghiệp sinh thái ở Khánh Hòa,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.9311584336923192
+181280,"CellphoneS mở bán OPPO Find X9 series, ưu đãi bộ quà tặng đến 10 triệu đồng",Khoa học công nghệ,Khoa học,Kinh doanh,False,0.9413634643051696
+64278,Xperia 1 VII chính là dấu chấm hết cho smartphone Sony?,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.9528207720274652
+57436,Giá Bitcoin tăng dựng đứng gần mốc 25.000 USD,Khoa học công nghệ,Khoa học,Kinh doanh,False,0.9904144759088036
+65131,ManageEngine cam kết thúc đẩy chuyển đổi số tại Việt Nam,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.0020064709931402
+182769,POS365 đồng hành cùng hộ kinh doanh xóa bỏ nỗi lo sai sót hóa đơn,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.0083096355872292
+65013,CEO Tim Cook che giấu doanh số iPhone sụt giảm,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.0289279963163658
+181241,MGID và Google giới thiệu giải pháp tăng doanh thu cho nhà xuất bản số,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.0388887260530524
+61266,Huawei tiếp tục đánh bại Apple trên mặt trận mới tại Trung Quốc,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.0569240521967496
+60226,Lazada tung deal hấp dẫn khuấy đảo dịp siêu sale 11.11,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.0595564657260756
+61025,Lazada đẩy mạnh hoạt động phát triển kinh doanh bền vững,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.1028764877803463
+56453,"Cổ phiếu tăng kỷ lục, Nvidia sắp soán ngôi vương của Apple",Khoa học công nghệ,Khoa học,Kinh doanh,False,1.1191431803609164
+16952,Bạn trẻ khởi nghiệp thời 4.0 và câu hỏi dữ liệu lấy từ đâu,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.1209608816513512
+181773,EVNGENCO1 đặt mục tiêu vượt kế hoạch sản lượng điện năm 2024,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.1540394092136106
+57683,J&T Express đảm bảo mạng lưới vận chuyển ổn định trong dịp tết,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.154239670361198
+59012,Apple tăng đầu tư tại Indonesia để bán iPhone 16,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.1666285396932723
+52723,Hiệp hội Blockchain Việt Nam được vinh danh trong hội thảo về FDI,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.174353381867539
+65183,GapoWork tổ chức sự kiện chia sẻ bí quyết thành công của các doanh nghiệp,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.2123463815640236
+182536,"Đồng Nai thúc đẩy quản lý sở hữu trí tuệ, nâng tầm thương hiệu số doanh nghiệp",Khoa học công nghệ,Khoa học,Kinh doanh,False,1.241997785360324
+182639,Nâng tầm dịch vụ khách hàng với giải pháp Tổng đài đa kênh VNPT Call Center,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.3049345333002496
+65091,Chuỗi cà phê gần 900 cửa hàng triển khai thanh toán số,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.4168410424963995
+52963,Giá Bitcoin tăng vọt sau khi ông Trump hoãn áp thuế 90 ngày,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.5112014574641788
+184484,Công ty nội thất Thụy Điển 'nhảy vọt' nhờ dữ liệu và trí tuệ nhân tạo,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.519786860605373
+182964,'Mỏ vàng' 6 triệu khách hàng chờ Tổng công ty VTC khai phá,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.5259734275992063
+58037,Chuỗi bán lẻ di động 'ngấm đòn' Covid-19,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.5359301194542667
+182087,CMC Consulting bổ nhiệm Tổng Giám đốc điều hành mới,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.5728831145251276
+63926,Apple vừa bị thổi bay 174 tỉ USD giá trị,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.6056920324106485
+181455,Viettel Global lãi ròng 2.389 tỷ đồng,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.665936108150683
+62610,iPhone 14 series thống lĩnh kệ hàng nửa đầu năm 2023,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.6944921928847334
+59254,'Logistics tùy chỉnh' mở đường tăng tốc cho thương mại điện tử,Khoa học công nghệ,Khoa học,Kinh doanh,False,1.771088515805578
+53033,"Giá Bitcoin hôm nay 16.12.2025: BTC sập sâu, nhà đầu tư tháo chạy",Khoa học công nghệ,Khoa học,Kinh doanh,False,1.8280712590310184
+182421,Chuyển đổi số - ‘chìa khóa’ mở cánh cửa bứt phá cho kinh tế tư nhân Việt Nam,Khoa học công nghệ,Khoa học,Kinh doanh,False,2.1461814425576837

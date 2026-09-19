@@ -45,6 +45,12 @@ class News(Base):
         nullable=False,
     )
 
+    content_source: Mapped[str] = mapped_column(
+        String(20),
+        nullable=False,
+        server_default="rss_fallback",
+    )
+
     source: Mapped[str] = mapped_column(
         String(100),
         nullable=False,

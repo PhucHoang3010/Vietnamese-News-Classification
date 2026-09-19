@@ -1,0 +1,22 @@
+{
+  "dataset": "data/processed/test.csv",
+  "samples": 487,
+  "accuracy": 0.8275154004106776,
+  "model": "p2_linear_svm_balanced.joblib",
+  "vectorizer": "p2_tfidf_vectorizer.joblib",
+  "classes": [
+    "Công đoàn",
+    "Giáo dục",
+    "Giải trí",
+    "Khoa học",
+    "Kinh doanh",
+    "Pháp luật",
+    "Sức khỏe",
+    "Thế giới",
+    "Thể thao",
+    "Thời sự",
+    "Xe",
+    "Xã hội",
+    "Đời sống"
+  ]
+}
