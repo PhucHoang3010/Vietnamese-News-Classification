@@ -65,3 +65,5 @@ logs/
 !models/p2_linear_svm_balanced.joblib
 !models/p2_tfidf_vectorizer.joblib
 !models/p2_model_metadata.json
+
+FINAL_QA.ps1
