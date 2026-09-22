@@ -1,0 +1,144 @@
+{
+  "production_model": {
+    "model": "Linear SVM — Balanced",
+    "class_weight": "balanced",
+    "macro_f1": 0.71359563750333,
+    "accuracy": 0.8501026694045175
+  },
+  "validation": {
+    "accuracy": 0.8501026694045175,
+    "macro_f1": 0.71359563750333
+  },
+  "test": {
+    "samples": 487,
+    "accuracy": 0.8069815195071869,
+    "precision_macro": 0.6853418453373575,
+    "recall_macro": 0.7132097156274195,
+    "macro_f1": 0.6871066933119706,
+    "weighted_f1": 0.8004299483355166
+  },
+  "classes": [
+    "Công đoàn",
+    "Giáo dục",
+    "Giải trí",
+    "Khoa học",
+    "Kinh doanh",
+    "Pháp luật",
+    "Sức khỏe",
+    "Thế giới",
+    "Thể thao",
+    "Thời sự",
+    "Xe",
+    "Xã hội",
+    "Đời sống"
+  ],
+  "top_confusion_pairs": [
+    {
+      "count": 14,
+      "true_class": "Kinh doanh",
+      "predicted_class": "Khoa học"
+    },
+    {
+      "count": 4,
+      "true_class": "Đời sống",
+      "predicted_class": "Pháp luật"
+    },
+    {
+      "count": 4,
+      "true_class": "Đời sống",
+      "predicted_class": "Khoa học"
+    },
+    {
+      "count": 3,
+      "true_class": "Thời sự",
+      "predicted_class": "Pháp luật"
+    },
+    {
+      "count": 3,
+      "true_class": "Thời sự",
+      "predicted_class": "Khoa học"
+    },
+    {
+      "count": 3,
+      "true_class": "Thế giới",
+      "predicted_class": "Sức khỏe"
+    },
+    {
+      "count": 3,
+      "true_class": "Thế giới",
+      "predicted_class": "Khoa học"
+    },
+    {
+      "count": 3,
+      "true_class": "Kinh doanh",
+      "predicted_class": "Đời sống"
+    },
+    {
+      "count": 3,
+      "true_class": "Kinh doanh",
+      "predicted_class": "Công đoàn"
+    },
+    {
+      "count": 2,
+      "true_class": "Đời sống",
+      "predicted_class": "Thời sự"
+    },
+    {
+      "count": 2,
+      "true_class": "Đời sống",
+      "predicted_class": "Kinh doanh"
+    },
+    {
+      "count": 2,
+      "true_class": "Đời sống",
+      "predicted_class": "Giải trí"
+    },
+    {
+      "count": 2,
+      "true_class": "Thời sự",
+      "predicted_class": "Đời sống"
+    },
+    {
+      "count": 2,
+      "true_class": "Thời sự",
+      "predicted_class": "Xã hội"
+    },
+    {
+      "count": 2,
+      "true_class": "Thời sự",
+      "predicted_class": "Kinh doanh"
+    }
+  ],
+  "ablation": [
+    {
+      "stage": "E0",
+      "component": "Raw baseline",
+      "macro_f1": 0.7062
+    },
+    {
+      "stage": "E1",
+      "component": "+ Underthesea",
+      "macro_f1": 0.7129
+    },
+    {
+      "stage": "E2",
+      "component": "+ Vietnamese stopwords",
+      "macro_f1": 0.7107
+    },
+    {
+      "stage": "E3",
+      "component": "+ TF-IDF tuning",
+      "macro_f1": 0.7232
+    },
+    {
+      "stage": "E4",
+      "component": "+ Classifier tuning",
+      "macro_f1": 0.7381
+    },
+    {
+      "stage": "E5",
+      "component": "Final configuration",
+      "macro_f1": 0.7381
+    }
+  ]
+}

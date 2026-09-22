@@ -1,0 +1,7 @@
+﻿stage,component,macro_f1
+E0,Raw baseline,0.7062
+E1,+ Underthesea,0.7129
+E2,+ Vietnamese stopwords,0.7107
+E3,+ TF-IDF tuning,0.7232
+E4,+ Classifier tuning,0.7381
+E5,Final configuration,0.7381
