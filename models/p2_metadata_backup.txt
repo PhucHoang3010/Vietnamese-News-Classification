@@ -1,0 +1,62 @@
+﻿{
+  "project": "Vietnamese News Classification & Trend Analytics Platform",
+  "dataset_version": "uvn1-v1.0.0",
+  "random_seed": 42,
+
+  "preprocessing": {
+    "tokenization": "Underthesea",
+    "stopwords": "Vietnamese custom stopwords",
+    "stopwords_count": 145,
+    "punctuation_removal": true,
+    "lowercase": false
+  },
+
+  "tfidf": {
+    "ngram_range": [
+      1,
+      2
+    ],
+    "min_df": 1,
+    "sublinear_tf": false,
+    "lowercase": false,
+    "feature_count": 379168
+  },
+
+  "model": {
+    "type": "LinearSVC",
+    "class_weight": "balanced"
+  },
+
+  "training": {
+    "train_samples": 2272,
+    "validation_samples": 487,
+    "classes": [
+      "CÃ´ng Ä‘oÃ n",
+      "GiÃ¡o dá»¥c",
+      "Giáº£i trÃ­",
+      "Khoa há»c",
+      "Kinh doanh",
+      "PhÃ¡p luáº­t",
+      "Sá»©c khá»e",
+      "Tháº¿ giá»›i",
+      "Thá»ƒ thao",
+      "Thá»i sá»±",
+      "Xe",
+      "XÃ£ há»™i",
+      "Äá»i sá»‘ng"
+    ]
+  },
+
+  "frozen_validation_reference": {
+    "accuracy": 0.8665,
+    "macro_f1": 0.7381,
+    "weighted_f1": 0.8593
+  },
+
+  "test_status": "LOCKED",
+
+  "artifacts": {
+    "vectorizer": "models\\p2_tfidf_vectorizer.joblib",
+    "model": "models\\p2_linear_svm_balanced.joblib"
+  }
+}

@@ -1,0 +1,1250 @@
+"""
+Vietnamese keyword extraction for the News Intelligence layer.
+
+Version: v0.4.1
+
+Design:
+    Article
+      -> candidate n-grams (1..4)
+      -> TF-IDF relevance
+      -> corpus association (PMI)
+      -> phrase quality
+      -> frequency/title signals
+      -> nested/redundancy reduction
+      -> final ranked keywords
+
+Notes:
+- This module is independent from the frozen P2 production classifier.
+- It is designed to be fitted on the current news corpus before extraction.
+- No database access is performed here.
+"""
+
+from __future__ import annotations
+
+import math
+import re
+from collections import Counter
+from pathlib import Path
+from typing import Iterable
+
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+
+
+class VietnameseKeywordExtractor:
+    """
+    Corpus-aware Vietnamese keyword extractor.
+
+    Public API kept intentionally simple and compatible with the test script:
+
+        extractor = VietnameseKeywordExtractor()
+        extractor.fit(documents)
+        keywords = extractor.extract(text, top_k=10, title=title)
+
+    Returned keyword dictionaries contain at least:
+        phrase
+        ngram
+        freq
+        tfidf
+        score
+
+    Additional diagnostics:
+        pmi
+        association_boost
+        phrase_quality
+        frequency_boost
+        title_boost
+    """
+
+    VERSION = "v0.4.1"
+
+    # 1..4 grams: allowing 4-grams matters for phrases such as
+    # "ngoại trú tối đa" and "iPhone 18 Pro Max", which were being
+    # fragmented by the previous 1..3-gram implementation.
+    NGRAM_RANGE = (1, 4)
+
+    # Score contribution by phrase length.
+    PHRASE_WEIGHTS = {
+        1: 0.45,
+        2: 1.00,
+        3: 1.08,
+        4: 1.03,
+    }
+
+    # A modest title signal. The title is useful, but should not dominate.
+    TITLE_BOOST_VALUE = 1.20
+
+    # Corpus phrase association:
+    # factor ~= 0.70 for weak association and up to 1.35 for strong association.
+    PMI_LOW = -1.5
+    PMI_HIGH = 10.0
+    ASSOCIATION_MIN = 0.70
+    ASSOCIATION_MAX = 1.35
+
+    # Keep the number of raw candidates bounded for predictable performance.
+    MAX_CANDIDATES = 250
+
+    # Tokenization deliberately preserves Vietnamese accents, digits,
+    # mixed alphanumeric terms, and common tech punctuation.
+    TOKEN_RE = re.compile(
+        r"\b[\wÀ-ỹ]+(?:[./:&+#-][\wÀ-ỹ]+)*\b",
+        re.UNICODE,
+    )
+
+    # A small fallback set only. The project stopword file remains the
+    # primary source whenever it can be found.
+    FALLBACK_STOPWORDS = {
+        "và", "là", "của", "cho", "với", "trong", "một", "những",
+        "các", "được", "để", "khi", "theo", "từ", "tại", "trên",
+        "vào", "ra", "này", "đó", "như", "có", "không", "đã", "sẽ",
+        "bị", "do", "nên", "mà", "hay", "hoặc", "rất", "còn", "đang",
+        "thì", "lại", "cùng", "sau", "trước", "qua", "đến", "về",
+        "bởi", "hơn", "nhất", "nhiều", "ít", "từng", "mỗi", "mọi",
+    }
+
+    def __init__(
+        self,
+        stopwords_path: str | Path | None = None,
+        *,
+        min_df: int = 1,
+        max_df: float = 0.90,
+    ) -> None:
+        self.stopwords_path = (
+            Path(stopwords_path)
+            if stopwords_path is not None
+            else None
+        )
+
+        self.min_df = min_df
+        self.max_df = max_df
+
+        self.stopwords = self._load_stopwords()
+
+        self.vectorizer = TfidfVectorizer(
+            analyzer="word",
+            token_pattern=self.TOKEN_RE.pattern,
+            lowercase=False,
+            ngram_range=self.NGRAM_RANGE,
+            min_df=self.min_df,
+            max_df=self.max_df,
+            sublinear_tf=True,
+            norm="l2",
+        )
+
+        self._fitted = False
+        self.documents_count = 0
+        self.total_tokens = 0
+
+        self.unigram_counts: Counter[str] = Counter()
+        self.bigram_counts: Counter[tuple[str, str]] = Counter()
+        self.trigram_counts: Counter[tuple[str, str, str]] = Counter()
+        self.fourgram_counts: Counter[tuple[str, str, str, str]] = Counter()
+
+        self.total_bigrams = 0
+        self.total_trigrams = 0
+        self.total_fourgrams = 0
+
+        self._vocabulary: dict[str, int] = {}
+        self._feature_names: np.ndarray | None = None
+
+    # ------------------------------------------------------------------
+    # Public helpers
+    # ------------------------------------------------------------------
+
+    @property
+    def fitted(self) -> bool:
+        """Whether corpus fitting has completed successfully."""
+        return self._fitted
+
+    @property
+    def stats(self) -> dict[str, int | str]:
+        """Compact extractor state for diagnostics."""
+        return {
+            "version": self.VERSION,
+            "documents": self.documents_count,
+            "total_tokens": self.total_tokens,
+            "unigrams": len(self.unigram_counts),
+            "bigrams": len(self.bigram_counts),
+            "trigrams": len(self.trigram_counts),
+            "fourgrams": len(self.fourgram_counts),
+            "fitted": int(self._fitted),
+        }
+
+    # ------------------------------------------------------------------
+    # Stopwords / normalization
+    # ------------------------------------------------------------------
+
+    def _candidate_stopword_paths(self) -> list[Path]:
+        root = Path.cwd().resolve()
+
+        return [
+            root / "data" / "stopwords.txt",
+            root / "data" / "stopwords" / "stopwords.txt",
+            root / "data" / "processed" / "stopwords.txt",
+            root / "data" / "raw" / "stopwords.txt",
+            root / "src" / "intelligence" / "stopwords.txt",
+            root / "src" / "intelligence" / "data" / "stopwords.txt",
+        ]
+
+    def _load_stopwords(self) -> set[str]:
+        paths: list[Path] = []
+
+        if self.stopwords_path is not None:
+            paths.append(self.stopwords_path)
+
+        paths.extend(self._candidate_stopword_paths())
+
+        for path in paths:
+            try:
+                if not path.is_file():
+                    continue
+
+                words: set[str] = set()
+
+                with path.open(
+                    "r",
+                    encoding="utf-8",
+                ) as handle:
+                    for raw_line in handle:
+                        line = raw_line.strip()
+
+                        if not line:
+                            continue
+
+                        # Support one stopword per line and whitespace-separated
+                        # lists without forcing a specific file format.
+                        for item in line.split():
+                            words.add(
+                                item.strip().lower()
+                            )
+
+                if words:
+                    return words
+
+            except (OSError, UnicodeError):
+                continue
+
+        return set(self.FALLBACK_STOPWORDS)
+
+    @staticmethod
+    def _normalize_token(token: str) -> str:
+        token = token.replace("_", " ")
+        token = token.strip(" \t\r\n,.;:!?\"'`()[]{}<>“”‘’")
+        return token.strip().lower()
+
+    def _tokenize(self, text: str) -> list[str]:
+        if not text:
+            return []
+
+        text = text.replace("\u00a0", " ")
+        text = text.replace("_", " ")
+
+        raw_tokens = self.TOKEN_RE.findall(text)
+
+        tokens: list[str] = []
+
+        for raw in raw_tokens:
+            token = raw.strip()
+
+            if not token:
+                continue
+
+            normalized = self._normalize_token(token)
+
+            if not normalized:
+                continue
+
+            tokens.append(token)
+
+        return tokens
+
+    def _is_stopword(self, token: str) -> bool:
+        return self._normalize_token(token) in self.stopwords
+
+    @staticmethod
+    def _is_numeric(token: str) -> bool:
+        compact = token.replace(",", "").replace(".", "")
+        return compact.isdigit()
+
+    @staticmethod
+    def _has_letters(token: str) -> bool:
+        return any(ch.isalpha() for ch in token)
+
+    @staticmethod
+    def _looks_like_entity_token(token: str) -> bool:
+        # Mixed alphanumeric tokens (iPhone18, 5G, B2B, etc.) are usually
+        # informative and should not be treated as ordinary stop-like words.
+        if any(ch.isdigit() for ch in token) and any(
+            ch.isalpha() for ch in token
+        ):
+            return True
+
+        letters = [ch for ch in token if ch.isalpha()]
+
+        if not letters:
+            return False
+
+        return token[:1].isupper()
+
+    # ------------------------------------------------------------------
+    # Corpus fitting
+    # ------------------------------------------------------------------
+
+    def fit(
+        self,
+        documents: Iterable[str],
+    ) -> "VietnameseKeywordExtractor":
+        """
+        Fit TF-IDF and corpus n-gram statistics.
+
+        Fitting is required before extract().
+        """
+        documents_list = [
+            str(doc).strip()
+            for doc in documents
+            if doc is not None and str(doc).strip()
+        ]
+
+        if not documents_list:
+            raise ValueError(
+                "Cannot fit keyword extractor on an empty corpus."
+            )
+
+        self.documents_count = len(documents_list)
+
+        print(
+            f"[KeywordExtractor {self.VERSION}] fitting "
+            f"{self.documents_count} documents...",
+            flush=True,
+        )
+
+        self.vectorizer.fit(documents_list)
+
+        self._vocabulary = dict(
+            self.vectorizer.vocabulary_
+        )
+        self._feature_names = self.vectorizer.get_feature_names_out()
+
+        # Reset counts so fit() can safely be called more than once.
+        self.total_tokens = 0
+
+        self.unigram_counts.clear()
+        self.bigram_counts.clear()
+        self.trigram_counts.clear()
+        self.fourgram_counts.clear()
+
+        for document in documents_list:
+            tokens = [
+                self._normalize_token(token)
+                for token in self._tokenize(document)
+            ]
+
+            tokens = [
+                token
+                for token in tokens
+                if token
+            ]
+
+            self.total_tokens += len(tokens)
+
+            if not tokens:
+                continue
+
+            self.unigram_counts.update(tokens)
+
+            if len(tokens) >= 2:
+                self.bigram_counts.update(
+                    zip(
+                        tokens,
+                        tokens[1:],
+                    )
+                )
+
+            if len(tokens) >= 3:
+                self.trigram_counts.update(
+                    zip(
+                        tokens,
+                        tokens[1:],
+                        tokens[2:],
+                    )
+                )
+
+            if len(tokens) >= 4:
+                self.fourgram_counts.update(
+                    zip(
+                        tokens,
+                        tokens[1:],
+                        tokens[2:],
+                        tokens[3:],
+                    )
+                )
+
+        self.total_bigrams = max(
+            self.total_tokens - self.documents_count,
+            0,
+        )
+
+        self.total_trigrams = max(
+            self.total_tokens - 2 * self.documents_count,
+            0,
+        )
+
+        self.total_fourgrams = max(
+            self.total_tokens - 3 * self.documents_count,
+            0,
+        )
+
+        self._fitted = True
+
+        return self
+
+    # ------------------------------------------------------------------
+    # TF-IDF
+    # ------------------------------------------------------------------
+
+    def _get_tfidf_scores(
+        self,
+        text: str,
+    ) -> dict[str, float]:
+        """Return sparse TF-IDF scores for all features present in text."""
+        if not self._fitted:
+            raise RuntimeError(
+                "Extractor has not been fitted. "
+                "Call fit(documents) first."
+            )
+
+        matrix = self.vectorizer.transform(
+            [text]
+        )
+
+        if matrix.nnz == 0:
+            return {}
+
+        scores: dict[str, float] = {}
+
+        row = matrix.getrow(0)
+
+        for index, value in zip(
+            row.indices,
+            row.data,
+        ):
+            feature = self._feature_names[index]
+
+            scores[feature] = float(
+                value
+            )
+
+        return scores
+
+    # ------------------------------------------------------------------
+    # Candidate generation
+    # ------------------------------------------------------------------
+
+    def _candidate_is_valid(
+        self,
+        tokens: tuple[str, ...],
+    ) -> bool:
+        n = len(tokens)
+
+        if n < 1:
+            return False
+
+        # Phrase boundaries should not be stopwords.
+        if self._is_stopword(tokens[0]):
+            return False
+
+        if self._is_stopword(tokens[-1]):
+            return False
+
+        # Reject phrases made entirely from stopwords/numbers.
+        if all(
+            self._is_stopword(token)
+            for token in tokens
+        ):
+            return False
+
+        if all(
+            self._is_numeric(token)
+            for token in tokens
+        ):
+            return False
+
+        # A one-character alphabetic unigram is usually noise in news text.
+        if n == 1:
+            token = tokens[0]
+
+            if len(
+                self._normalize_token(token)
+            ) <= 1:
+                if not self._looks_like_entity_token(token):
+                    return False
+
+        # Very short ordinary unigrams get filtered.
+        if n == 1:
+            normalized = self._normalize_token(
+                tokens[0]
+            )
+
+            if (
+                len(normalized) <= 2
+                and not self._looks_like_entity_token(tokens[0])
+                and not any(
+                    ch.isdigit()
+                    for ch in normalized
+                )
+            ):
+                return False
+
+        # Phrases need at least one meaningful content token.
+        if not any(
+            self._has_letters(token)
+            for token in tokens
+        ):
+            return False
+
+        return True
+
+    def _generate_candidates(
+        self,
+        tokens: list[str],
+    ) -> dict[str, dict[str, object]]:
+        """
+        Generate unique 1..4 gram candidates.
+
+        Display form keeps original casing; comparison keys use lowercase.
+        """
+        candidates: dict[str, dict[str, object]] = {}
+
+        n_tokens = len(tokens)
+
+        for size in range(
+            self.NGRAM_RANGE[0],
+            self.NGRAM_RANGE[1] + 1,
+        ):
+            if n_tokens < size:
+                continue
+
+            for start in range(
+                0,
+                n_tokens - size + 1,
+            ):
+                raw_tuple = tuple(
+                    tokens[
+                        start:start + size
+                    ]
+                )
+
+                if not self._candidate_is_valid(
+                    raw_tuple
+                ):
+                    continue
+
+                normalized_tuple = tuple(
+                    self._normalize_token(token)
+                    for token in raw_tuple
+                )
+
+                key = " ".join(
+                    normalized_tuple
+                )
+
+                if not key:
+                    continue
+
+                existing = candidates.get(key)
+
+                if existing is None:
+                    candidates[key] = {
+                        "key": key,
+                        "tokens": normalized_tuple,
+                        "display": " ".join(
+                            raw_tuple
+                        ),
+                        "freq": 1,
+                        "entity_like": all(
+                            self._looks_like_entity_token(token)
+                            for token in raw_tuple
+                        ) if size > 1 else self._looks_like_entity_token(raw_tuple[0]),
+                    }
+
+                else:
+                    existing["freq"] = (
+                        int(existing["freq"]) + 1
+                    )
+
+        return candidates
+
+    # ------------------------------------------------------------------
+    # Corpus association / PMI
+    # ------------------------------------------------------------------
+
+    def _pmi_for_tokens(
+        self,
+        tokens: tuple[str, ...],
+    ) -> float:
+        """
+        Compute PMI of an n-gram against the unigram marginals.
+
+        Uses corpus counts and probabilities. The formula naturally
+        generalizes to 2/3/4-grams.
+        """
+        n = len(tokens)
+
+        if n <= 1:
+            return 0.0
+
+        unigram_product = 1.0
+
+        total = max(
+            float(self.total_tokens),
+            1.0,
+        )
+
+        for token in tokens:
+            count = self.unigram_counts.get(
+                token,
+                0,
+            )
+
+            if count <= 0:
+                return self.PMI_LOW
+
+            unigram_product *= (
+                count / total
+            )
+
+        if n == 2:
+            count_ngram = self.bigram_counts.get(
+                tokens,
+                0,
+            )
+            total_ngram = max(
+                self.total_bigrams,
+                1,
+            )
+
+        elif n == 3:
+            count_ngram = self.trigram_counts.get(
+                tokens,
+                0,
+            )
+            total_ngram = max(
+                self.total_trigrams,
+                1,
+            )
+
+        elif n == 4:
+            count_ngram = self.fourgram_counts.get(
+                tokens,
+                0,
+            )
+            total_ngram = max(
+                self.total_fourgrams,
+                1,
+            )
+
+        else:
+            return self.PMI_LOW
+
+        if count_ngram <= 0:
+            return self.PMI_LOW
+
+        p_ngram = (
+            count_ngram / total_ngram
+        )
+
+        if p_ngram <= 0:
+            return self.PMI_LOW
+
+        pmi = math.log2(
+            p_ngram / unigram_product
+        )
+
+        # Avoid pathological infinities from degenerate tiny corpora.
+        if not math.isfinite(pmi):
+            return self.PMI_LOW
+
+        return pmi
+
+    def _association_boost(
+        self,
+        tokens: tuple[str, ...],
+    ) -> tuple[float, float]:
+        """
+        Map PMI to a bounded multiplicative factor.
+
+        This is intentionally stronger than the earlier 1 + pmi/10 mapping:
+        weakly associated fragments should actually lose score, while
+        coherent phrases get a visible but controlled boost.
+        """
+        if len(tokens) == 1:
+            return 1.0, 0.0
+
+        pmi = self._pmi_for_tokens(
+            tokens
+        )
+
+        clipped = max(
+            self.PMI_LOW,
+            min(
+                pmi,
+                self.PMI_HIGH,
+            ),
+        )
+
+        normalized = (
+            clipped - self.PMI_LOW
+        ) / (
+            self.PMI_HIGH - self.PMI_LOW
+        )
+
+        boost = (
+            self.ASSOCIATION_MIN
+            + normalized
+            * (
+                self.ASSOCIATION_MAX
+                - self.ASSOCIATION_MIN
+            )
+        )
+
+        return float(boost), float(pmi)
+
+    # Backward-compatible aliases used by earlier experiments.
+    def _bigram_pmi(
+        self,
+        tokens: tuple[str, str],
+    ) -> float:
+        return self._pmi_for_tokens(
+            tokens
+        )
+
+    def _trigram_pmi(
+        self,
+        tokens: tuple[str, str, str],
+    ) -> float:
+        return self._pmi_for_tokens(
+            tokens
+        )
+
+    # ------------------------------------------------------------------
+    # Phrase quality
+    # ------------------------------------------------------------------
+
+    def _phrase_quality(
+        self,
+        tokens: tuple[str, ...],
+        *,
+        entity_like: bool = False,
+    ) -> float:
+        """
+        Evaluate phrase integrity without maintaining a large hand-written
+        phrase dictionary.
+
+        Signals:
+        - content-token ratio
+        - internal stopword penalty
+        - punctuation/noise penalty
+        - entity/mixed-token bonus
+        - longer coherent phrases get a modest base advantage
+        """
+        n = len(tokens)
+
+        if not tokens:
+            return 0.0
+
+        score = 1.0
+
+        stop_internal = sum(
+            1
+            for token in tokens[1:-1]
+            if self._is_stopword(token)
+        )
+
+        if stop_internal:
+            score *= max(
+                0.72,
+                1.0 - 0.10 * stop_internal,
+            )
+
+        content_tokens = [
+            token
+            for token in tokens
+            if not self._is_stopword(token)
+        ]
+
+        content_ratio = (
+            len(content_tokens) / n
+        )
+
+        score *= (
+            0.85
+            + 0.15 * content_ratio
+        )
+
+        normalized_phrase = " ".join(
+            self._normalize_token(token)
+            for token in tokens
+        )
+
+        # Repeated punctuation or a single-letter ordinary word is weak.
+        if re.search(
+            r"[!?]{2,}|\.{2,}",
+            normalized_phrase,
+        ):
+            score *= 0.75
+
+        if n == 1:
+            token = tokens[0]
+
+            if (
+                len(
+                    self._normalize_token(token)
+                ) <= 2
+                and not self._looks_like_entity_token(token)
+            ):
+                score *= 0.60
+
+        # Named entities / product names benefit from preserving their
+        # integrity, but the boost is intentionally modest.
+        if entity_like:
+            score *= 1.08
+
+        # Slight preference for 2-4 word phrases over isolated tokens.
+        if n == 2:
+            score *= 1.02
+        elif n == 3:
+            score *= 1.04
+        elif n == 4:
+            score *= 1.03
+
+        return float(
+            max(
+                0.40,
+                min(score, 1.20),
+            )
+        )
+
+    # ------------------------------------------------------------------
+    # Score
+    # ------------------------------------------------------------------
+
+    def _frequency_boost(
+        self,
+        frequency: int,
+    ) -> float:
+        if frequency <= 0:
+            return 1.0
+
+        return float(
+            min(
+                1.24,
+                1.0
+                + 0.08 * math.log1p(
+                    frequency
+                ),
+            )
+        )
+
+    def _title_boost(
+        self,
+        phrase: str,
+        title: str | None,
+    ) -> float:
+        if not title:
+            return 1.0
+
+        phrase_norm = " ".join(
+            self._normalize_token(token)
+            for token in self._tokenize(phrase)
+        )
+
+        title_norm = " ".join(
+            self._normalize_token(token)
+            for token in self._tokenize(title)
+        )
+
+        if not phrase_norm or not title_norm:
+            return 1.0
+
+        title_tokens = title_norm.split()
+        phrase_tokens = phrase_norm.split()
+
+        phrase_len = len(
+            phrase_tokens
+        )
+
+        if phrase_len > len(title_tokens):
+            return 1.0
+
+        for i in range(
+            len(title_tokens) - phrase_len + 1
+        ):
+            if title_tokens[
+                i:i + phrase_len
+            ] == phrase_tokens:
+                return self.TITLE_BOOST_VALUE
+
+        return 1.0
+
+    def _score_candidate(
+        self,
+        *,
+        phrase: str,
+        tokens: tuple[str, ...],
+        tfidf: float,
+        frequency: int,
+        title: str | None,
+        entity_like: bool = False,
+    ) -> dict[str, object]:
+        n = len(tokens)
+
+        phrase_weight = self.PHRASE_WEIGHTS.get(
+            n,
+            1.0,
+        )
+
+        association_boost, pmi = (
+            self._association_boost(
+                tokens
+            )
+        )
+
+        phrase_quality = (
+            self._phrase_quality(
+                tokens,
+                entity_like=entity_like,
+            )
+        )
+
+        frequency_boost = (
+            self._frequency_boost(
+                frequency
+            )
+        )
+
+        title_boost = (
+            self._title_boost(
+                phrase,
+                title,
+            )
+        )
+
+        score = (
+            float(tfidf)
+            * phrase_weight
+            * association_boost
+            * phrase_quality
+            * frequency_boost
+            * title_boost
+        )
+
+        return {
+            "phrase": phrase,
+            "ngram": {
+                1: "unigram",
+                2: "bigram",
+                3: "trigram",
+                4: "fourgram",
+            }.get(n, f"{n}-gram"),
+            "freq": int(frequency),
+            "tfidf": float(tfidf),
+            "score": float(score),
+            "pmi": float(pmi),
+            "association_boost": float(
+                association_boost
+            ),
+            "phrase_quality": float(
+                phrase_quality
+            ),
+            "frequency_boost": float(
+                frequency_boost
+            ),
+            "title_boost": float(
+                title_boost
+            ),
+        }
+
+    # ------------------------------------------------------------------
+    # Redundancy reduction
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _contains_consecutive(
+        longer: tuple[str, ...],
+        shorter: tuple[str, ...],
+    ) -> bool:
+        if len(shorter) >= len(longer):
+            return False
+
+        k = len(shorter)
+
+        for i in range(
+            len(longer) - k + 1
+        ):
+            if longer[
+                i:i + k
+            ] == shorter:
+                return True
+
+        return False
+
+    @staticmethod
+    def _token_set_overlap(
+        left: tuple[str, ...],
+        right: tuple[str, ...],
+    ) -> float:
+        if not left or not right:
+            return 0.0
+
+        a = set(left)
+        b = set(right)
+
+        return len(a & b) / max(
+            len(a | b),
+            1,
+        )
+
+    def _reduce_nested_phrases(
+        self,
+        ranked: list[dict[str, object]],
+        *,
+        top_k: int,
+    ) -> list[dict[str, object]]:
+        """
+        Remove phrases that are clear subphrases of a stronger selected phrase.
+
+        This is what prevents outputs such as:
+            cá voi
+            cá voi lưng
+            voi lưng gù
+        from filling most of one article's keyword slots when a longer
+        coherent phrase is available.
+
+        Also suppresses near-duplicate candidates with very high token overlap.
+        """
+        selected: list[dict[str, object]] = []
+
+        for candidate in ranked:
+            candidate_tokens = tuple(
+                str(candidate["phrase"]).lower().split()
+            )
+
+            skip = False
+
+            for existing in selected:
+                existing_tokens = tuple(
+                    str(existing["phrase"]).lower().split()
+                )
+
+                # Stronger longer phrase contains the candidate.
+                if self._contains_consecutive(
+                    existing_tokens,
+                    candidate_tokens,
+                ):
+                    existing_score = float(
+                        existing["score"]
+                    )
+                    candidate_score = float(
+                        candidate["score"]
+                    )
+
+                    if (
+                        existing_score
+                        >= candidate_score * 0.82
+                    ):
+                        skip = True
+                        break
+
+                # Candidate is a longer phrase that is essentially the same
+                # token set; keep the stronger one only.
+                overlap = self._token_set_overlap(
+                    existing_tokens,
+                    candidate_tokens,
+                )
+
+                if (
+                    overlap >= 0.80
+                    and len(candidate_tokens)
+                    <= len(existing_tokens) + 1
+                ):
+                    skip = True
+                    break
+
+            if skip:
+                continue
+
+            selected.append(
+                candidate
+            )
+
+            if len(selected) >= top_k:
+                break
+
+        return selected
+
+    # ------------------------------------------------------------------
+    # Main extraction
+    # ------------------------------------------------------------------
+
+    def extract(
+        self,
+        text: str,
+        top_k: int = 10,
+        title: str | None = None,
+    ) -> list[dict[str, object]]:
+        """
+        Extract ranked keywords from one article.
+
+        Parameters
+        ----------
+        text:
+            Article text. The title may be included.
+        top_k:
+            Number of final keywords.
+        title:
+            Optional title used for title boosting.
+        """
+        if not self._fitted:
+            raise RuntimeError(
+                "Extractor has not been fitted. "
+                "Call fit(documents) first."
+            )
+
+        if not text or not str(text).strip():
+            return []
+
+        top_k = max(
+            int(top_k),
+            1,
+        )
+
+        text = str(text).strip()
+
+        tokens_display = self._tokenize(
+            text
+        )
+
+        if not tokens_display:
+            return []
+
+        # Candidate frequencies are measured directly from the article,
+        # while the score uses corpus-aware TF-IDF + PMI.
+        candidates = self._generate_candidates(
+            tokens_display
+        )
+
+        if not candidates:
+            return []
+
+        tfidf_scores = self._get_tfidf_scores(
+            text
+        )
+
+        raw_ranked: list[
+            dict[str, object]
+        ] = []
+
+        for key, candidate in candidates.items():
+            tokens = tuple(
+                str(token)
+                for token in candidate["tokens"]
+            )
+
+            n = len(tokens)
+
+            # Use the vectorizer's feature vocabulary where available.
+            feature_key = key
+
+            if feature_key not in self._vocabulary:
+                # This can happen if max_df/min_df filtered a feature.
+                continue
+
+            tfidf = tfidf_scores.get(
+                feature_key,
+                0.0,
+            )
+
+            if tfidf <= 0.0:
+                continue
+
+            frequency = int(
+                candidate["freq"]
+            )
+
+            scored = self._score_candidate(
+                phrase=str(
+                    candidate["display"]
+                ),
+                tokens=tokens,
+                tfidf=tfidf,
+                frequency=frequency,
+                title=title,
+                entity_like=bool(
+                    candidate["entity_like"]
+                ),
+            )
+
+            # Keep a few internal diagnostic fields useful for debugging
+            # but do not require them in the API consumer.
+            scored["_key"] = key
+            scored["_token_count"] = n
+
+            raw_ranked.append(
+                scored
+            )
+
+        if not raw_ranked:
+            return []
+
+        raw_ranked.sort(
+            key=lambda item: (
+                float(item["score"]),
+                float(item["tfidf"]),
+                int(item["freq"]),
+            ),
+            reverse=True,
+        )
+
+        raw_ranked = raw_ranked[
+            : self.MAX_CANDIDATES
+        ]
+
+        final = self._reduce_nested_phrases(
+            raw_ranked,
+            top_k=top_k,
+        )
+
+        # Remove private diagnostics from public result.
+        for item in final:
+            item.pop(
+                "_key",
+                None,
+            )
+            item.pop(
+                "_token_count",
+                None,
+            )
+
+        return final
+
+    # ------------------------------------------------------------------
+    # Optional convenience aliases
+    # ------------------------------------------------------------------
+
+    def extract_keywords(
+        self,
+        text: str,
+        top_k: int = 10,
+        title: str | None = None,
+    ) -> list[dict[str, object]]:
+        """Alias for extract()."""
+        return self.extract(
+            text=text,
+            top_k=top_k,
+            title=title,
+        )
+
+
+__all__ = [
+    "VietnameseKeywordExtractor",
+]

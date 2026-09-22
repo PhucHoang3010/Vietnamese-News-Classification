@@ -3,6 +3,7 @@
 import asyncio
 import logging
 import os
+from datetime import date
 
 import httpx
 
@@ -51,12 +52,102 @@ def get_crawl_interval_seconds() -> int:
     return interval
 
 
-async def run_crawl_once():
+def parse_iso_date(
+    value: str | None,
+) -> date | None:
+    if value is None or value == "":
+        return None
+
+    try:
+        return date.fromisoformat(value)
+    except ValueError as exc:
+        raise ValueError(
+            f"Invalid date format: {value}. "
+            "Expected YYYY-MM-DD."
+        ) from exc
+
+
+def resolve_feeds(
+    sources: list[str] | None,
+):
+    enabled_feeds = [
+        feed
+        for feed in DEFAULT_RSS_FEEDS
+        if feed.enabled
+    ]
+
+    if not sources:
+        return enabled_feeds
+
+    requested = {
+        source.strip().lower()
+        for source in sources
+        if source and source.strip()
+    }
+
+    if not requested:
+        return enabled_feeds
+
+    available = {
+        feed.name.lower(): feed
+        for feed in enabled_feeds
+    }
+
+    unknown = sorted(
+        requested - available.keys()
+    )
+
+    if unknown:
+        raise ValueError(
+            "Unknown crawler source(s): "
+            + ", ".join(unknown)
+        )
+
+    return [
+        available[name]
+        for name in sorted(requested)
+    ]
+
+
+async def run_crawl_once(
+    options: dict | None = None,
+):
+    options = options or {}
+
+    sources = options.get("sources")
+
+    from_date = parse_iso_date(
+        options.get("from_date")
+    )
+    to_date = parse_iso_date(
+        options.get("to_date")
+    )
+
+    if (
+        from_date is not None
+        and to_date is not None
+        and from_date > to_date
+    ):
+        raise ValueError(
+            "from_date must be <= to_date."
+        )
+
+    feeds = resolve_feeds(sources)
+
     prediction_api_url = get_prediction_api_url()
 
     logger.info(
-        "Starting crawl cycle | prediction_api=%s",
+        (
+            "Starting crawl cycle | "
+            "prediction_api=%s | "
+            "sources=%s | "
+            "from_date=%s | "
+            "to_date=%s"
+        ),
         prediction_api_url,
+        [feed.name for feed in feeds],
+        from_date,
+        to_date,
     )
 
     async with create_fetcher() as fetcher:
@@ -76,7 +167,9 @@ async def run_crawl_once():
                 )
 
                 stats = await crawler.crawl_feeds(
-                    DEFAULT_RSS_FEEDS
+                    feeds,
+                    from_date=from_date,
+                    to_date=to_date,
                 )
 
                 logger.info(
@@ -86,6 +179,7 @@ async def run_crawl_once():
                         "feeds_success=%d "
                         "feeds_failed=%d "
                         "articles_parsed=%d "
+                        "articles_date_filtered=%d "
                         "articles_duplicate=%d "
                         "articles_predicted=%d "
                         "articles_created=%d "
@@ -97,6 +191,7 @@ async def run_crawl_once():
                     stats.feeds_success,
                     stats.feeds_failed,
                     stats.articles_parsed,
+                    stats.articles_date_filtered,
                     stats.articles_duplicate,
                     stats.articles_predicted,
                     stats.articles_created,
@@ -126,7 +221,10 @@ async def scheduled_worker(
                     "another crawl is running."
                 )
             else:
-                await control._run("scheduled")
+                await control._run(
+                    "scheduled",
+                    {},
+                )
 
         except Exception:
             logger.exception(

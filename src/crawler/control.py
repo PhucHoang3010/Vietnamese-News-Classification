@@ -14,9 +14,13 @@ logger = logging.getLogger("crawler.control")
 class CrawlerControl:
     def __init__(
         self,
-        crawl_func: Callable[[], Awaitable[object]],
+        crawl_func: Callable[
+            [dict],
+            Awaitable[object],
+        ],
     ) -> None:
         self.crawl_func = crawl_func
+
         self.token = os.getenv(
             "CRAWLER_CONTROL_TOKEN",
             "local-dev-crawler-token",
@@ -32,6 +36,7 @@ class CrawlerControl:
         self.last_finished_at = None
         self.last_error = None
         self.last_stats = None
+        self.last_options = {}
 
     def is_running(self) -> bool:
         return (
@@ -50,20 +55,35 @@ class CrawlerControl:
             "last_started_at": self.last_started_at,
             "last_finished_at": self.last_finished_at,
             "last_error": self.last_error,
+            "last_options": self.last_options,
             "last_stats": self.last_stats,
         }
 
-    async def trigger(self) -> bool:
+    async def trigger(
+        self,
+        options: dict | None = None,
+    ) -> bool:
         if self.is_running():
             return False
 
+        normalized_options = options or {}
+
         self._task = asyncio.create_task(
-            self._run("manual")
+            self._run(
+                "manual",
+                normalized_options,
+            )
         )
 
         return True
 
-    async def _run(self, source: str) -> None:
+    async def _run(
+        self,
+        source: str,
+        options: dict | None = None,
+    ) -> None:
+        options = options or {}
+
         async with self._lock:
             self.status = "running"
             self.last_run_status = "running"
@@ -74,14 +94,21 @@ class CrawlerControl:
             self.last_finished_at = None
             self.last_error = None
             self.last_stats = None
+            self.last_options = options
 
             logger.info(
-                "Crawl started from control | source=%s",
+                (
+                    "Crawl started from control | "
+                    "source=%s | options=%s"
+                ),
                 source,
+                options,
             )
 
             try:
-                stats = await self.crawl_func()
+                stats = await self.crawl_func(
+                    options
+                )
 
                 self.last_stats = {
                     key: value
@@ -91,8 +118,12 @@ class CrawlerControl:
                 self.last_run_status = "success"
 
                 logger.info(
-                    "Controlled crawl completed | source=%s",
+                    (
+                        "Controlled crawl completed | "
+                        "source=%s | options=%s"
+                    ),
                     source,
+                    options,
                 )
 
             except Exception as exc:
@@ -100,8 +131,12 @@ class CrawlerControl:
                 self.last_error = str(exc)
 
                 logger.exception(
-                    "Controlled crawl failed | source=%s",
+                    (
+                        "Controlled crawl failed | "
+                        "source=%s | options=%s"
+                    ),
                     source,
+                    options,
                 )
 
             finally:
@@ -110,7 +145,10 @@ class CrawlerControl:
                     timezone.utc
                 ).isoformat()
 
-    def _authorized(self, headers: dict[str, str]) -> bool:
+    def _authorized(
+        self,
+        headers: dict[str, str],
+    ) -> bool:
         return (
             headers.get("x-crawler-token", "")
             == self.token
@@ -130,11 +168,15 @@ class CrawlerControl:
         status_text = {
             200: "OK",
             202: "Accepted",
+            400: "Bad Request",
             401: "Unauthorized",
             404: "Not Found",
             405: "Method Not Allowed",
             409: "Conflict",
-        }.get(status_code, "Error")
+        }.get(
+            status_code,
+            "Error",
+        )
 
         response = (
             f"HTTP/1.1 {status_code} {status_text}\r\n"
@@ -146,12 +188,41 @@ class CrawlerControl:
 
         writer.write(response + body)
         await writer.drain()
+
         writer.close()
 
         try:
             await writer.wait_closed()
         except Exception:
             pass
+
+    @staticmethod
+    async def _read_body(
+        reader: asyncio.StreamReader,
+        headers: dict[str, str],
+    ) -> bytes:
+        raw_length = headers.get(
+            "content-length",
+            "0",
+        )
+
+        try:
+            content_length = int(raw_length)
+        except ValueError:
+            content_length = 0
+
+        if content_length <= 0:
+            return b""
+
+        if content_length > 100_000:
+            raise ValueError(
+                "Request body is too large."
+            )
+
+        return await asyncio.wait_for(
+            reader.readexactly(content_length),
+            timeout=5,
+        )
 
     async def handle_client(
         self,
@@ -180,7 +251,7 @@ class CrawlerControl:
             if len(parts) < 2:
                 await self._write_response(
                     writer,
-                    404,
+                    400,
                     {"detail": "Invalid request"},
                 )
                 return
@@ -196,7 +267,11 @@ class CrawlerControl:
                     timeout=5,
                 )
 
-                if line in (b"\r\n", b"\n", b""):
+                if line in (
+                    b"\r\n",
+                    b"\n",
+                    b"",
+                ):
                     break
 
                 decoded = line.decode(
@@ -209,9 +284,10 @@ class CrawlerControl:
                         ":",
                         1,
                     )
-                    headers[key.strip().lower()] = (
-                        value.strip()
-                    )
+
+                    headers[
+                        key.strip().lower()
+                    ] = value.strip()
 
             if not self._authorized(headers):
                 await self._write_response(
@@ -230,7 +306,44 @@ class CrawlerControl:
                 return
 
             if method == "POST" and path == "/run":
-                accepted = await self.trigger()
+                body = await self._read_body(
+                    reader,
+                    headers,
+                )
+
+                options = {}
+
+                if body:
+                    try:
+                        options = json.loads(
+                            body.decode("utf-8")
+                        )
+
+                        if not isinstance(
+                            options,
+                            dict,
+                        ):
+                            raise ValueError(
+                                "Request body must be a JSON object."
+                            )
+
+                    except (
+                        json.JSONDecodeError,
+                        UnicodeDecodeError,
+                        ValueError,
+                    ) as exc:
+                        await self._write_response(
+                            writer,
+                            400,
+                            {
+                                "detail": str(exc),
+                            },
+                        )
+                        return
+
+                accepted = await self.trigger(
+                    options
+                )
 
                 if not accepted:
                     await self._write_response(
@@ -253,6 +366,7 @@ class CrawlerControl:
                         "detail": (
                             "Crawler run started."
                         ),
+                        "options": options,
                     },
                 )
                 return
@@ -267,12 +381,3 @@ class CrawlerControl:
             logger.exception(
                 "Crawler control request failed."
             )
-
-            try:
-                await self._write_response(
-                    writer,
-                    404,
-                    {"detail": "Request failed"},
-                )
-            except Exception:
-                pass

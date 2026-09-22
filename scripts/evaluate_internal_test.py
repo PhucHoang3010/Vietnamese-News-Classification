@@ -1,5 +1,11 @@
 from pathlib import Path
+import sys
 import json
+
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
 
 import joblib
 import pandas as pd
@@ -9,21 +15,24 @@ from sklearn.metrics import (
     confusion_matrix,
 )
 
-from underthesea import word_tokenize
+from src.predictor.preprocessing import (
+    load_stopwords,
+    preprocess_text,
+)
 
 
-MODEL_PATH = Path("models/p2_linear_svm_balanced.joblib")
-VECTORIZER_PATH = Path("models/p2_tfidf_vectorizer.joblib")
-INPUT = Path("data/processed/test.csv")
+MODEL_PATH = PROJECT_ROOT / "models" / "p2_linear_svm_balanced.joblib"
+VECTORIZER_PATH = PROJECT_ROOT / "models" / "p2_tfidf_vectorizer.joblib"
+INPUT = PROJECT_ROOT / "data" / "processed" / "test.csv"
 
-OUTPUT_DIR = Path("reports/internal")
+OUTPUT_DIR = PROJECT_ROOT / "reports" / "internal"
+STOPWORDS_PATH = PROJECT_ROOT / "data" / "stopwords_vi.txt"
+
+stopwords = load_stopwords(
+    STOPWORDS_PATH
+)
+
 OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-
-
-def preprocess(text):
-    text = str(text)
-    tokens = word_tokenize(text)
-    return " ".join(tokens)
 
 
 print("=" * 80)
@@ -57,7 +66,12 @@ print(y_true.value_counts().sort_index().to_string())
 
 print("\nPreprocessing test data...")
 
-texts = df["text"].fillna("").map(preprocess)
+texts = df["text"].fillna("").map(
+    lambda text: preprocess_text(
+        text,
+        stopwords,
+    )
+)
 
 X = vectorizer.transform(texts)
 

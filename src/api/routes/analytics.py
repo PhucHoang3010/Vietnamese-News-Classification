@@ -18,8 +18,10 @@ def build_filters(
     from_date: date | None,
     to_date: date | None,
     category: str | None,
+    source: str | None,
     content_source: str | None,
 ):
+
     trend_date = cast(
         func.coalesce(
             News.published_at,
@@ -39,20 +41,21 @@ def build_filters(
     if category:
         conditions.append(News.category == category)
 
+    if source:
+        conditions.append(News.source == source)
+
     if content_source:
         conditions.append(News.content_source == content_source)
 
     return trend_date, conditions
 
 
-@router.get(
-    "/summary",
-    summary="Get news analytics summary",
-)
+@router.get("/summary")
 async def analytics_summary(
     from_date: date | None = Query(default=None),
     to_date: date | None = Query(default=None),
     category: str | None = Query(default=None),
+    source: str | None = Query(default=None),
     content_source: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):
@@ -60,6 +63,7 @@ async def analytics_summary(
         from_date,
         to_date,
         category,
+        source,
         content_source,
     )
 
@@ -71,13 +75,15 @@ async def analytics_summary(
 
     total_categories = (
         await db.scalar(
-            select(func.count(distinct(News.category))).where(*conditions)
+            select(func.count(distinct(News.category)))
+            .where(*conditions)
         )
     ) or 0
 
     total_sources = (
         await db.scalar(
-            select(func.count(distinct(News.source))).where(*conditions)
+            select(func.count(distinct(News.source)))
+            .where(*conditions)
         )
     ) or 0
 
@@ -111,14 +117,12 @@ async def analytics_summary(
     }
 
 
-@router.get(
-    "/categories",
-    summary="Get article count by category",
-)
+@router.get("/categories")
 async def analytics_categories(
     from_date: date | None = Query(default=None),
     to_date: date | None = Query(default=None),
     category: str | None = Query(default=None),
+    source: str | None = Query(default=None),
     content_source: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):
@@ -126,6 +130,7 @@ async def analytics_categories(
         from_date,
         to_date,
         category,
+        source,
         content_source,
     )
 
@@ -172,14 +177,12 @@ async def analytics_categories(
     }
 
 
-@router.get(
-    "/daily",
-    summary="Get daily news trend",
-)
+@router.get("/daily")
 async def analytics_daily(
     from_date: date | None = Query(default=None),
     to_date: date | None = Query(default=None),
     category: str | None = Query(default=None),
+    source: str | None = Query(default=None),
     content_source: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):
@@ -187,6 +190,7 @@ async def analytics_daily(
         from_date,
         to_date,
         category,
+        source,
         content_source,
     )
 
@@ -213,14 +217,12 @@ async def analytics_daily(
     }
 
 
-@router.get(
-    "/sources",
-    summary="Get article count by source",
-)
+@router.get("/sources")
 async def analytics_sources(
     from_date: date | None = Query(default=None),
     to_date: date | None = Query(default=None),
     category: str | None = Query(default=None),
+    source: str | None = Query(default=None),
     content_source: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):
@@ -228,6 +230,7 @@ async def analytics_sources(
         from_date,
         to_date,
         category,
+        source,
         content_source,
     )
 
@@ -254,14 +257,12 @@ async def analytics_sources(
     }
 
 
-@router.get(
-    "/content-sources",
-    summary="Get fulltext and RSS fallback statistics",
-)
+@router.get("/content-sources")
 async def analytics_content_sources(
     from_date: date | None = Query(default=None),
     to_date: date | None = Query(default=None),
     category: str | None = Query(default=None),
+    source: str | None = Query(default=None),
     content_source: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):
@@ -269,6 +270,7 @@ async def analytics_content_sources(
         from_date,
         to_date,
         category,
+        source,
         content_source,
     )
 
@@ -295,14 +297,12 @@ async def analytics_content_sources(
     }
 
 
-@router.get(
-    "/trend-by-category",
-    summary="Get daily news trend grouped by category",
-)
+@router.get("/trend-by-category")
 async def analytics_trend_by_category(
     from_date: date | None = Query(default=None),
     to_date: date | None = Query(default=None),
     category: str | None = Query(default=None),
+    source: str | None = Query(default=None),
     content_source: str | None = Query(default=None),
     db: AsyncSession = Depends(get_db),
 ):
@@ -310,6 +310,7 @@ async def analytics_trend_by_category(
         from_date,
         to_date,
         category,
+        source,
         content_source,
     )
 
@@ -351,14 +352,12 @@ async def analytics_trend_by_category(
     }
 
 
-@router.get(
-    "/recent",
-    summary="Get recently classified news",
-)
+@router.get("/recent")
 async def analytics_recent(
     from_date: date | None = Query(default=None),
     to_date: date | None = Query(default=None),
     category: str | None = Query(default=None),
+    source: str | None = Query(default=None),
     content_source: str | None = Query(default=None),
     limit: int = Query(default=20, ge=1, le=100),
     db: AsyncSession = Depends(get_db),
@@ -380,6 +379,9 @@ async def analytics_recent(
 
     if category:
         conditions.append(News.category == category)
+
+    if source:
+        conditions.append(News.source == source)
 
     if content_source:
         conditions.append(News.content_source == content_source)

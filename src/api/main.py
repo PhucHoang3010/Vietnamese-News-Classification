@@ -7,6 +7,7 @@ from fastapi.responses import JSONResponse
 from src.api.routes.prediction import router as prediction_router
 from src.api.routes.analytics import router as analytics_router
 from src.api.routes.crawler_control import router as crawler_router
+from src.api.routes.intelligence import router as intelligence_router
 from src.db.database import check_db_connection
 from src.predictor.predictor import VietnameseNewsPredictor
 
@@ -40,6 +41,8 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:5173",
         "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
     ],
     allow_credentials=True,
     allow_methods=["*"],
@@ -79,6 +82,9 @@ async def health():
 app.include_router(prediction_router)
 app.include_router(analytics_router)
 app.include_router(crawler_router)
+app.include_router(intelligence_router)
+
+
 
 
 

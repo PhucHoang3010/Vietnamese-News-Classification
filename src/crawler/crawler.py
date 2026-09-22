@@ -1,23 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
+from datetime import date
 
-from src.crawler.article_fetcher import (
-    AsyncArticleFetcher,
-)
+from src.crawler.article_fetcher import AsyncArticleFetcher
 from src.crawler.config import RSSFeedConfig
-from src.crawler.fetcher import (
-    AsyncRSSFetcher,
-    FetchError,
-)
-from src.crawler.prediction_client import (
-    NewsPredictionClient,
-)
+from src.crawler.fetcher import AsyncRSSFetcher, FetchError
+from src.crawler.prediction_client import NewsPredictionClient
 from src.crawler.rss_parser import parse_rss
-from src.db.deduplication import (
-    generate_content_hash,
-    normalize_url,
-)
+from src.db.deduplication import generate_content_hash, normalize_url
 from src.db.repository import NewsRepository
 
 
@@ -28,6 +19,7 @@ class CrawlStats:
     feeds_failed: int = 0
 
     articles_parsed: int = 0
+    articles_date_filtered: int = 0
     articles_skipped: int = 0
     articles_duplicate: int = 0
     articles_predicted: int = 0
@@ -47,18 +39,15 @@ class RSSCrawler:
           ↓
         Parse
           ↓
-        URL deduplication
+        Date filter
+          ↓
+        URL/content deduplication
           ↓
         Fetch full article HTML
-          ↓
-        Extract full content
           ↓
         FastAPI /predict/batch
           ↓
         PostgreSQL
-
-    RSS is used for article discovery.
-    The actual article page is used for ML content.
     """
 
     def __init__(
@@ -78,16 +67,44 @@ class RSSCrawler:
             max_content_chars=40_000,
         )
 
+    @staticmethod
+    def _in_date_range(
+        published_at,
+        from_date: date | None,
+        to_date: date | None,
+    ) -> bool:
+        """
+        Inclusive date filter.
+
+        The crawler only filters articles that are already exposed
+        by the RSS feed. It does not imply historical archive access.
+        """
+        if from_date is None and to_date is None:
+            return True
+
+        if published_at is None:
+            return False
+
+        article_date = published_at.date()
+
+        if from_date is not None and article_date < from_date:
+            return False
+
+        if to_date is not None and article_date > to_date:
+            return False
+
+        return True
+
     async def crawl_feed(
         self,
         feed: RSSFeedConfig,
         stats: CrawlStats,
+        *,
+        from_date: date | None = None,
+        to_date: date | None = None,
     ) -> None:
-
         try:
-            xml_content = await self.fetcher.fetch(
-                feed.url
-            )
+            xml_content = await self.fetcher.fetch(feed.url)
 
             articles = parse_rss(
                 xml_content,
@@ -104,18 +121,22 @@ class RSSCrawler:
         candidates = []
 
         for article in articles:
-            normalized_url = normalize_url(
-                article.url
-            )
+            if not self._in_date_range(
+                article.published_at,
+                from_date,
+                to_date,
+            ):
+                stats.articles_date_filtered += 1
+                continue
+
+            normalized_url = normalize_url(article.url)
 
             hashes = generate_content_hash(
                 article.title,
                 article.content,
             )
 
-            content_hash = hashes[
-                "content_hash"
-            ]
+            content_hash = hashes["content_hash"]
 
             # -----------------------------------------------------
             # Dedup BEFORE article fetch / ML inference
@@ -151,10 +172,8 @@ class RSSCrawler:
             for candidate in candidates
         ]
 
-        full_articles = (
-            await self.article_fetcher.fetch_many(
-                article_urls
-            )
+        full_articles = await self.article_fetcher.fetch_many(
+            article_urls
         )
 
         resolved_contents: list[str] = []
@@ -165,9 +184,7 @@ class RSSCrawler:
             full_articles,
             strict=True,
         ):
-            rss_content = (
-                candidate["article"].content
-            )
+            rss_content = candidate["article"].content
 
             if (
                 full_article is not None
@@ -176,22 +193,12 @@ class RSSCrawler:
                 resolved_contents.append(
                     full_article.content
                 )
-
                 content_sources.append("fulltext")
-
                 stats.articles_fulltext_fetched += 1
 
             else:
-                # -------------------------------------------------
-                # Safe fallback:
-                # use RSS snippet when full article cannot be fetched.
-                # -------------------------------------------------
-                resolved_contents.append(
-                    rss_content
-                )
-
+                resolved_contents.append(rss_content)
                 content_sources.append("rss_fallback")
-
                 stats.articles_fulltext_fallback += 1
 
         # ---------------------------------------------------------
@@ -211,15 +218,11 @@ class RSSCrawler:
             )
         ]
 
-        predictions = (
-            await self.prediction_client.predict_batch(
-                prediction_inputs
-            )
+        predictions = await self.prediction_client.predict_batch(
+            prediction_inputs
         )
 
-        stats.articles_predicted += (
-            len(predictions)
-        )
+        stats.articles_predicted += len(predictions)
 
         # ---------------------------------------------------------
         # Persist results
@@ -236,20 +239,10 @@ class RSSCrawler:
         ):
             article = candidate["article"]
 
-            label = prediction.get(
-                "label"
-            )
+            label = prediction.get("label")
+            score = prediction.get("score")
+            status = prediction.get("status")
 
-            score = prediction.get(
-                "score"
-            )
-
-            status = prediction.get(
-                "status"
-            )
-
-            # UNKNOWN / invalid prediction
-            # should never become a normal category.
             if (
                 status != "OK"
                 or label is None
@@ -259,42 +252,31 @@ class RSSCrawler:
                 continue
 
             news, create_status = (
-                await self.repository
-                .create_news_deduplicated(
-                    url=candidate[
-                        "normalized_url"
-                    ],
+                await self.repository.create_news_deduplicated(
+                    url=candidate["normalized_url"],
                     title=article.title,
-                    content=resolved_contents[
-                        index
-                    ],
-                    content_source=content_sources[
-                        index
-                    ],
+                    content=resolved_contents[index],
+                    content_source=content_sources[index],
                     source=article.source,
                     category=label,
-                    decision_score=float(
-                        score
-                    ),
-                    published_at=(
-                        article.published_at
-                    ),
+                    decision_score=float(score),
+                    published_at=article.published_at,
                 )
             )
 
             if create_status == "CREATED":
                 stats.articles_created += 1
 
-            elif create_status.startswith(
-                "DUPLICATE"
-            ):
+            elif create_status.startswith("DUPLICATE"):
                 stats.articles_duplicate += 1
 
     async def crawl_feeds(
         self,
         feeds: list[RSSFeedConfig],
+        *,
+        from_date: date | None = None,
+        to_date: date | None = None,
     ) -> CrawlStats:
-
         stats = CrawlStats()
 
         enabled_feeds = [
@@ -303,21 +285,15 @@ class RSSCrawler:
             if feed.enabled
         ]
 
-        stats.feeds_total = len(
-            enabled_feeds
-        )
+        stats.feeds_total = len(enabled_feeds)
 
-        # Keep one HTTP client alive for all feeds.
         async with self.article_fetcher:
-
-            # -----------------------------------------------------
-            # Feed isolation:
-            # one failed feed must not stop other feeds.
-            # -----------------------------------------------------
             for feed in enabled_feeds:
                 await self.crawl_feed(
                     feed,
                     stats,
+                    from_date=from_date,
+                    to_date=to_date,
                 )
 
         return stats

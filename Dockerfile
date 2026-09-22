@@ -31,4 +31,4 @@ COPY models/p2_model_metadata.json ./models/p2_model_metadata.json
 
 EXPOSE 8000
 
-CMD ["./docker/entrypoint.sh", "uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["/bin/sh", "./docker/entrypoint.sh", "uvicorn", "src.api.main:app", "--host", "0.0.0.0", "--port", "8000"]

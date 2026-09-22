@@ -1,4 +1,4 @@
-from dataclasses import dataclass
+﻿from dataclasses import dataclass
 
 
 @dataclass(frozen=True)
@@ -14,5 +14,15 @@ DEFAULT_RSS_FEEDS = [
         name="vnexpress",
         url="https://vnexpress.net/rss/tin-moi-nhat.rss",
         source="VnExpress",
+    ),
+    RSSFeedConfig(
+        name="tuoitre",
+        url="https://tuoitre.vn/home.rss",
+        source="Tuổi Trẻ",
+    ),
+    RSSFeedConfig(
+        name="thanhnien",
+        url="https://thanhnien.vn/rss/home.rss",
+        source="Thanh Niên",
     ),
 ]

@@ -2,7 +2,11 @@
 from pathlib import Path
 import json
 import joblib
-from underthesea import word_tokenize
+
+from .preprocessing import (
+    load_stopwords,
+    preprocess_text,
+)
 
 
 class VietnameseNewsPredictor:
@@ -51,34 +55,19 @@ class VietnameseNewsPredictor:
             self.metadata = json.load(f)
 
         # Load stopwords for metadata / future extensions
-        with open(
-            self.stopwords_path,
-            "r",
-            encoding="utf-8"
-        ) as f:
-            self.stopwords = {
-                line.strip()
-                for line in f
-                if line.strip()
-            }
+        self.stopwords = load_stopwords(
+            self.stopwords_path
+        )
 
     # --------------------------------------------------------
     # Preprocessing
     # --------------------------------------------------------
 
     def preprocess(self, text):
-
-        if text is None:
-            return ""
-
-        text = str(text).strip()
-
-        if not text:
-            return ""
-
-        tokens = word_tokenize(text)
-
-        return " ".join(tokens)
+        return preprocess_text(
+            text,
+            self.stopwords,
+        )
 
     # --------------------------------------------------------
     # Predict one article

@@ -1,7 +1,7 @@
 {
   "dataset": "data/processed/test.csv",
   "samples": 487,
-  "accuracy": 0.8275154004106776,
+  "accuracy": 0.8501026694045175,
   "model": "p2_linear_svm_balanced.joblib",
   "vectorizer": "p2_tfidf_vectorizer.joblib",
   "classes": [

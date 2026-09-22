@@ -38,7 +38,7 @@
       DATABASE_URL: ${DATABASE_URL_DOCKER}
       PYTHONPATH: /app
       CRAWLER_CONTROL_URL: http://crawler:9000
-      CRAWLER_CONTROL_TOKEN: local-dev-crawler-token
+      CRAWLER_CONTROL_TOKEN: ${CRAWLER_CONTROL_TOKEN}
 
     volumes:
       - ./data:/app/data
@@ -87,7 +87,7 @@
       CRAWL_INTERVAL_SECONDS: ${CRAWL_INTERVAL_SECONDS}
       LOG_LEVEL: ${LOG_LEVEL}
       PYTHONPATH: /app
-      CRAWLER_CONTROL_TOKEN: local-dev-crawler-token
+      CRAWLER_CONTROL_TOKEN: ${CRAWLER_CONTROL_TOKEN}
 
     depends_on:
       fastapi:

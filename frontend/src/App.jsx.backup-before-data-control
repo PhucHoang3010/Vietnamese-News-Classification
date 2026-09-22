@@ -1,0 +1,668 @@
+﻿import { useEffect, useState } from "react";
+import {
+  CartesianGrid,
+  Legend,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
+
+import {
+  getCategories,
+  getDaily,
+  getHotTopics,
+  getIntelligenceTrends,
+  getKeywords,
+  getRecent,
+  getSummary,
+  getTrendByCategory,
+} from "./services/api";
+
+import "./App.css";
+
+function formatDate(value) {
+  if (!value) return "—";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleDateString("vi-VN");
+}
+
+function formatDateTime(value) {
+  if (!value) return "—";
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return date.toLocaleString("vi-VN");
+}
+
+function formatNumber(value) {
+  if (typeof value !== "number") return "—";
+
+  return value.toLocaleString("vi-VN");
+}
+
+function formatScore(value) {
+  if (typeof value !== "number") return "—";
+
+  return value.toFixed(3);
+}
+
+function getTopicKeywords(topic) {
+  if (!Array.isArray(topic?.keywords)) {
+    return "—";
+  }
+
+  return topic.keywords
+    .map((item) => {
+      if (typeof item === "string") {
+        return item;
+      }
+
+      return item?.display_keyword || item?.keyword || "";
+    })
+    .filter(Boolean)
+    .join(", ");
+}
+
+function App() {
+  const [summary, setSummary] = useState(null);
+  const [categories, setCategories] = useState([]);
+  const [daily, setDaily] = useState([]);
+  const [trend, setTrend] = useState([]);
+  const [recent, setRecent] = useState([]);
+
+  const [keywords, setKeywords] = useState([]);
+  const [intelligenceTrends, setIntelligenceTrends] = useState([]);
+  const [hotTopics, setHotTopics] = useState([]);
+
+  const [trendMeta, setTrendMeta] = useState({
+    recent_days: 0,
+    previous_days: 0,
+    anchor_date: null,
+  });
+
+  const [hotTopicMeta, setHotTopicMeta] = useState({
+    recent_days: 0,
+    anchor_date: null,
+  });
+
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  async function loadDashboard() {
+    try {
+      setLoading(true);
+      setError("");
+
+      const [
+        summaryData,
+        categoriesData,
+        dailyData,
+        trendData,
+        recentData,
+        keywordsData,
+        intelligenceTrendData,
+        hotTopicsData,
+      ] = await Promise.all([
+        getSummary(),
+        getCategories(),
+        getDaily(),
+        getTrendByCategory(),
+        getRecent(20),
+        getKeywords(),
+        getIntelligenceTrends(),
+        getHotTopics(),
+      ]);
+
+      setSummary(summaryData);
+      setCategories(categoriesData.items || []);
+      setDaily(dailyData.items || []);
+      setTrend(trendData.items || []);
+      setRecent(recentData.items || []);
+
+      setKeywords(keywordsData.items || []);
+      setIntelligenceTrends(intelligenceTrendData.items || []);
+      setHotTopics(hotTopicsData.items || []);
+
+      setTrendMeta({
+        recent_days: intelligenceTrendData.recent_days || 0,
+        previous_days: intelligenceTrendData.previous_days || 0,
+        anchor_date: intelligenceTrendData.anchor_date || null,
+      });
+
+      setHotTopicMeta({
+        recent_days: hotTopicsData.recent_days || 0,
+        anchor_date: hotTopicsData.anchor_date || null,
+      });
+    } catch (err) {
+      setError(
+        err instanceof Error
+          ? err.message
+          : "Không thể tải dữ liệu từ máy chủ."
+      );
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  useEffect(() => {
+    loadDashboard();
+  }, []);
+
+  const trendData = trend.map((item) => ({
+    day: item.day,
+    ...item.categories,
+  }));
+
+  const trendCategories = [
+    ...new Set(
+      trend.flatMap((item) => Object.keys(item.categories || {}))
+    ),
+  ];
+
+  return (
+    <div className="app">
+      <header className="site-header">
+        <div className="header-inner">
+          <div>
+            <h1>Vietnamese News Classification</h1>
+            <p>News Classification & Trend Analytics Platform</p>
+          </div>
+
+          <div className="header-status">
+            Hệ thống phân tích tin tức
+          </div>
+        </div>
+      </header>
+
+      <main className="main-content">
+        <section className="page-heading">
+          <h2>Tổng quan</h2>
+          <p>
+            Thống kê và phân tích dữ liệu tin tức được thu thập từ hệ thống.
+          </p>
+        </section>
+
+        {error && (
+          <section className="error-box">
+            <strong>Lỗi kết nối:</strong> {error}
+            <button type="button" onClick={loadDashboard}>
+              Thử lại
+            </button>
+          </section>
+        )}
+
+        {loading ? (
+          <section className="loading-box">
+            Đang tải dữ liệu...
+          </section>
+        ) : (
+          <>
+            <section className="summary-grid">
+              <div className="summary-card">
+                <span className="summary-label">Tổng số bài viết</span>
+                <strong>{summary?.total_articles ?? 0}</strong>
+              </div>
+
+              <div className="summary-card">
+                <span className="summary-label">Số danh mục</span>
+                <strong>{summary?.total_categories ?? 0}</strong>
+              </div>
+
+              <div className="summary-card">
+                <span className="summary-label">Số nguồn</span>
+                <strong>{summary?.total_sources ?? 0}</strong>
+              </div>
+
+              <div className="summary-card">
+                <span className="summary-label">Bài có nội dung đầy đủ</span>
+                <strong>{summary?.fulltext_articles ?? 0}</strong>
+              </div>
+            </section>
+
+            <section className="content-section">
+              <div className="section-header">
+                <h3>Số lượng bài viết theo ngày</h3>
+              </div>
+
+              <div className="chart-container">
+                <ResponsiveContainer width="100%" height={330}>
+                  <LineChart
+                    data={daily}
+                    margin={{
+                      top: 15,
+                      right: 25,
+                      left: 5,
+                      bottom: 10,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+
+                    <XAxis
+                      dataKey="day"
+                      tickFormatter={formatDate}
+                    />
+
+                    <YAxis allowDecimals={false} />
+
+                    <Tooltip
+                      labelFormatter={(value) =>
+                        `Ngày: ${formatDate(value)}`
+                      }
+                    />
+
+                    <Line
+                      type="monotone"
+                      dataKey="total"
+                      name="Số bài viết"
+                      stroke="#17365d"
+                      strokeWidth={2}
+                      dot={{ r: 3 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </section>
+
+            <section className="two-column">
+              <div className="content-section">
+                <div className="section-header">
+                  <h3>Phân bố theo danh mục</h3>
+                </div>
+
+                <div className="category-table-wrapper">
+                  <table className="data-table">
+                    <thead>
+                      <tr>
+                        <th>Danh mục</th>
+                        <th>Số bài</th>
+                        <th>Tỷ lệ</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {categories.map((item) => (
+                        <tr key={item.category}>
+                          <td>{item.category}</td>
+                          <td>{formatNumber(item.total)}</td>
+                          <td>
+                            {typeof item.percentage === "number"
+                              ? `${item.percentage.toFixed(2)}%`
+                              : "—"}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+
+              <div className="content-section">
+                <div className="section-header">
+                  <h3>Nguồn nội dung</h3>
+                </div>
+
+                <div className="source-summary">
+                  <div>
+                    <span>Fulltext</span>
+                    <strong>
+                      {summary?.fulltext_articles ?? 0}
+                    </strong>
+                  </div>
+
+                  <div>
+                    <span>RSS fallback</span>
+                    <strong>
+                      {summary?.rss_fallback_articles ?? 0}
+                    </strong>
+                  </div>
+                </div>
+
+                <div className="latest-info">
+                  <span>Cập nhật dữ liệu gần nhất</span>
+                  <strong>
+                    {formatDateTime(summary?.latest_crawled_at)}
+                  </strong>
+                </div>
+              </div>
+            </section>
+
+            <section className="content-section">
+              <div className="section-header">
+                <h3>Xu hướng theo danh mục</h3>
+              </div>
+
+              <div className="chart-container">
+                <ResponsiveContainer width="100%" height={380}>
+                  <LineChart
+                    data={trendData}
+                    margin={{
+                      top: 15,
+                      right: 25,
+                      left: 5,
+                      bottom: 10,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+
+                    <XAxis
+                      dataKey="day"
+                      tickFormatter={formatDate}
+                    />
+
+                    <YAxis allowDecimals={false} />
+
+                    <Tooltip
+                      labelFormatter={(value) =>
+                        `Ngày: ${formatDate(value)}`
+                      }
+                    />
+
+                    <Legend />
+
+                    {trendCategories.map((category, index) => (
+                      <Line
+                        key={category}
+                        type="monotone"
+                        dataKey={category}
+                        name={category}
+                        stroke={
+                          [
+                            "#17365d",
+                            "#7f6000",
+                            "#38761d",
+                            "#741b47",
+                            "#134f5c",
+                            "#5b0f00",
+                            "#351c75",
+                            "#783f04",
+                            "#274e13",
+                            "#0b5394",
+                            "#660000",
+                            "#20124d",
+                            "#444444",
+                          ][index % 13]
+                        }
+                        strokeWidth={1.8}
+                        dot={{ r: 2 }}
+                      />
+                    ))}
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </section>
+
+            <section className="content-section intelligence-section">
+              <div className="section-header">
+                <div>
+                  <h3>News Intelligence</h3>
+                  <p className="section-note">
+                    Phân tích từ khóa, động lượng xu hướng và các cụm chủ đề
+                    được hình thành từ dữ liệu tin tức.
+                  </p>
+                </div>
+              </div>
+
+              <div className="two-column">
+                <div className="content-section nested-section">
+                  <div className="section-header">
+                    <h3>Top Keywords</h3>
+                  </div>
+
+                  <div className="table-scroll">
+                    <table className="data-table intelligence-table">
+                      <thead>
+                        <tr>
+                          <th>Từ khóa</th>
+                          <th>Bài viết</th>
+                          <th>Tần suất</th>
+                          <th>Strength</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {keywords.slice(0, 10).map((item) => (
+                          <tr key={item.keyword}>
+                            <td>
+                              <strong>
+                                {item.display_keyword || item.keyword}
+                              </strong>
+                            </td>
+                            <td>{formatNumber(item.article_count)}</td>
+                            <td>{formatNumber(item.total_frequency)}</td>
+                            <td>{formatScore(item.strength)}</td>
+                          </tr>
+                        ))}
+
+                        {keywords.length === 0 && (
+                          <tr>
+                            <td colSpan={4}>Chưa có dữ liệu từ khóa.</td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="content-section nested-section">
+                  <div className="section-header">
+                    <div>
+                      <h3>Trending Keywords</h3>
+                      <p className="section-note">
+                        {trendMeta.recent_days} ngày gần nhất so với{" "}
+                        {trendMeta.previous_days} ngày trước đó
+                        {trendMeta.anchor_date
+                          ? ` · cập nhật ${formatDate(
+                              trendMeta.anchor_date
+                            )}`
+                          : ""}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="table-scroll">
+                    <table className="data-table intelligence-table">
+                      <thead>
+                        <tr>
+                          <th>Từ khóa</th>
+                          <th>Bài viết</th>
+                          <th>Tần suất</th>
+                          <th>Strength</th>
+                          <th>Trend</th>
+                        </tr>
+                      </thead>
+
+                      <tbody>
+                        {intelligenceTrends.slice(0, 10).map((item) => (
+                          <tr key={item.keyword}>
+                            <td>
+                              <strong>
+                                {item.display_keyword || item.keyword}
+                              </strong>
+                            </td>
+
+                            <td>
+                              {formatNumber(item.total_articles)}
+                            </td>
+
+                            <td>
+                              {formatNumber(item.total_frequency)}
+                            </td>
+
+                            <td>
+                              {formatScore(item.keyword_strength)}
+                            </td>
+
+                            <td>
+                              <span
+                                className={
+                                  item.growth_label === "NEW"
+                                    ? "trend-badge trend-new"
+                                    : "trend-badge"
+                                }
+                              >
+                                {item.growth_label || "—"}
+                              </span>
+                              <span className="trend-score">
+                                {formatScore(item.trend_score)}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+
+                        {intelligenceTrends.length === 0 && (
+                          <tr>
+                            <td colSpan={5}>
+                              Chưa có dữ liệu xu hướng.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div className="content-section nested-section">
+                <div className="section-header">
+                  <div>
+                    <h3>Hot Topic Candidates</h3>
+                    <p className="section-note">
+                      Các cụm từ khóa có liên hệ trong cùng tập dữ liệu;
+                      đây là topic candidates, không phải chủ đề được sinh
+                      bởi mô hình ngôn ngữ.
+                      {hotTopicMeta.anchor_date
+                        ? ` · cập nhật ${formatDate(
+                            hotTopicMeta.anchor_date
+                          )}`
+                        : ""}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="hot-topic-grid">
+                  {hotTopics.map((topic, index) => (
+                    <article
+                      className="hot-topic-card"
+                      key={`${topic.label}-${index}`}
+                    >
+                      <div className="hot-topic-header">
+                        <span className="topic-index">
+                          {String(index + 1).padStart(2, "0")}
+                        </span>
+
+                        <h4>{topic.label || "Chưa xác định"}</h4>
+                      </div>
+
+                      <p className="topic-keywords">
+                        {getTopicKeywords(topic)}
+                      </p>
+
+                      <div className="topic-meta">
+                        <span>
+                          Bài viết:{" "}
+                          <strong>
+                            {formatNumber(
+                              topic.article_volume ??
+                                topic.total_articles ??
+                                0
+                            )}
+                          </strong>
+                        </span>
+
+                        <span>
+                          Keywords:{" "}
+                          <strong>
+                            {formatNumber(topic.keyword_count)}
+                          </strong>
+                        </span>
+
+                        <span>
+                          Trend:{" "}
+                          <strong>
+                            {formatScore(topic.max_trend_score)}
+                          </strong>
+                        </span>
+                      </div>
+                    </article>
+                  ))}
+
+                  {hotTopics.length === 0 && (
+                    <div className="empty-state">
+                      Chưa hình thành topic candidate từ dữ liệu hiện tại.
+                    </div>
+                  )}
+                </div>
+              </div>
+            </section>
+
+            <section className="content-section">
+              <div className="section-header">
+                <h3>Tin tức gần đây</h3>
+              </div>
+
+              <div className="table-scroll">
+                <table className="data-table recent-table">
+                  <thead>
+                    <tr>
+                      <th>Tiêu đề</th>
+                      <th>Danh mục</th>
+                      <th>Nguồn</th>
+                      <th>Loại nội dung</th>
+                      <th>Decision Score</th>
+                      <th>Thời gian</th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                    {recent.map((article) => (
+                      <tr key={article.id}>
+                        <td>{article.title || "—"}</td>
+                        <td>{article.category || "—"}</td>
+                        <td>{article.source || "—"}</td>
+                        <td>{article.content_source || "—"}</td>
+
+                        <td>
+                          {typeof article.decision_score === "number"
+                            ? article.decision_score.toFixed(4)
+                            : "—"}
+                        </td>
+
+                        <td>
+                          {formatDateTime(
+                            article.published_at ||
+                              article.crawled_at
+                          )}
+                        </td>
+                      </tr>
+                    ))}
+
+                    {recent.length === 0 && (
+                      <tr>
+                        <td colSpan={6}>Chưa có bài viết.</td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </section>
+          </>
+        )}
+      </main>
+    </div>
+  );
+}
+
+export default App;
