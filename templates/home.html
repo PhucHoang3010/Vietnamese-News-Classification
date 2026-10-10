@@ -5,6 +5,7 @@
     <div class="in"><span class="tag">{{ hero.icon }} {{ hero.label }}</span><h1>{{ hero.title }}</h1><p>{{ hero.desc[:220] }}{{ '…' if hero.desc|length>220 }}</p></div></a>
   <div class="hero-side">{% for a in side %}{{ mini(a) }}{% endfor %}</div>
 </div>
+<a class="arena-banner" href="{{ url_for('arena') }}"><span class="big">🥊</span><div><b class="serif">Bạn có phân loại tin giỏi hơn AI không?</b><small>10 lượt đấu với bài báo AI chưa từng thấy · kết quả người vs AI được ghi lại thật · có bảng xếp hạng</small></div><span class="btn">Chơi ngay →</span></a>
 <div class="trio">
   <a href="{{ url_for('summarize_page') }}"><span>📝</span><b>Tóm tắt tự động</b><small>Rút 2–3 câu cốt lõi của bài dài — TextRank</small></a>
   <a href="{{ url_for('events') }}"><span>🧩</span><b>Sự kiện & chủ đề con</b><small>AI tự gom bài cùng câu chuyện — KMeans</small></a>

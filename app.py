@@ -593,6 +593,84 @@ def api_recommend():
     return jsonify(items=[{k: ART[IDS[j]][k] for k in keep} for j in top], profile=prof)
 
 
+# ---------------------------------------------------------------- Thử thách: Con người vs AI (ghi kết quả thật vào data/arena.jsonl)
+import threading, time
+ARENA_F = ROOT / "data" / "arena.jsonl"
+_ALOCK = threading.Lock()
+TEST_IDS = [i for i, a in ART.items() if a["test"]]            # chỉ dùng bài kiểm thử: AI chưa từng thấy khi huấn luyện
+
+
+def arena_rows():
+    if not ARENA_F.exists():
+        return []
+    out = []
+    for line in ARENA_F.read_text(encoding="utf-8").splitlines():
+        try:
+            out.append(json.loads(line))
+        except Exception:
+            pass
+    return out
+
+
+def arena_stats():
+    rows = arena_rows(); n = len(rows)
+    if not n:
+        return {"n": 0}
+    h = [r["choice"] == r["truth"] for r in rows]; a = [r["ai"] == r["truth"] for r in rows]
+    both = sum(x and y for x, y in zip(h, a)); only_h = sum(x and not y for x, y in zip(h, a))
+    only_a = sum(y and not x for x, y in zip(h, a)); neither = n - both - only_h - only_a
+    per = []
+    for c in CLASSES:
+        rr = [r for r in rows if r["truth"] == c]
+        if rr:
+            per.append({"label": c, "icon": TOPICS[c][1], "n": len(rr), "human": round(100 * sum(r["choice"] == c for r in rr) / len(rr)),
+                        "ai": round(100 * sum(r["ai"] == c for r in rr) / len(rr))})
+    pl = {}
+    for r in rows:
+        p = (r.get("player") or "").strip()
+        if p:
+            d = pl.setdefault(p, [0, 0, 0]); d[0] += 1; d[1] += r["choice"] == r["truth"]; d[2] += r["ai"] == r["truth"]
+    board = sorted(({"player": p, "n": v[0], "acc": round(100 * v[1] / v[0]), "ai": round(100 * v[2] / v[0])} for p, v in pl.items() if v[0] >= 5),
+                   key=lambda x: (-x["acc"], -x["n"]))[:10]
+    conf = Counter((r["truth"], r["choice"]) for r in rows if r["choice"] != r["truth"]).most_common(5)
+    return {"n": n, "human": round(100 * sum(h) / n, 1), "ai": round(100 * sum(a) / n, 1), "both": both, "only_h": only_h, "only_a": only_a, "neither": neither,
+            "per": per, "board": board, "players": len(pl), "confused": [{"truth": t, "choice": c, "n": k} for (t, c), k in conf]}
+
+
+@app.get("/thu-thach")
+def arena():
+    return render_template("arena.html")
+
+
+@app.get("/api/arena/next")
+def arena_next():
+    seen = {int(x) for x in request.args.get("seen", "").split(",") if x.isdigit()}
+    pool = [i for i in TEST_IDS if i not in seen] or TEST_IDS
+    a = ART[random.choice(pool)]
+    return jsonify(id=a["id"], title=a["title"], desc=a["desc"], snippet=a["content"][:360].rsplit(" ", 1)[0] + "…")
+
+
+@app.post("/api/arena/answer")
+def arena_answer():
+    d = request.get_json(silent=True) or {}
+    aid, choice = d.get("id"), d.get("choice")
+    a = ART.get(aid) if isinstance(aid, int) else None
+    if not a or not a["test"] or choice not in CLASSES:
+        return jsonify(error="Dữ liệu không hợp lệ."), 400
+    player = re.sub(r"[^\w .\-À-ỹ]", "", str(d.get("player") or ""))[:20].strip()
+    row = {"t": int(time.time()), "player": player, "aid": aid, "choice": choice, "truth": a["truth"], "ai": a["label"], "ai_pct": a["pct"]}
+    with _ALOCK:
+        ARENA_F.parent.mkdir(exist_ok=True)
+        with open(ARENA_F, "a", encoding="utf-8") as f:
+            f.write(json.dumps(row, ensure_ascii=False) + "\n")
+    return jsonify(truth=a["truth"], ai=a["label"], ai_pct=a["pct"], ai_icon=a["icon"], truth_icon=TOPICS[a["truth"]][1], url=f"/bai/{aid}")
+
+
+@app.get("/api/arena/stats")
+def arena_stats_api():
+    return jsonify(arena_stats())
+
+
 @app.get("/favicon.ico")
 def favicon():
     return "", 204

@@ -2,7 +2,7 @@
 {% block title %}Bản tin nhanh 60 giây — VnNews{% endblock %}
 {% block content %}
 <div class="pagehead"><div class="big">⚡</div><div><h1>Bản tin nhanh 60 giây</h1><p>Mỗi chuyên mục một tin nổi bật, được AI tóm tắt còn 2 câu. Rút gọn từ <b>{{ win }}</b> xuống <b>{{ wout }}</b> từ (−{{ (100 - wout*100/win)|round|int }}%).</p></div></div>
-<div style="max-width:820px;margin:0 auto">
+<div style="max-width:820px;margin:0 auto"><div class="bar-row" style="margin:0 0 6px"><button class="btn" id="listen">🔊 Nghe bản tin</button><span class="note" style="margin:0">AI đọc to từng tin bằng giọng tiếng Việt của trình duyệt.</span></div>
 {% for it in items %}{% set a = it.a %}
 <article class="digest-item"><div class="thumb"><img src="{{ a.img }}" alt="" loading="lazy"></div>
   <div><span class="tag">{{ a.icon }} {{ a.label }}</span><h3 class="serif"><a href="{{ url_for('article', aid=a.id) }}">{{ a.title }}</a></h3>
@@ -11,3 +11,11 @@
   <div class="meta"><span>{{ it.win }} từ → {{ it.wout }} từ</span><a class="conf" href="{{ url_for('article', aid=a.id) }}" style="text-decoration:underline">Đọc đầy đủ →</a></div></div></article>
 {% endfor %}</div>
 {% endblock %}
+{% block scripts %}<script>
+const ITEMS={{ items|map(attribute='sum')|list|tojson }},TITLES={{ items|map(attribute='a')|map(attribute='title')|list|tojson }},LABELS2={{ items|map(attribute='a')|map(attribute='label')|list|tojson }};
+let playing=false;$('#listen').onclick=()=>{
+  if(playing){stopSpeak();playing=false;$('#listen').textContent='🔊 Nghe bản tin';return}
+  playing=true;$('#listen').textContent='⏹ Dừng đọc';
+  const texts=['Bản tin nhanh VnNews.'];ITEMS.forEach((s,i)=>texts.push('Mục '+LABELS2[i]+'. '+TITLES[i]+'. '+s.join(' ')));texts.push('Hết bản tin.');
+  speak(texts,()=>{playing=false;$('#listen').textContent='🔊 Nghe bản tin'})};
+</script>{% endblock %}

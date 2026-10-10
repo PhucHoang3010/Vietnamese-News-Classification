@@ -4,6 +4,8 @@
 <div class="pagehead"><div class="big">✦</div><div><h1>Công cụ AI</h1><p>Ngoài phân loại chuyên mục, hệ thống còn làm nhiều việc khác với bài báo — mỗi công cụ dùng một kỹ thuật học máy / xử lý ngôn ngữ khác nhau.</p></div></div>
 <div class="grid3">
   {% for icon, name, tech, kind, desc, href in [
+   ('🥊','Thử thách: người vs AI','Đánh giá với con người','Nghiên cứu người dùng','Đấu 10 lượt với AI trên bài chưa từng thấy; hệ thống ghi lại kết quả thật của mọi người chơi và so sánh người với AI.', url_for('arena')),
+   ('🎤','Nói để phân loại','Web Speech API','Giọng nói','Nói một đoạn tin, trình duyệt chuyển thành văn bản và AI phân loại ngay (Chrome/Edge).', url_for('classify_page')),
    ('🏷️','Phân loại bài báo','TF-IDF + Linear SVM','Học có giám sát','Xếp bài vào 1 trong 11 chuyên mục. Độ chính xác 89,3% trên tập kiểm thử.', url_for('classify_page')),
    ('📝','Tóm tắt tự động','TextRank (PageRank trên đồ thị câu)','Xử lý ngôn ngữ','Rút 1–6 câu quan trọng nhất của bài hoặc đường link, kèm từ khóa và số phút đọc tiết kiệm được.', url_for('summarize_page')),
    ('🧩','Sự kiện & chủ đề con','KMeans + TruncatedSVD','Học không giám sát','Không dùng nhãn, AI tự gom các bài cùng câu chuyện: giá vàng, SEA Games, ung thư…', url_for('events')),

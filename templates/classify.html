@@ -8,7 +8,8 @@
       <div class="tabs"><button class="on" data-tab="text">✍️ Nhập văn bản</button><button data-tab="url">🔗 Từ link báo</button></div>
       <div id="pane-text"><textarea id="text" placeholder="Dán nội dung bài báo vào đây (tối thiểu khoảng 10 từ)..."></textarea></div>
       <div id="pane-url" hidden><input type="url" id="url" placeholder="https://vnexpress.net/..."><p class="note">Hệ thống tải bài báo, trích nội dung rồi phân loại.</p></div>
-      <div class="bar-row"><button class="btn blue" id="go">Phân loại ngay</button><button class="btn ghost" id="rand">🎲 Bài ngẫu nhiên</button><button class="btn ghost" id="clear">Xóa</button><span class="count" id="count">0 từ</span></div>
+      <div class="bar-row"><button class="btn blue" id="go">Phân loại ngay</button><button class="btn ghost" id="rand">🎲 Bài ngẫu nhiên</button><button class="btn ghost" id="mic" title="Nói một đoạn tin tức, AI nghe và phân loại">🎤 Nói để phân loại</button><button class="btn ghost" id="clear">Xóa</button><span class="count" id="count">0 từ</span></div>
+      <label class="note" style="display:flex;gap:6px;align-items:center;margin-top:10px"><input type="checkbox" id="live" checked> Phân loại ngay khi đang gõ (từ 12 từ trở lên)</label>
       <div id="err"></div>
     </div>
     <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 12px">Gợi ý nhanh — bấm để thử theo chuyên mục</h3><div class="chips" id="samples"></div></div>
@@ -24,9 +25,11 @@
 const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
 document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));$('#pane-text').hidden=b.dataset.tab!=='text';$('#pane-url').hidden=b.dataset.tab!=='url';$('#err').innerHTML=''});
 const words=t=>(t.trim().match(/\S+/g)||[]).length;
-$('#text').oninput=()=>$('#count').textContent=words($('#text').value)+' từ';
+let liveT=null,nolive=false;
+$('#text').oninput=()=>{$('#count').textContent=words($('#text').value)+' từ';clearTimeout(liveT);
+  if(!nolive&&$('#live').checked&&words($('#text').value)>=12)liveT=setTimeout(async()=>{try{const d=await post('/api/predict',{text:$('#text').value});render(d)}catch(e){}},700)};
 const showErr=m=>$('#err').innerHTML=m?'<div class="err">'+esc(m)+'</div>':'';
-function setText(t){document.querySelector('[data-tab=text]').click();$('#text').value=t;$('#text').oninput()}
+function setText(t){document.querySelector('[data-tab=text]').click();$('#text').value=t;nolive=true;$('#text').oninput();nolive=false}
 const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error);return d});
 const reset=()=>{$('#go').disabled=false;$('#go').textContent='Phân loại ngay'};
 async function run(){
@@ -59,5 +62,16 @@ $('#rand').onclick=async()=>{try{const d=await fetch('/api/random').then(r=>r.js
 fetch('/api/samples').then(r=>r.json()).then(list=>{$('#samples').innerHTML=list.map(s=>`<button class="chip" style="--c:${s.color}" data-l="${esc(s.label)}">${s.icon} ${esc(s.label)}</button>`).join('');
   $('#samples').querySelectorAll('.chip').forEach((c,i)=>c.onclick=()=>{setText(list[i].text);run()})});
 drawHist();
+/* nhập bằng giọng nói (Web Speech API — Chrome/Edge) */
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;let rec=null,listening=false;
+if(!SR){$('#mic').disabled=true;$('#mic').title='Trình duyệt chưa hỗ trợ — hãy dùng Chrome hoặc Edge'}
+else $('#mic').onclick=()=>{
+  if(listening){rec.stop();return}
+  document.querySelector('[data-tab=text]').click();rec=new SR();rec.lang='vi-VN';rec.interimResults=true;rec.continuous=true;const base=$('#text').value?$('#text').value.trim()+' ':'';
+  rec.onresult=e=>{let t='';for(const r of e.results)t+=r[0].transcript+' ';nolive=true;$('#text').value=base+t.trim();$('#text').oninput();nolive=false};
+  rec.onstart=()=>{listening=true;$('#mic').classList.add('on');$('#mic').textContent='⏹ Đang nghe… bấm để dừng'};
+  rec.onend=()=>{listening=false;$('#mic').classList.remove('on');$('#mic').textContent='🎤 Nói để phân loại';if(words($('#text').value)>=6)run()};
+  rec.onerror=e=>{showErr(e.error==='not-allowed'?'Bạn chưa cho phép dùng micro.':'Không nhận được giọng nói ('+e.error+'). Cần kết nối mạng và Chrome/Edge.')};
+  rec.start()};
 </script>
 {% endblock %}

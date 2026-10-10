@@ -9,6 +9,8 @@ Chạy hoàn toàn trên CPU, không cần GPU hay mô hình ngôn ngữ lớn.
 **Các chức năng khác (không phải phân loại):**
 | Chức năng | Kỹ thuật | Trang |
 |---|---|---|
+| **Thử thách: người vs AI** (ghi kết quả thật, bảng xếp hạng) | Đánh giá với con người (human baseline) | `/thu-thach` |
+| Nói để phân loại / nghe bản tin / phân loại khi gõ | Web Speech API (Chrome, Edge) | `/phan-loai`, `/ban-tin` |
 | Tóm tắt tự động (kèm từ khóa, đo ROUGE) | TextRank / PageRank trên đồ thị câu | `/tom-tat` |
 | Gom sự kiện & chủ đề con | KMeans + TruncatedSVD (học không giám sát) | `/su-kien` |
 | Bản tin nhanh 60 giây | Tóm tắt hàng loạt | `/ban-tin` |

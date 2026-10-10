@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+{% block title %}Thử thách: Con người vs AI — VnNews{% endblock %}
+{% block content %}
+<div class="pagehead"><div class="big">🥊</div><div><h1>Thử thách: bạn có phân loại giỏi hơn AI?</h1><p>10 lượt, mỗi lượt một bài báo mà AI chưa từng thấy khi huấn luyện. Chọn chuyên mục đúng — rồi xem AI trả lời thế nào.</p></div></div>
+<div class="two split" style="align-items:start">
+  <div>
+    <div class="panel" id="start">
+      <h3 style="margin-top:0">Sẵn sàng chưa?</h3>
+      <p>Bạn sẽ thấy <b>tiêu đề, sapo và đoạn đầu</b> của bài (AI đọc toàn bộ bài). Chọn 1 trong 11 chuyên mục. Kết quả của bạn được ghi lại để so sánh <b>người với AI</b> trên toàn bộ người chơi.</p>
+      <div class="bar-row"><input id="nick" maxlength="20" placeholder="Biệt danh (không bắt buộc)" style="border:1.5px solid var(--rule);background:var(--bg);padding:10px 14px;outline:none;min-width:220px"><button class="btn" id="play">▶ Bắt đầu 10 lượt</button></div>
+    </div>
+    <div id="game" hidden>
+      <div class="score">
+        <div><small>BẠN</small><b id="sh">0</b></div><div class="vs">VS</div><div><small>AI</small><b id="sa">0</b></div>
+        <div class="round"><small>LƯỢT</small><b><span id="rn">1</span>/10</b></div>
+      </div>
+      <div class="panel arena-card"><span class="tag" id="rtag">Bài báo cần phân loại</span>
+        <h2 class="serif" id="atitle"></h2><p class="lead" id="adesc" style="font-family:var(--serif);font-weight:600;font-size:18px;margin:8px 0"></p><p id="asnip" style="color:var(--muted)"></p></div>
+      <div class="choices" id="choices">{% for n in NAV %}<button class="choice" data-l="{{ n.name }}"><span>{{ n.icon }}</span>{{ n.name }}</button>{% endfor %}</div>
+      <div class="panel" id="reveal" hidden></div>
+    </div>
+    <div class="panel" id="end" hidden></div>
+  </div>
+  <div>
+    <div class="panel"><h3 style="margin-top:0">Bảng thống kê tất cả người chơi</h3><div id="gstats"><p class="note">Đang tải…</p></div></div>
+    <div class="panel" style="margin-top:20px"><h3 style="margin-top:0">Bảng xếp hạng</h3><div id="board"><p class="note">Cần ít nhất 5 lượt chơi có biệt danh.</p></div></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const LABELS={{ NAV|map(attribute='name')|list|tojson }};
+let seen=[],R=0,H=0,A=0,cur=null,log=[],nick='',busy=false;
+const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error);return d});
+async function next(){
+  $('#reveal').hidden=true;busy=false;document.querySelectorAll('.choice').forEach(b=>{b.disabled=false;b.className='choice'});
+  const d=await fetch('/api/arena/next?seen='+seen.join(',')).then(r=>r.json());cur=d;seen.push(d.id);
+  $('#atitle').textContent=d.title;$('#adesc').textContent=d.desc;$('#asnip').textContent=d.snippet;$('#rn').textContent=R+1;
+}
+$('#play').onclick=()=>{nick=$('#nick').value.trim();try{localStorage.setItem('vn_nick',nick)}catch(e){}R=H=A=0;seen=[];log=[];$('#sh').textContent=0;$('#sa').textContent=0;$('#start').hidden=true;$('#end').hidden=true;$('#game').hidden=false;next()};
+try{$('#nick').value=localStorage.getItem('vn_nick')||''}catch(e){}
+document.querySelectorAll('.choice').forEach(b=>b.onclick=async()=>{
+  if(busy)return;busy=true;const choice=b.dataset.l;
+  const d=await post('/api/arena/answer',{id:cur.id,choice,player:nick});
+  const hOk=choice===d.truth,aOk=d.ai===d.truth;H+=hOk;A+=aOk;R++;log.push({t:cur.title,truth:d.truth,choice,ai:d.ai,hOk,aOk});
+  $('#sh').textContent=H;$('#sa').textContent=A;
+  document.querySelectorAll('.choice').forEach(x=>{x.disabled=true;if(x.dataset.l===d.truth)x.classList.add('right');else if(x===b)x.classList.add('wrong')});
+  const verdict=hOk&&!aOk?'🏆 Bạn thắng lượt này!':!hOk&&aOk?'🤖 AI thắng lượt này':hOk&&aOk?'🤝 Cả hai cùng đúng':'😅 Cả hai cùng sai';
+  $('#reveal').hidden=false;$('#reveal').innerHTML=`<div class="verdict">${verdict}</div>
+   <div class="duel"><div><small>Đáp án</small><b>${d.truth_icon} ${esc(d.truth)}</b></div><div><small>Bạn chọn</small><b class="${hOk?'ok':'no'}">${esc(choice)} ${hOk?'✓':'✗'}</b></div><div><small>AI chọn (${d.ai_pct}%)</small><b class="${aOk?'ok':'no'}">${d.ai_icon} ${esc(d.ai)} ${aOk?'✓':'✗'}</b></div></div>
+   <div class="bar-row"><a class="btn ghost sm" href="${d.url}" target="_blank">Đọc bài đầy đủ ↗</a><button class="btn" id="nx" style="margin-left:auto">${R>=10?'Xem kết quả →':'Lượt tiếp →'}</button></div>`;
+  $('#nx').onclick=()=>R>=10?finish():next();loadStats();
+});
+function finish(){
+  $('#game').hidden=true;$('#end').hidden=false;
+  const msg=H>A?'Bạn đã đánh bại AI! 🏆':H===A?'Hòa với AI! 🤝':'AI thắng lần này 🤖';
+  $('#end').innerHTML=`<div class="verdict" style="font-size:28px">${msg}</div>
+   <div class="duel"><div><small>Bạn</small><b>${H}/10</b></div><div><small>AI</small><b>${A}/10</b></div></div>
+   <table style="margin-top:14px"><tr><th>Bài</th><th>Đáp án</th><th>Bạn</th><th>AI</th></tr>${log.map(l=>`<tr><td>${esc(l.t.slice(0,60))}${l.t.length>60?'…':''}</td><td>${esc(l.truth)}</td><td>${l.hOk?'✓':'✗ '+esc(l.choice)}</td><td>${l.aOk?'✓':'✗ '+esc(l.ai)}</td></tr>`).join('')}</table>
+   <div class="bar-row"><button class="btn" id="again">🔁 Chơi lại</button><button class="btn ghost" id="share">📋 Sao chép kết quả</button></div>`;
+  $('#again').onclick=()=>{$('#end').hidden=true;$('#start').hidden=false};
+  $('#share').onclick=()=>{navigator.clipboard?.writeText(`VnNews — Con người vs AI: tôi ${H}/10, AI ${A}/10 ${H>A?'(tôi thắng!)':H===A?'(hòa)':''}`);toast('Đã sao chép')};
+}
+async function loadStats(){
+  const s=await fetch('/api/arena/stats').then(r=>r.json());
+  if(!s.n){$('#gstats').innerHTML='<p class="note">Chưa có lượt chơi nào — hãy là người đầu tiên! Kết quả thật sẽ hiện ở đây.</p>';return}
+  const bar=(v,l)=>`<div class="row2" style="grid-template-columns:70px 1fr 54px"><span>${l}</span><div class="track"><i style="width:${v}%"></i></div><em>${v}%</em></div>`;
+  $('#gstats').innerHTML=`<p class="note" style="margin-top:0"><b>${s.n}</b> lượt chơi · <b>${s.players}</b> người có biệt danh</p>${bar(s.human,'Người')}${bar(s.ai,'AI')}
+   <div class="kpis" style="grid-template-columns:repeat(4,1fr);margin:14px 0"><div class="kpi" style="padding:10px"><b style="font-size:22px">${s.only_h}</b><span>chỉ người đúng</span></div><div class="kpi" style="padding:10px"><b style="font-size:22px">${s.only_a}</b><span>chỉ AI đúng</span></div><div class="kpi" style="padding:10px"><b style="font-size:22px">${s.both}</b><span>cùng đúng</span></div><div class="kpi" style="padding:10px"><b style="font-size:22px">${s.neither}</b><span>cùng sai</span></div></div>
+   <div class="sec">Theo chuyên mục (người / AI)</div>${s.per.map(p=>`<div class="row2" style="grid-template-columns:110px 1fr 74px;margin:5px 0"><span>${p.icon} ${esc(p.label)}</span><div class="track"><i style="width:${p.human}%"></i></div><em>${p.human}/${p.ai}%</em></div>`).join('')}
+   ${s.confused.length?`<div class="sec">Người hay nhầm</div><p class="note" style="margin-top:6px">${s.confused.map(c=>`${esc(c.truth)} → ${esc(c.choice)} (${c.n})`).join(' · ')}</p>`:''}`;
+  $('#board').innerHTML=s.board.length?`<table><tr><th>#</th><th>Người chơi</th><th class="num">Đúng</th><th class="num">AI</th><th class="num">Lượt</th></tr>${s.board.map((b,i)=>`<tr><td>${i+1}</td><td>${esc(b.player)}</td><td class="num"><b>${b.acc}%</b></td><td class="num">${b.ai}%</td><td class="num">${b.n}</td></tr>`).join('')}</table>`:'<p class="note">Cần ít nhất 5 lượt chơi có biệt danh.</p>';
+}
+loadStats();
+</script>
+{% endblock %}

@@ -96,6 +96,21 @@ B(["Gợi ý “Dành cho bạn”: hệ gợi ý dựa trên nội dung (conten
 H("6.4 AI Lab – giải thích dự đoán (Explainable AI)", 2)
 P("Vì Linear SVM là mô hình tuyến tính nên điểm của mỗi chủ đề bằng tổng (trọng số × giá trị TF-IDF); có thể tách chính xác đóng góp của từng từ mà không cần xấp xỉ như LIME/SHAP. "
   "Trang AI Lab tô đậm từng từ theo mức ủng hộ chủ đề dự đoán, cho phép bỏ từ để thử What-if, và phát hiện bài đa chủ đề bằng cách phân loại riêng từng đoạn. Trang thống kê có mục phân tích lỗi các bài AI đoán sai.")
+H("6.5 Thử thách: con người so với AI (đánh giá với người dùng)", 2)
+P("Trang Thử thách cho người dùng đấu 10 lượt với AI. Mỗi lượt hệ thống lấy ngẫu nhiên một bài từ tập kiểm thử (AI chưa từng thấy khi huấn luyện), người chơi xem tiêu đề, sapo và đoạn đầu rồi chọn một trong 11 chuyên mục; sau đó hệ thống hiển thị đáp án và lựa chọn của AI. "
+  "Mọi lượt chơi được ghi lại (data/arena.jsonl) để thống kê: độ chính xác của người so với AI trên cùng các bài, số lượt chỉ người đúng / chỉ AI đúng / cùng đúng / cùng sai, độ chính xác theo từng chuyên mục, cặp chuyên mục người hay nhầm và bảng xếp hạng. "
+  "Cách làm này cho một mốc so sánh (human baseline) thật sự, đồng thời cho thấy chuyên mục nào vốn mơ hồ cả với con người (ví dụ Thời sự – Đời sống).")
+af = O.parent / "data" / "arena.jsonl"
+rows = [json.loads(x) for x in af.read_text(encoding="utf-8").splitlines() if x.strip()] if af.exists() else []
+if len(rows) >= 20:
+    hh = sum(r["choice"] == r["truth"] for r in rows) / len(rows); aa = sum(r["ai"] == r["truth"] for r in rows) / len(rows)
+    P(f"Kết quả thực tế sau {len(rows)} lượt chơi: người đúng {hh:.1%}, AI đúng {aa:.1%} trên cùng các bài.")
+else:
+    P("Số liệu người chơi thực tế được cập nhật trực tiếp trên trang Thử thách của website (chưa đủ lượt chơi tại thời điểm tạo báo cáo).")
+H("6.6 Nhập bằng giọng nói, đọc bản tin và phân loại khi gõ", 2)
+B(["Nói để phân loại: dùng Web Speech API của trình duyệt (Chrome/Edge, tiếng Việt vi-VN) chuyển giọng nói thành văn bản rồi phân loại ngay.",
+   "Nghe bản tin / nghe tóm tắt: dùng Speech Synthesis để đọc to bản tin 60 giây và tóm tắt từng bài.",
+   "Phân loại khi gõ: kết quả cập nhật theo thời gian thực sau mỗi lần ngừng gõ."])
 H("7. Hạn chế và hướng phát triển")
 B(["Chưa tách từ tiếng Việt (word segmentation); có thể thêm underthesea/VnCoreNLP để cải thiện.",
    "Có thể thử mô hình học sâu (PhoBERT) khi có GPU – đã cố ý không dùng để chương trình chạy được trên máy yếu.",
