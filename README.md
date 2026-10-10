@@ -1,53 +1,23 @@
-# Vietnamese News Classification & Trend Analytics Platform
+# Đồ án: Phân loại tin tức tiếng Việt (Học máy)
 
-> **P2 — Vietnamese News Classification & Trend Analytics Platform**  
-> Automated Vietnamese news collection, NLP classification, storage and trend analytics dashboard.
+Pipeline nhẹ, chạy CPU, **không cần DeepSeek / GPU / mô hình lớn**.
 
-## 1. Overview
+- Dữ liệu: `data/news_dataset.csv` (5.500 bài, 11 chủ đề)
+- Mô hình: TF-IDF (1–2 gram) + Linear SVM (so sánh với NB, LR, RF)
+- Kết quả test: Accuracy ≈ 89,3%, Macro-F1 ≈ 89,3%
 
-Vietnamese News Classification & Trend Analytics Platform is an end-to-end data and machine learning system for:
+```bash
+pip install -r requirements.txt
+python train.py          # huấn luyện, sinh outputs/ và model.joblib
+python predict.py "Bộ Giáo dục công bố điểm chuẩn đại học"
+python make_report.py    # sinh BAO_CAO_DO_AN.docx
+```
+Báo cáo: `BAO_CAO_DO_AN.docx`. Điền tên/MSSV ở trang đầu.
 
-- Collecting Vietnamese news articles from RSS feeds.
-- Fetching full article content from source websites.
-- Cleaning and preprocessing Vietnamese text.
-- Classifying news into predefined categories using Machine Learning.
-- Storing classified news in PostgreSQL.
-- Analyzing category distribution and daily trends.
-- Monitoring crawler and data quality.
-- Providing an interactive analytics dashboard.
-
-### Current pipeline
-
-```text
-RSS Feed
-   │
-   ▼
-RSS Parser
-   │
-   ▼
-URL / Content Deduplication
-   │
-   ▼
-Article Fetcher
-   │
-   ├── Full Article Content
-   │
-   └── RSS Fallback
-   │
-   ▼
-Vietnamese Text Preprocessing
-   │
-   ▼
-TF-IDF Vectorization
-   │
-   ▼
-LinearSVC Classifier
-   │
-   ▼
-PostgreSQL
-   │
-   ▼
-Analytics API
-   │
-   ▼
-React + Vite Dashboard
+## Web giao diện (khuyên dùng)
+```bash
+pip install -r requirements.txt
+python app.py        # mở http://127.0.0.1:5000
+```
+Tính năng: phân loại từ văn bản hoặc link báo, gợi ý mẫu cho 11 chủ đề, bài ngẫu nhiên từ dữ liệu,
+từ khóa giải thích kết quả, lịch sử, chế độ tối, trang thông tin mô hình. Cần có `model.joblib`, thư mục `templates/` và `outputs/`.
