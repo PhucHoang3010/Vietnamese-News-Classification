@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% block title %}AI Lab — Giải thích AI — VnNews{% endblock %}
+{% block content %}
+<div class="pagehead"><div class="big">🔬</div><div><h1>AI Lab — nhìn xem AI “nghĩ” gì</h1><p>Mỗi từ được tô đậm theo mức đóng góp vào kết quả. Bấm vào từ để <b>bỏ nó đi</b> và xem dự đoán thay đổi thế nào (What-if).</p></div></div>
+<div class="two split" style="align-items:start">
+  <div>
+    <div class="panel" id="input">
+      <textarea id="text" placeholder="Dán nội dung bài báo vào đây (tối thiểu khoảng 10 từ)…"></textarea>
+      <div class="bar-row"><button class="btn" id="go">Phân tích & giải thích</button><button class="btn ghost" id="rand">🎲 Bài ngẫu nhiên</button><button class="btn ghost" id="mixed">🧪 Thử bài đa chủ đề</button><span class="count" id="count">0 từ</span></div>
+      <div class="chips" id="samples" style="margin-top:14px"></div><div id="err"></div>
+    </div>
+    <div id="viewer" hidden>
+      <div class="sec" style="display:flex;align-items:center;gap:10px">Văn bản được tô theo đóng góp <button class="btn ghost sm" id="edit" style="margin-left:auto">✎ Sửa văn bản</button></div>
+      <div class="legend"><span><i style="background:var(--brand)"></i>ủng hộ chủ đề dự đoán (càng đậm càng mạnh)</span><span><i style="background:repeating-linear-gradient(135deg,transparent 0 4px,#8885 4px 5px)"></i>đi ngược chủ đề</span><span><i style="text-decoration:line-through;background:var(--soft)"></i>từ đã bỏ</span></div>
+      <div class="lab-text" id="lab"></div>
+      <div class="bar-row"><button class="btn ghost sm" id="unmask">↺ Khôi phục tất cả từ</button><label style="margin-left:auto;font-size:14px;color:var(--muted)">So sánh với: <select id="vs" style="border:1.5px solid var(--rule);background:var(--bg);padding:4px 8px"><option value="all">tất cả chủ đề khác</option></select></label></div>
+    </div>
+  </div>
+  <div id="side">
+    <div class="panel" id="result"><div class="empty"><div class="big">🔬</div><b>Chưa có phân tích</b><br>Nhập bài báo hoặc chọn một gợi ý để bắt đầu.</div></div>
+  </div>
+</div>
+<div class="panel" style="margin-top:6px"><h3 style="margin-top:0">Cách hoạt động</h3>
+  <p style="margin:0 0 8px">Mô hình Linear SVM tính điểm mỗi chủ đề bằng <b>tổng (trọng số từ × giá trị TF-IDF)</b>. Vì là mô hình tuyến tính nên có thể tách chính xác phần đóng góp của từng từ và cụm 2 từ — không cần xấp xỉ như LIME hay SHAP.</p>
+  <p style="margin:0 0 8px"><b>Điểm đóng góp</b> của một từ = (trọng số chủ đề dự đoán − trọng số các chủ đề còn lại) × TF-IDF. Từ nào đậm nghĩa là nó đẩy bài về chủ đề dự đoán nhiều nhất.</p>
+  <p style="margin:0"><b>Dải đa chủ đề</b>: bài được cắt thành nhiều đoạn, mỗi đoạn được phân loại riêng; nếu dưới 75% nội dung cùng một chủ đề thì AI cảnh báo bài đa chủ đề / mơ hồ.</p></div>
+{% endblock %}
+{% block scripts %}
+<script>
+const PRE={{ pre|tojson }};
+const MIXED="Đội tuyển Việt Nam giành chiến thắng 2-0 trong trận chung kết, tiền đạo ghi hai bàn thắng đẹp mắt trước sự cổ vũ của khán giả. Huấn luyện viên khen ngợi tinh thần thi đấu của các cầu thủ.\nTrong khi đó, Ngân hàng Nhà nước điều chỉnh lãi suất điều hành, doanh nghiệp kỳ vọng chi phí vốn giảm. Thị trường chứng khoán tăng điểm, cổ phiếu ngân hàng dẫn dắt, nhà đầu tư quan tâm đến lợi nhuận và chính sách thuế.";
+const CLASSES={{ TOPICS.keys()|list|tojson }};
+let mask=new Set(),base=null,cur=null,timer=null,busy=false;
+$('#vs').innerHTML+=CLASSES.map(c=>`<option>${esc(c)}</option>`).join('');
+const words=t=>(t.trim().match(/\S+/g)||[]).length;
+$('#text').oninput=()=>$('#count').textContent=words($('#text').value)+' từ';
+const showErr=m=>$('#err').innerHTML=m?'<div class="err">'+esc(m)+'</div>':'';
+const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error);return d});
+
+async function analyze(fresh){
+  if(busy)return;busy=true;showErr('');
+  const text=fresh?$('#text').value:cur.text;
+  try{
+    const d=await post('/api/explain',{text,mask:[...mask],vs:$('#vs').value});
+    if(fresh){base=d.result;mask=new Set()}
+    cur=d;draw(d);
+  }catch(e){showErr(e.message);if(fresh){$('#input').hidden=false}}
+  busy=false;
+}
+function draw(d){
+  $('#input').hidden=true;$('#viewer').hidden=false;
+  const ws=d.tokens.map(t=>Math.abs(t.w)).sort((a,b)=>a-b),p=ws[Math.floor(ws.length*.95)]||ws[ws.length-1]||1e-6;
+  let html='',pos=0;
+  for(const t of d.tokens){
+    html+=esc(d.text.slice(pos,t.s));
+    const word=d.text.slice(t.s,t.e),key=word.toLowerCase(),a=Math.min(1,Math.abs(t.w)/p);
+    let cls='w',st='';
+    if(mask.has(key))cls+=' off';
+    else if(t.w>0&&a>.06)st=`background:color-mix(in srgb,var(--brand) ${Math.round(a*88)}%,transparent);${a>.5?'color:var(--on-brand)':''}`;
+    else if(t.w<0&&a>.06)cls+=' neg';
+    html+=`<span class="${cls}" data-t="${esc(key)}" style="${st}" title="đóng góp ${t.w>0?'+':''}${t.w}">${esc(word)}</span>`;pos=t.e;
+  }
+  $('#lab').innerHTML=html+esc(d.text.slice(pos));
+  $('#lab').querySelectorAll('.w').forEach(el=>el.onclick=()=>toggle(el.dataset.t));
+  side(d);
+}
+function toggle(w){mask.has(w)?mask.delete(w):mask.add(w);clearTimeout(timer);timer=setTimeout(()=>analyze(false),300);draw(cur)}
+function side(d){
+  const r=d.result,b=base,changed=b&&b.label!==r.label,delta=b?(r.top.find(t=>t.label===b.label)?.pct??0)-b.pct:0;
+  const prev=b&&mask.size?`<div class="sec">What-if</div><p style="margin:6px 0">Đã bỏ <b>${mask.size}</b> từ: ${[...mask].map(w=>`<span class="pill" style="cursor:pointer" data-w="${esc(w)}">${esc(w)} ✕</span>`).join(' ')}</p>
+     <p style="margin:6px 0">Gốc: <b>${esc(b.label)}</b> ${b.pct}% → Bây giờ: <b>${esc(r.label)}</b> ${r.pct}% ${changed?'<span class="pill fill">ĐỔI CHỦ ĐỀ!</span>':`<span class="delta ${delta<0?'dn':'up'}">${delta.toFixed(1)} điểm</span>`}</p>`:'';
+  $('#result').innerHTML=`<div class="topic"><div class="ic">${r.icon}</div><div><small>Chủ đề dự đoán</small><strong>${esc(r.label)}</strong></div><div class="badge"><span>${r.pct}%</span></div></div>${prev}
+   <div class="sec">Xếp hạng</div>${r.top.map(t=>`<div class="row2"><span>${t.icon} ${esc(t.label)}</span><div class="track"><i style="width:${t.pct}%"></i></div><em>${t.pct}%</em></div>`).join('')}
+   <div class="sec">Từ ủng hộ mạnh nhất (bấm để bỏ)</div><div class="kw" style="margin-top:8px">${d.pos.map(k=>`<span style="cursor:pointer" data-w="${esc(k.word)}" title="+${k.w}">${esc(k.word)}</span>`).join('')||'—'}</div>
+   ${d.neg.length?`<div class="sec">Từ đi ngược</div><div class="kw" style="margin-top:8px">${d.neg.map(k=>`<span style="cursor:pointer;border-style:dashed" data-w="${esc(k.word)}" title="${k.w}">${esc(k.word)}</span>`).join('')}</div>`:''}
+   <div class="sec">Dải chủ đề theo từng đoạn</div>
+   <div class="seg-strip">${d.segments.map(s=>`<div class="${s.label===r.label?'same':'diff'}" title="${esc(s.label)} ${s.pct}% — ${esc(s.text)}">${s.icon}</div>`).join('')||'<div>—</div>'}</div>
+   <p style="margin:6px 0"><span class="pill ${d.agree>=75?'':'fill'}">${esc(d.verdict)}</span> <span style="color:var(--muted);font-size:13.5px">${d.agree}% nội dung cùng chủ đề “${esc(r.label)}”</span></p>`;
+  $('#result').querySelectorAll('[data-w]').forEach(el=>el.onclick=()=>toggle(el.dataset.w));
+}
+$('#go').onclick=()=>analyze(true);
+$('#edit').onclick=()=>{$('#input').hidden=false;$('#viewer').hidden=true;mask=new Set()};
+$('#unmask').onclick=()=>{mask=new Set();analyze(false)};
+$('#vs').onchange=()=>cur&&analyze(false);
+$('#mixed').onclick=()=>{$('#text').value=MIXED;$('#text').oninput();analyze(true)};
+$('#rand').onclick=async()=>{const d=await fetch('/api/random').then(r=>r.json());$('#text').value=d.text;$('#text').oninput();analyze(true)};
+fetch('/api/samples').then(r=>r.json()).then(list=>{$('#samples').innerHTML='<small style="color:var(--muted);align-self:center">Gợi ý:</small>'+list.map(s=>`<button class="chip">${s.icon} ${esc(s.label)}</button>`).join('');
+  $('#samples').querySelectorAll('.chip').forEach((c,i)=>c.onclick=()=>{$('#text').value=list[i].text;$('#text').oninput();analyze(true)})});
+if(PRE){$('#text').value=PRE.text.slice(0,4000);$('#text').oninput();analyze(true)}
+</script>
+{% endblock %}

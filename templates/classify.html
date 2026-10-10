@@ -2,7 +2,7 @@
 {% block title %}Phân loại bài báo bằng AI — VnNews{% endblock %}
 {% block content %}
 <div class="pagehead"><div class="big">✨</div><div><h1>Phân loại bài báo bằng AI</h1><p>Dán nội dung, hoặc link báo điện tử — hệ thống xác định chuyên mục và giải thích vì sao.</p></div></div>
-<div class="two" style="grid-template-columns:1.2fr 1fr;align-items:start">
+<div class="two split" style="align-items:start">
   <div>
     <div class="panel">
       <div class="tabs"><button class="on" data-tab="text">✍️ Nhập văn bản</button><button data-tab="url">🔗 Từ link báo</button></div>
@@ -11,11 +11,11 @@
       <div class="bar-row"><button class="btn blue" id="go">Phân loại ngay</button><button class="btn ghost" id="rand">🎲 Bài ngẫu nhiên</button><button class="btn ghost" id="clear">Xóa</button><span class="count" id="count">0 từ</span></div>
       <div id="err"></div>
     </div>
-    <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 12px">💡 Gợi ý nhanh — bấm để thử theo chuyên mục</h3><div class="chips" id="samples"></div></div>
+    <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 12px">Gợi ý nhanh — bấm để thử theo chuyên mục</h3><div class="chips" id="samples"></div></div>
   </div>
   <div>
     <div class="panel" id="result"><div class="empty"><div class="big">📄</div><b>Chưa có kết quả</b><br>Nhập bài báo hoặc chọn một gợi ý để bắt đầu.</div></div>
-    <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 8px;display:flex">🕘 Lịch sử gần đây <button class="btn ghost sm" id="hclear" style="margin-left:auto">Xóa</button></h3><ul class="hist" id="hist"></ul></div>
+    <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 8px;display:flex">Lịch sử gần đây <button class="btn ghost sm" id="hclear" style="margin-left:auto">Xóa</button></h3><ul class="hist" id="hist"></ul></div>
   </div>
 </div>
 {% endblock %}
@@ -38,8 +38,8 @@ async function run(){
   reset();
 }
 function render(d,truth){
-  const col={cao:'#16a34a','trung bình':'#d97706',thấp:'#dc2626'}[d.confidence];
-  $('#result').innerHTML=`<div class="topic" style="--c:${d.color}"><div class="ic">${d.icon}</div><div><small>Chuyên mục dự đoán</small><strong>${esc(d.label)}</strong></div><div class="badge"><span style="--b:${col}">Tin cậy ${d.confidence}</span></div></div>
+  const col='var(--brand)';
+  $('#result').innerHTML=`<div class="topic" style="--c:${d.color}"><div class="ic">${d.icon}</div><div><small>Chuyên mục dự đoán</small><strong>${esc(d.label)}</strong></div><div class="badge"><span>Tin cậy ${d.confidence}</span></div></div>
    ${truth?`<p class="note">Nhãn thật trong dữ liệu: <b>${esc(truth)}</b> ${truth===d.label?'✅ đúng':'❌ khác'}</p>`:''}
    <div class="sec">Xếp hạng chuyên mục</div>
    ${d.top.map(t=>`<div class="row2" style="--c:${t.color}"><span>${t.icon} ${esc(t.label)}</span><div class="track"><i data-w="${t.pct}"></i></div><em style="text-align:right;color:var(--muted)">${t.pct}%</em></div>`).join('')}

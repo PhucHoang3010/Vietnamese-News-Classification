@@ -4,27 +4,30 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>{% block title %}VnNews — Tin tức được AI phân loại{% endblock %}</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📰%3C/text%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap&subset=vietnamese">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'light'}catch(e){}</script>
 </head>
 <body>
-<div class="topbar"><div class="wrap"><span>🤖 Mọi bài viết được AI tự động phân loại vào 11 chuyên mục</span>
-  <div class="r"><a href="{{ url_for('classify_page') }}">Thử phân loại</a><a href="{{ url_for('stats') }}">Thống kê</a><a href="{{ url_for('about') }}">Giới thiệu</a></div></div></div>
+<div class="topbar"><div class="wrap"><span>Mọi bài viết được AI tự động phân loại vào 11 chuyên mục</span>
+  <div class="r"><a href="{{ url_for('classify_page') }}">Phân loại</a><a href="{{ url_for('lab') }}">AI Lab</a><a href="{{ url_for('stats') }}">Thống kê</a><a href="{{ url_for('about') }}">Giới thiệu</a></div></div></div>
 <header class="main"><div class="wrap head">
-  <a class="logo" href="{{ url_for('home') }}"><i>N</i><span>VnNews<small>Tin tức · AI phân loại</small></span></a>
+  <a class="logo" href="{{ url_for('home') }}">VnNews<small>Tin tức · AI phân loại</small></a>
   <form class="search" action="{{ url_for('search') }}"><input name="q" value="{{ q }}" placeholder="Tìm kiếm bài báo, chủ đề..." autocomplete="off"><button>Tìm</button></form>
-  <a class="btn" href="{{ url_for('classify_page') }}">✨ Phân loại bằng AI</a>
+  <a class="btn" href="{{ url_for('lab') }}">🔬 AI Lab</a>
   <button class="icon" id="theme" title="Sáng / tối">🌙</button>
 </div></header>
 <nav class="cats"><div class="wrap">
-  <a class="home {{ 'on' if request.endpoint=='home' }}" href="{{ url_for('home') }}">🏠 Trang chủ</a>
+  <a class="home {{ 'on' if request.endpoint=='home' }}" href="{{ url_for('home') }}">Trang chủ</a>
   {% for n in NAV %}<a style="--c:{{ n.color }}" class="{{ 'on' if request.view_args and request.view_args.get('slug')==n.slug }}" href="{{ url_for('category', slug=n.slug) }}">{{ n.name }}</a>{% endfor %}
+  <a class="lab" href="{{ url_for('lab') }}">🔬 AI Lab</a>
 </div></nav>
 <main><div class="wrap">{% block content %}{% endblock %}</div></main>
 <footer><div class="wrap">
   <div><h5>VnNews</h5>Trang tin tức mô phỏng với hệ thống học máy phân loại chủ đề tiếng Việt (TF-IDF + Linear SVM). Dữ liệu gồm {{ '{:,}'.format(STATS.n).replace(',', '.') }} bài báo, đồ án môn Học máy.</div>
   <div><h5>Chuyên mục</h5>{% for n in NAV[:6] %}<a href="{{ url_for('category', slug=n.slug) }}">{{ n.name }}</a>{% endfor %}</div>
-  <div><h5>Công cụ</h5><a href="{{ url_for('classify_page') }}">Phân loại bài báo</a><a href="{{ url_for('stats') }}">Thống kê mô hình</a><a href="{{ url_for('about') }}">Giới thiệu đồ án</a></div>
+  <div><h5>Công cụ</h5><a href="{{ url_for('lab') }}">AI Lab — giải thích AI</a><a href="{{ url_for('classify_page') }}">Phân loại bài báo</a><a href="{{ url_for('stats') }}">Thống kê mô hình</a><a href="{{ url_for('about') }}">Giới thiệu đồ án</a></div>
 </div></footer>
 <div class="toast" id="toast"></div>
 <script>

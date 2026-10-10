@@ -2,7 +2,7 @@
 {% block title %}Tìm kiếm: {{ qq }} — VnNews{% endblock %}
 {% block content %}
 <div class="layout"><div>
-  <div class="sec-h"><h2>🔍 Kết quả cho “{{ qq }}”</h2><a>{{ results|length }} bài</a></div>
+  <div class="sec-h"><h2>Kết quả cho “{{ qq }}”</h2><a>{{ results|length }} bài</a></div>
   <div class="chips" style="margin-bottom:18px">
     <a class="chip" style="{{ 'border-color:var(--brand);color:var(--brand)' if not topic }}" href="?q={{ qq|urlencode }}">Tất cả</a>
     {% for n in NAV %}<a class="chip" style="--c:{{ n.color }};{{ 'border-color:var(--c);color:var(--c)' if topic==n.name }}" href="?q={{ qq|urlencode }}&topic={{ n.name|urlencode }}">{{ n.name }}</a>{% endfor %}</div>

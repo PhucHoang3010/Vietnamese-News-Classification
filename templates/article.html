@@ -3,17 +3,18 @@
 {% block content %}
 <div class="crumb"><a href="{{ url_for('home') }}">Trang chủ</a> › <a href="{{ url_for('category', slug=a.slug) }}">{{ a.label }}</a></div>
 <div class="layout"><div>
-<article class="art" style="--c:{{ a.color }}">
+<article class="art">
   <a class="tag" href="{{ url_for('category', slug=a.slug) }}">{{ a.icon }} {{ a.label }}</a>
   <h1>{{ a.title }}</h1>
-  <div class="byline"><span>⏱ {{ a.minutes }} phút đọc</span><span>🤖 AI phân loại: <b>{{ a.label }}</b> ({{ a.pct }}%)</span>
+  <div class="byline"><span>{{ a.minutes }} phút đọc</span><span>AI phân loại: <b>{{ a.label }}</b> ({{ a.pct }}%)</span><a href="{{ url_for('lab', id=a.id) }}" class="pill fill">🔬 Xem AI giải thích</a>
     {% if a.truth != a.label %}<span>Nhãn gốc trong dữ liệu: {{ a.truth }}</span>{% endif %}</div>
   <p class="lead" style="margin-top:18px">{{ a.desc }}</p>
-  {% if res %}<div class="ai"><h4>🤖 AI phân tích bài viết này</h4>
+  <figure class="fig" style="margin-left:0;margin-right:0"><div class="thumb"><img src="{{ a.img }}" alt=""></div><div class="figcap">Ảnh minh họa theo chuyên mục “{{ a.label }}”.</div></figure>
+  {% if res %}<div class="ai"><h4>AI phân tích bài viết này</h4>
     {% for t in res.top[:3] %}<div class="row" style="--c:{{ t.color }}"><span>{{ t.icon }} {{ t.label }}</span><div class="track"><i data-w="{{ t.pct }}"></i></div><em>{{ t.pct }}%</em></div>{% endfor %}
     <div class="kw" style="margin-top:10px"><small style="color:var(--muted);align-self:center">Từ khóa quyết định:</small>{% for k in res.keywords %}<span>{{ k.word }}</span>{% endfor %}</div></div>{% endif %}
   <div class="body" style="margin-top:20px">{% for p in a.content|paras %}<p>{{ p }}</p>{% endfor %}</div>
 </article>
-<section class="blk" style="margin-top:30px"><div class="sec-h"><h2>📎 Bài viết liên quan</h2></div><div class="grid2">{% for r in related %}{{ card(r) }}{% endfor %}</div></section>
+<section class="blk" style="margin-top:30px"><div class="sec-h"><h2>Bài viết liên quan</h2></div><div class="grid2">{% for r in related %}{{ card(r) }}{% endfor %}</div></section>
 </div>{{ sidebar() }}</div>
 {% endblock %}

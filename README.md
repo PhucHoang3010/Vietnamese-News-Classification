@@ -10,7 +10,9 @@ Chạy hoàn toàn trên CPU, không cần GPU hay mô hình ngôn ngữ lớn.
 - **Tìm kiếm** theo nội dung, lọc theo chuyên mục
 - **Công cụ phân loại**: nhập văn bản / link báo, gợi ý mẫu, bài ngẫu nhiên, lịch sử
 - **Thống kê**: Accuracy, F1 từng lớp, ma trận nhầm lẫn, so sánh thuật toán, từ khóa đặc trưng
-- Chế độ sáng/tối, hiển thị tốt trên điện thoại
+- **AI Lab — chức năng nổi bật**: giải thích AI bằng bản đồ nhiệt từ ngữ, bấm bỏ từ để xem dự đoán đổi (what-if), phát hiện bài đa chủ đề, phân tích lỗi
+- Giao diện trắng đen kiểu báo giấy, chế độ sáng/tối, tốt trên điện thoại
+- Ảnh minh họa đen-trắng tự tạo theo chuyên mục; muốn dùng ảnh thật chỉ cần chép `static/img/<id>.jpg` (id = số bài, xem trên URL `/bai/<id>`)
 
 ## Chạy
 ```bash

@@ -1,12 +1,13 @@
 {% extends "base.html" %}{% from "_macros.html" import card, mini, sidebar with context %}
 {% block content %}
 <div class="hero">
-  <a class="hero-main" href="{{ url_for('article', aid=hero.id) }}" style="--c:{{ hero.color }}"><span class="emoji">{{ hero.icon }}</span>
+  <a class="hero-main" href="{{ url_for('article', aid=hero.id) }}" style="--c:{{ hero.color }}"><img class="bg" src="{{ hero.img }}" alt="">
     <div class="in"><span class="tag">{{ hero.icon }} {{ hero.label }}</span><h1>{{ hero.title }}</h1><p>{{ hero.desc[:220] }}{{ '…' if hero.desc|length>220 }}</p></div></a>
   <div class="hero-side">{% for a in side %}{{ mini(a) }}{% endfor %}</div>
 </div>
+<div class="feature"><div class="big">🔬</div><div><h2>AI Lab — nhìn xem AI “nghĩ” gì</h2><p>Mỗi từ trong bài được tô đậm theo mức đóng góp vào kết quả. Bấm bỏ một từ để xem dự đoán thay đổi thế nào, và phát hiện bài trộn nhiều chủ đề.</p></div><a class="btn" href="{{ url_for('lab') }}">Thử ngay →</a></div>
 <div class="layout"><div>
-  <section class="blk"><div class="sec-h"><h2>🔥 Tin mới nhất</h2></div><div class="grid2">{% for a in latest[:4] %}{{ card(a) }}{% endfor %}</div></section>
+  <section class="blk"><div class="sec-h"><h2>Tin mới nhất</h2></div><div class="grid2">{% for a in latest[:4] %}{{ card(a) }}{% endfor %}</div></section>
   {% for name, items in sections %}{% set m = TOPICS[name] %}
   <section class="blk" style="--c:{{ m[2] }}"><div class="sec-h"><h2>{{ m[1] }} {{ name }}</h2><a href="{{ url_for('category', slug=m[0]) }}">Xem tất cả →</a></div>
     <div class="sect">{{ card(items[0]) }}<div class="stack">{% for a in items[1:4] %}{{ mini(a) }}{% endfor %}</div></div></section>

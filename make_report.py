@@ -69,15 +69,25 @@ P("Từ khóa đặc trưng nhất của từng chủ đề (trọng số lớn 
 TABLE(pd.DataFrame({"Chủ đề": list(kw), "Top từ khóa": [", ".join(v[:6]) for v in kw.values()]}))
 P(f"Số mẫu dự đoán sai trên tập kiểm thử: {len(err)} / {m['test_size']} (xem file outputs/mau_du_doan_sai.csv).")
 
-H("6. Hạn chế và hướng phát triển")
+H("6. Hệ thống web và chức năng nổi bật")
+P("Mô hình được đóng gói thành website tin tức VnNews (Flask) gồm: trang chủ, 11 chuyên mục, trang đọc bài, tìm kiếm TF-IDF, công cụ phân loại (văn bản/đường link), trang thống kê và giới thiệu. "
+  "Toàn bộ 5.500 bài được mô hình tự động gán chuyên mục; các chỉ số độ chính xác chỉ tính trên tập kiểm thử.")
+H("6.1 AI Lab – giải thích dự đoán (Explainable AI)", 2)
+P("Điểm khác biệt của đồ án là chức năng giải thích vì sao mô hình chọn một chủ đề. Vì Linear SVM là mô hình tuyến tính, điểm của mỗi chủ đề bằng tổng (trọng số × giá trị TF-IDF) nên có thể tách chính xác "
+  "phần đóng góp của từng từ và cụm hai từ mà không cần xấp xỉ như LIME/SHAP. Đóng góp của một từ = (trọng số chủ đề dự đoán − trọng số trung bình các chủ đề còn lại) × TF-IDF.")
+B(["Bản đồ nhiệt từ ngữ: mỗi từ trong bài được tô đậm theo mức ủng hộ chủ đề dự đoán; từ đi ngược được gạch chấm.",
+   "What-if: người dùng bấm bỏ một từ, hệ thống dự đoán lại ngay và cho biết xác suất thay đổi bao nhiêu hoặc chủ đề có bị đổi không (ví dụ bỏ các từ thể thao thì bài chuyển sang Kinh doanh).",
+   "Dải chủ đề theo đoạn: bài được cắt thành các đoạn, mỗi đoạn phân loại riêng; nếu dưới 75% nội dung cùng một chủ đề thì cảnh báo bài đa chủ đề/mơ hồ.",
+   "Phân tích lỗi: trang thống kê liệt kê các bài AI đoán sai nhưng có độ tin cậy cao, kèm liên kết sang AI Lab để xem nguyên nhân."])
+H("7. Hạn chế và hướng phát triển")
 B(["Chưa tách từ tiếng Việt (word segmentation); có thể thêm underthesea/VnCoreNLP để cải thiện.",
    "Có thể thử mô hình học sâu (PhoBERT) khi có GPU – đã cố ý không dùng để chương trình chạy được trên máy yếu.",
    "Dữ liệu chỉ 5.500 bài; thêm dữ liệu và gộp/chuẩn hóa nhãn mờ sẽ tăng độ chính xác.",
    "Triển khai thành web/API để người dùng dán bài báo và nhận chủ đề."])
 
-H("7. Hướng dẫn chạy")
-P("pip install -r requirements.txt\npython train.py        # huấn luyện + sinh biểu đồ\npython predict.py \"nội dung bài báo\"\npython make_report.py  # sinh lại báo cáo")
-H("8. Kết luận")
+H("8. Hướng dẫn chạy")
+P("pip install -r requirements.txt\npython train.py        # huấn luyện + sinh biểu đồ\npython app.py          # chạy website tại http://127.0.0.1:5000\npython predict.py \"nội dung bài báo\"\npython make_report.py  # sinh lại báo cáo")
+H("9. Kết luận")
 P(f"Hệ thống TF-IDF + Linear SVM đạt Accuracy {m['test_accuracy']:.1%} và Macro-F1 {m['test_macro_f1']:.1%} trên 11 chủ đề, huấn luyện chỉ vài giây trên CPU, "
   "đáp ứng mục tiêu phân loại tin tức tự động mà không cần tài nguyên tính toán lớn.")
 H("Tài liệu tham khảo")
