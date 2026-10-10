@@ -1,0 +1,12 @@
+{
+ "n_samples": 5500,
+ "n_classes": 11,
+ "best_params": {
+  "clf__C": "2",
+  "tfidf__ngram_range": "(1, 2)"
+ },
+ "cv_macro_f1": 0.8825015483392008,
+ "test_accuracy": 0.8933333333333333,
+ "test_macro_f1": 0.8928700040046939,
+ "test_size": 825
+}
