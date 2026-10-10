@@ -1,0 +1,240 @@
+{% raw %}<!doctype html>
+<html lang="vi" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns=%27http://www.w3.org/2000/svg%27 viewBox=%270 0 100 100%27%3E%3Ctext y=%27.9em%27 font-size=%2790%27%3E📰%3C/text%3E%3C/svg%3E">
+<title>VnNews AI — Phân loại tin tức tiếng Việt</title>
+<style>
+:root{--bg:#f6f8fc;--surface:#fff;--text:#0f172a;--muted:#64748b;--line:#e2e8f0;--brand:#4f46e5;--brand2:#2563eb;--soft:#eef2ff;--shadow:0 1px 2px #0f172a0d,0 8px 24px #0f172a0f;--ok:#16a34a;--warn:#d97706;--bad:#dc2626}
+[data-theme=dark]{--bg:#0b1020;--surface:#131a2e;--text:#e6e9f5;--muted:#93a0bd;--line:#252e47;--soft:#1c2347;--shadow:0 1px 2px #0006,0 8px 24px #0005}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--text);font:15px/1.6 "Segoe UI",system-ui,-apple-system,Roboto,sans-serif;transition:background .2s}
+a{color:var(--brand)}button{font:inherit;cursor:pointer}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+header{position:sticky;top:0;z-index:20;background:color-mix(in srgb,var(--surface) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;gap:20px;height:60px}
+.logo{display:flex;align-items:center;gap:10px;font-weight:800;font-size:18px;color:var(--text);text-decoration:none}
+.logo b{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;font-size:17px}
+.nav nav{display:flex;gap:4px;margin-left:12px}.nav nav a{padding:7px 14px;border-radius:8px;color:var(--muted);text-decoration:none;font-weight:600}
+.nav nav a:hover,.nav nav a.on{background:var(--soft);color:var(--brand)}
+.sp{flex:1}.icon-btn{border:1px solid var(--line);background:var(--surface);color:var(--text);width:38px;height:38px;border-radius:10px;font-size:17px}
+.hero{padding:44px 0 22px;text-align:center}
+.hero h1{font-size:clamp(26px,4vw,40px);line-height:1.2;margin:0 0 10px;letter-spacing:-.5px}
+.hero h1 span{background:linear-gradient(90deg,var(--brand),var(--brand2));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hero p{color:var(--muted);margin:0 auto;max-width:620px}
+.stats{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;margin-top:18px}
+.pill{background:var(--surface);border:1px solid var(--line);padding:5px 14px;border-radius:99px;font-size:13px;color:var(--muted)}.pill b{color:var(--text)}
+.grid{display:grid;grid-template-columns:1.25fr 1fr;gap:20px;align-items:start;margin-top:20px}
+@media(max-width:860px){.grid{grid-template-columns:1fr}.nav nav{display:none}}
+.grid>div,.two>div{min-width:0}html,body{overflow-x:hidden}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow);padding:20px}
+.card h2{font-size:16px;margin:0 0 12px;display:flex;align-items:center;gap:8px}
+.tabs{display:flex;gap:6px;margin-bottom:12px;background:var(--bg);padding:4px;border-radius:10px;width:fit-content}
+.tabs button{border:0;background:none;padding:6px 14px;border-radius:7px;color:var(--muted);font-weight:600}
+.tabs button.on{background:var(--surface);color:var(--brand);box-shadow:var(--shadow)}
+textarea,input[type=url]{width:100%;border:1px solid var(--line);background:var(--bg);color:var(--text);border-radius:12px;padding:12px 14px;font:inherit;outline:none;transition:.15s}
+textarea{min-height:210px;resize:vertical}textarea:focus,input:focus{border-color:var(--brand);box-shadow:0 0 0 3px #4f46e522}
+.bar-row{display:flex;align-items:center;gap:10px;margin-top:12px;flex-wrap:wrap}
+.btn{border:0;border-radius:10px;padding:10px 20px;font-weight:700;background:linear-gradient(135deg,var(--brand),var(--brand2));color:#fff;box-shadow:0 4px 14px #4f46e544}
+.btn:hover{filter:brightness(1.07)}.btn:disabled{opacity:.6;cursor:wait}
+.ghost{border:1px solid var(--line);background:var(--surface);color:var(--text);border-radius:10px;padding:9px 14px;font-weight:600}.ghost:hover{border-color:var(--brand);color:var(--brand)}
+.count{margin-left:auto;color:var(--muted);font-size:13px}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1px solid var(--line);background:var(--bg);color:var(--text);padding:6px 12px;border-radius:99px;font-size:13px;font-weight:600;transition:.15s}
+.chip:hover{transform:translateY(-1px);border-color:var(--c,var(--brand));color:var(--c,var(--brand))}
+.hint{color:var(--muted);font-size:13px;margin:0 0 10px}
+.result{animation:up .35s ease}@keyframes up{from{opacity:0;transform:translateY(8px)}}
+.empty{text-align:center;color:var(--muted);padding:36px 10px}.empty .big{font-size:44px}
+.topic{display:flex;align-items:center;gap:14px;padding:14px;border-radius:14px;background:color-mix(in srgb,var(--c) 10%,var(--surface));border:1px solid color-mix(in srgb,var(--c) 30%,var(--line))}
+.topic .ic{font-size:34px}.topic small{color:var(--muted);display:block}.topic strong{font-size:26px;color:var(--c);line-height:1.2}
+.badge{margin-left:auto;text-align:right}.badge span{display:inline-block;padding:3px 10px;border-radius:99px;font-size:12px;font-weight:700;color:#fff;background:var(--b)}
+.row{display:grid;grid-template-columns:minmax(0,104px) 1fr 48px;align-items:center;gap:10px;margin:9px 0;font-size:14px}
+.track{height:10px;background:var(--bg);border-radius:6px;overflow:hidden}.track i{display:block;height:100%;border-radius:6px;background:var(--c);width:0;transition:width .7s cubic-bezier(.2,.8,.2,1)}
+.row em{font-style:normal;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.sec{margin-top:18px;font-size:13px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px}
+.kw{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}.kw span{background:var(--soft);color:var(--brand);padding:3px 10px;border-radius:7px;font-size:13px;font-weight:600}
+.note{margin-top:14px;font-size:12.5px;color:var(--muted)}
+.err{background:#fee2e2;color:#991b1b;border-radius:10px;padding:10px 14px;margin-top:12px;font-weight:600}
+[data-theme=dark] .err{background:#451a1a;color:#fca5a5}
+.hist{list-style:none;padding:0;margin:0}.hist li{display:flex;gap:10px;align-items:center;padding:9px 0;border-top:1px solid var(--line);cursor:pointer;font-size:14px}
+.hist li:first-child{border-top:0}.hist li:hover .t{color:var(--brand)}.hist .t{flex:1;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;color:var(--muted)}
+.hist .tag{font-weight:700;white-space:nowrap}
+section.page{padding:34px 0}section.page h2.title{font-size:24px;margin:0 0 4px}
+.metrics{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin:18px 0}
+@media(max-width:700px){.metrics{grid-template-columns:repeat(2,1fr)}}
+.metric{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.metric b{display:block;font-size:26px;color:var(--brand)}.metric span{color:var(--muted);font-size:13px}
+table{width:100%;border-collapse:collapse;font-size:14px}th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line)}th{color:var(--muted);font-size:12px;text-transform:uppercase}
+.two{display:grid;grid-template-columns:1fr 1fr;gap:20px}@media(max-width:860px){.two{grid-template-columns:1fr}}
+footer{border-top:1px solid var(--line);margin-top:30px;padding:24px 0;color:var(--muted);font-size:13px;text-align:center}
+.spin{display:inline-block;width:14px;height:14px;border:2px solid #fff6;border-top-color:#fff;border-radius:50%;animation:r .7s linear infinite;vertical-align:-2px;margin-right:6px}@keyframes r{to{transform:rotate(360deg)}}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:9px 18px;border-radius:10px;font-weight:600;opacity:0;pointer-events:none;transition:.25s}.toast.on{opacity:1}
+</style>
+</head>
+<body>
+<header><div class="wrap nav">
+  <a class="logo" href="#top"><b>N</b> VnNews AI</a>
+  <nav><a href="#top" class="on">Phân loại</a><a href="#info">Về mô hình</a><a href="#help">Hướng dẫn</a></nav>
+  <div class="sp"></div>
+  <button class="icon-btn" id="theme" title="Chế độ sáng/tối">🌙</button>
+</div></header>
+
+<main class="wrap" id="top">
+  <div class="hero">
+    <h1>Phân loại tin tức tiếng Việt <span>bằng AI</span></h1>
+    <p>Dán nội dung bài báo hoặc link báo điện tử, hệ thống sẽ xác định chủ đề và giải thích vì sao.</p>
+    <div class="stats" id="stats"></div>
+  </div>
+
+  <div class="grid">
+    <div>
+      <div class="card">
+        <div class="tabs"><button class="on" data-tab="text">✍️ Nhập văn bản</button><button data-tab="url">🔗 Từ link báo</button></div>
+        <div id="pane-text"><textarea id="text" placeholder="Dán nội dung bài báo vào đây (tối thiểu khoảng 10 từ)..."></textarea></div>
+        <div id="pane-url" hidden>
+          <input type="url" id="url" placeholder="https://vnexpress.net/...">
+          <p class="hint" style="margin-top:8px">Hệ thống sẽ tải bài báo, trích nội dung rồi chuyển sang tab văn bản để phân loại.</p>
+        </div>
+        <div class="bar-row">
+          <button class="btn" id="go">Phân loại ngay</button>
+          <button class="ghost" id="rand" title="Lấy một bài ngẫu nhiên từ bộ dữ liệu">🎲 Bài ngẫu nhiên</button>
+          <button class="ghost" id="clear">Xóa</button>
+          <span class="count" id="count">0 từ</span>
+        </div>
+        <div id="err"></div>
+      </div>
+
+      <div class="card" style="margin-top:20px">
+        <h2>💡 Gợi ý nhanh — bấm để thử theo chủ đề</h2>
+        <div class="chips" id="samples"></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" id="result"><div class="empty"><div class="big">📄</div><b>Chưa có kết quả</b><br>Nhập bài báo hoặc chọn một gợi ý để bắt đầu.</div></div>
+      <div class="card" style="margin-top:20px"><h2>🕘 Lịch sử gần đây <button class="ghost" id="hclear" style="margin-left:auto;padding:3px 10px;font-size:12px">Xóa</button></h2>
+        <ul class="hist" id="hist"></ul></div>
+    </div>
+  </div>
+
+  <section class="page" id="info">
+    <h2 class="title">Về mô hình</h2><p class="hint">TF-IDF (unigram + bigram) kết hợp Linear SVM, huấn luyện trên 5.500 bài báo, 11 chủ đề. Chạy hoàn toàn trên CPU.</p>
+    <div class="metrics" id="metrics"></div>
+    <div class="two">
+      <div class="card"><h2>📊 Độ chính xác theo chủ đề (F1)</h2><div id="perclass"></div></div>
+      <div class="card"><h2>⚔️ So sánh thuật toán</h2><table id="bench"></table>
+        <p class="note">Linear SVM cho kết quả tốt nhất trên tập kiểm định nên được chọn làm mô hình chính.</p></div>
+    </div>
+  </section>
+
+  <section class="page" id="help">
+    <h2 class="title">Hướng dẫn &amp; lưu ý</h2>
+    <div class="card"><ol style="margin:0;padding-left:20px">
+      <li>Dán nguyên văn bài báo (tiêu đề + nội dung) để có kết quả tốt nhất — bài càng dài càng chính xác.</li>
+      <li>Có thể dán link báo điện tử; hệ thống tự trích nội dung (một số trang chặn tải tự động).</li>
+      <li><b>Độ tin cậy</b> là điểm tương đối giữa các chủ đề, không phải xác suất tuyệt đối. Nếu mức <i>thấp</i>, bài thường nằm giữa hai chủ đề (ví dụ Thời sự – Kinh doanh).</li>
+      <li><b>Từ khóa ảnh hưởng</b> là các từ trong bài đóng góp nhiều nhất vào chủ đề được chọn.</li>
+      <li>Mô hình chỉ biết 11 chủ đề: Giáo dục, Giải trí, Khoa học, Kinh doanh, Pháp luật, Sức khỏe, Thế giới, Thể thao, Thời sự, Xe, Đời sống.</li>
+    </ol></div>
+  </section>
+</main>
+<footer>Đồ án Học máy · Phân loại tin tức tiếng Việt · TF-IDF + Linear SVM</footer>
+<div class="toast" id="toast"></div>
+
+<script>
+const $=s=>document.querySelector(s), esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+let TOPIC={};
+const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
+
+/* theme */
+function theme(t){document.documentElement.dataset.theme=t;$('#theme').textContent=t==='dark'?'☀️':'🌙';store.set('theme',t)}
+theme(store.get('theme',matchMedia('(prefers-color-scheme:dark)').matches?'dark':'light'));
+$('#theme').onclick=()=>theme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+
+/* tabs */
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));
+  $('#pane-text').hidden=b.dataset.tab!=='text';$('#pane-url').hidden=b.dataset.tab!=='url';$('#err').innerHTML='';
+});
+const words=t=>(t.trim().match(/\S+/g)||[]).length;
+$('#text').oninput=()=>$('#count').textContent=words($('#text').value)+' từ';
+const showErr=m=>$('#err').innerHTML=m?'<div class="err">'+esc(m)+'</div>':'';
+function setText(t){document.querySelector('[data-tab=text]').click();$('#text').value=t;$('#text').oninput()}
+
+/* classify */
+async function run(){
+  showErr('');
+  if(!$('#pane-url').hidden){
+    const url=$('#url').value.trim(); if(!url) return showErr('Hãy nhập link bài báo.');
+    $('#go').disabled=true;$('#go').innerHTML='<span class="spin"></span>Đang tải bài báo...';
+    try{const r=await fetch('/api/url',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({url})});const d=await r.json();
+      if(!r.ok) throw new Error(d.error);setText((d.title?d.title+'. ':'')+d.text)}
+    catch(e){reset();return showErr(e.message)}
+  }
+  const text=$('#text').value;
+  $('#go').disabled=true;$('#go').innerHTML='<span class="spin"></span>Đang phân tích...';
+  try{
+    const r=await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text})});
+    const d=await r.json(); if(!r.ok) throw new Error(d.error);
+    render(d);addHist(text,d);
+  }catch(e){showErr(e.message)}
+  reset();
+}
+function reset(){$('#go').disabled=false;$('#go').textContent='Phân loại ngay'}
+function render(d,truth){
+  const col={cao:'var(--ok)',['trung bình']:'var(--warn)',thấp:'var(--bad)'}[d.confidence];
+  $('#result').innerHTML=`<div class="result">
+   <div class="topic" style="--c:${d.color}"><div class="ic">${d.icon}</div><div><small>Chủ đề dự đoán</small><strong>${esc(d.label)}</strong></div>
+   <div class="badge"><span style="--b:${col}">Tin cậy ${d.confidence}</span></div></div>
+   ${truth?`<p class="note">Nhãn thật trong dữ liệu: <b>${esc(truth)}</b> ${truth===d.label?'✅ đúng':'❌ khác'}</p>`:''}
+   <div class="sec">Xếp hạng chủ đề</div>
+   ${d.top.map(t=>`<div class="row" style="--c:${t.color}"><span>${t.icon} ${esc(t.label)}</span><div class="track"><i data-w="${t.pct}"></i></div><em>${t.pct}%</em></div>`).join('')}
+   <div class="sec">Từ khóa ảnh hưởng nhiều nhất</div>
+   <div class="kw">${d.keywords.length?d.keywords.map(k=>`<span title="đóng góp ${k.weight}">${esc(k.word)}</span>`).join(''):'<small>Không có từ khóa nổi bật.</small>'}</div>
+   <div class="bar-row" style="margin-top:16px"><button class="ghost" id="copy">📋 Sao chép kết quả</button></div>
+   <p class="note">Phân tích ${d.words} từ. Độ tin cậy là điểm tương đối giữa các chủ đề, không phải xác suất tuyệt đối.</p></div>`;
+  requestAnimationFrame(()=>document.querySelectorAll('.track i').forEach(i=>i.style.width=i.dataset.w+'%'));
+  $('#copy').onclick=()=>{navigator.clipboard?.writeText(`Chủ đề: ${d.label} (${d.pct}%) — từ khóa: ${d.keywords.map(k=>k.word).join(', ')}`);toast('Đã sao chép')};
+}
+
+/* history */
+function addHist(text,d){
+  const h=store.get('hist',[]);h.unshift({text:text.slice(0,2000),label:d.label,icon:d.icon,color:d.color,pct:d.pct});
+  store.set('hist',h.slice(0,8));drawHist();
+}
+function drawHist(){
+  const h=store.get('hist',[]);
+  $('#hist').innerHTML=h.length?h.map((x,i)=>`<li data-i="${i}"><span class="tag" style="color:${x.color}">${x.icon} ${esc(x.label)}</span><span class="t">${esc(x.text.slice(0,70))}</span></li>`).join(''):'<li style="cursor:default;color:var(--muted)">Chưa có lịch sử.</li>';
+  $('#hist').querySelectorAll('li[data-i]').forEach(li=>li.onclick=()=>{setText(h[li.dataset.i].text);run()});
+}
+$('#hclear').onclick=()=>{store.set('hist',[]);drawHist()};
+
+/* buttons */
+$('#go').onclick=run;
+$('#text').addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter')run()});
+$('#clear').onclick=()=>{$('#text').value='';$('#url').value='';$('#text').oninput();showErr('')};
+$('#rand').onclick=async()=>{
+  const r=await fetch('/api/random');const d=await r.json(); if(!r.ok) return showErr(d.error);
+  setText(d.text);showErr('');
+  const p=await fetch('/api/predict',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:d.text})});
+  const res=await p.json(); if(p.ok){render(res,d.truth);addHist(d.text,res)}
+};
+
+/* samples + info */
+fetch('/api/samples').then(r=>r.json()).then(list=>{
+  list.forEach(s=>TOPIC[s.label]=s);
+  $('#samples').innerHTML=list.map(s=>`<button class="chip" style="--c:${s.color}" data-l="${esc(s.label)}">${s.icon} ${esc(s.label)}</button>`).join('');
+  $('#samples').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{setText(TOPIC[c.dataset.l].text);run()});
+});
+fetch('/api/info').then(r=>r.json()).then(i=>{
+  const m=i.metrics||{};const pc=x=>(x*100).toFixed(1)+'%';
+  $('#stats').innerHTML=`<span class="pill"><b>${i.classes.length}</b> chủ đề</span>`+(m.test_accuracy?`<span class="pill">Accuracy <b>${pc(m.test_accuracy)}</b></span><span class="pill">Macro-F1 <b>${pc(m.test_macro_f1)}</b></span>`:'');
+  $('#metrics').innerHTML=m.n_samples?[['Số bài trong dữ liệu',m.n_samples.toLocaleString('vi-VN')],['Accuracy (test)',pc(m.test_accuracy)],['Macro-F1 (test)',pc(m.test_macro_f1)],['Số đặc trưng',i.features.toLocaleString('vi-VN')]].map(x=>`<div class="metric"><b>${x[1]}</b><span>${x[0]}</span></div>`).join(''):'';
+  $('#perclass').innerHTML=(i.per_class||[]).sort((a,b)=>b.f1-a.f1).map(c=>{const t=TOPIC[c.label]||{color:'var(--brand)',icon:''};return `<div class="row" style="--c:${t.color}"><span>${t.icon} ${esc(c.label)}</span><div class="track"><i style="width:${c.f1*100}%"></i></div><em>${c.f1.toFixed(2)}</em></div>`}).join('');
+  $('#bench').innerHTML='<tr><th>Mô hình</th><th>Acc</th><th>Macro-F1</th></tr>'+(i.bench||[]).map(b=>`<tr><td>${esc(b.model)}</td><td>${(+b.val_acc).toFixed(3)}</td><td>${(+b.val_macro_f1).toFixed(3)}</td></tr>`).join('');
+});
+drawHist();
+</script>
+</body></html>{% endraw %}
