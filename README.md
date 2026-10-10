@@ -1,23 +1,32 @@
-# Đồ án: Phân loại tin tức tiếng Việt (Học máy)
+# VnNews — Website tin tức có AI phân loại chủ đề (Đồ án Học máy)
 
-Pipeline nhẹ, chạy CPU, **không cần DeepSeek / GPU / mô hình lớn**.
+Website tin tức tiếng Việt gồm **5.500 bài báo**, mỗi bài được mô hình **TF-IDF + Linear SVM** tự động xếp vào **11 chuyên mục**.
+Chạy hoàn toàn trên CPU, không cần GPU hay mô hình ngôn ngữ lớn.
 
-- Dữ liệu: `data/news_dataset.csv` (5.500 bài, 11 chủ đề)
-- Mô hình: TF-IDF (1–2 gram) + Linear SVM (so sánh với NB, LR, RF)
-- Kết quả test: Accuracy ≈ 89,3%, Macro-F1 ≈ 89,3%
+## Chức năng
+- **Trang chủ** kiểu báo điện tử: tin nổi bật, tin mới, từng chuyên mục
+- **11 chuyên mục** có phân trang (Thời sự, Thế giới, Kinh doanh, Pháp luật, Giáo dục, Sức khỏe, Khoa học, Đời sống, Giải trí, Thể thao, Xe)
+- **Đọc bài** kèm phân tích AI (xác suất, từ khóa quyết định) và bài liên quan
+- **Tìm kiếm** theo nội dung, lọc theo chuyên mục
+- **Công cụ phân loại**: nhập văn bản / link báo, gợi ý mẫu, bài ngẫu nhiên, lịch sử
+- **Thống kê**: Accuracy, F1 từng lớp, ma trận nhầm lẫn, so sánh thuật toán, từ khóa đặc trưng
+- Chế độ sáng/tối, hiển thị tốt trên điện thoại
 
+## Chạy
 ```bash
 pip install -r requirements.txt
+python app.py          # mở http://127.0.0.1:5000
+```
+
+## Huấn luyện lại / báo cáo
+```bash
 python train.py          # huấn luyện, sinh outputs/ và model.joblib
+python build_cache.py    # dự đoán sẵn cho toàn bộ bài -> data/predictions.json
 python predict.py "Bộ Giáo dục công bố điểm chuẩn đại học"
 python make_report.py    # sinh BAO_CAO_DO_AN.docx
 ```
-Báo cáo: `BAO_CAO_DO_AN.docx`. Điền tên/MSSV ở trang đầu.
 
-## Web giao diện (khuyên dùng)
-```bash
-pip install -r requirements.txt
-python app.py        # mở http://127.0.0.1:5000
-```
-Tính năng: phân loại từ văn bản hoặc link báo, gợi ý mẫu cho 11 chủ đề, bài ngẫu nhiên từ dữ liệu,
-từ khóa giải thích kết quả, lịch sử, chế độ tối, trang thông tin mô hình. Cần có `model.joblib`, thư mục `templates/` và `outputs/`.
+## Kết quả (tập kiểm thử 825 bài chưa dùng khi huấn luyện)
+Accuracy ≈ 89,3% · Macro-F1 ≈ 89,3%
+
+Báo cáo đầy đủ: `BAO_CAO_DO_AN.docx` (điền tên/MSSV ở trang đầu).

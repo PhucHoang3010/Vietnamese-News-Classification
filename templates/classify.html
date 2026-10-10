@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block title %}Phân loại bài báo bằng AI — VnNews{% endblock %}
+{% block content %}
+<div class="pagehead"><div class="big">✨</div><div><h1>Phân loại bài báo bằng AI</h1><p>Dán nội dung, hoặc link báo điện tử — hệ thống xác định chuyên mục và giải thích vì sao.</p></div></div>
+<div class="two" style="grid-template-columns:1.2fr 1fr;align-items:start">
+  <div>
+    <div class="panel">
+      <div class="tabs"><button class="on" data-tab="text">✍️ Nhập văn bản</button><button data-tab="url">🔗 Từ link báo</button></div>
+      <div id="pane-text"><textarea id="text" placeholder="Dán nội dung bài báo vào đây (tối thiểu khoảng 10 từ)..."></textarea></div>
+      <div id="pane-url" hidden><input type="url" id="url" placeholder="https://vnexpress.net/..."><p class="note">Hệ thống tải bài báo, trích nội dung rồi phân loại.</p></div>
+      <div class="bar-row"><button class="btn blue" id="go">Phân loại ngay</button><button class="btn ghost" id="rand">🎲 Bài ngẫu nhiên</button><button class="btn ghost" id="clear">Xóa</button><span class="count" id="count">0 từ</span></div>
+      <div id="err"></div>
+    </div>
+    <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 12px">💡 Gợi ý nhanh — bấm để thử theo chuyên mục</h3><div class="chips" id="samples"></div></div>
+  </div>
+  <div>
+    <div class="panel" id="result"><div class="empty"><div class="big">📄</div><b>Chưa có kết quả</b><br>Nhập bài báo hoặc chọn một gợi ý để bắt đầu.</div></div>
+    <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 8px;display:flex">🕘 Lịch sử gần đây <button class="btn ghost sm" id="hclear" style="margin-left:auto">Xóa</button></h3><ul class="hist" id="hist"></ul></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));$('#pane-text').hidden=b.dataset.tab!=='text';$('#pane-url').hidden=b.dataset.tab!=='url';$('#err').innerHTML=''});
+const words=t=>(t.trim().match(/\S+/g)||[]).length;
+$('#text').oninput=()=>$('#count').textContent=words($('#text').value)+' từ';
+const showErr=m=>$('#err').innerHTML=m?'<div class="err">'+esc(m)+'</div>':'';
+function setText(t){document.querySelector('[data-tab=text]').click();$('#text').value=t;$('#text').oninput()}
+const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error);return d});
+const reset=()=>{$('#go').disabled=false;$('#go').textContent='Phân loại ngay'};
+async function run(){
+  showErr('');$('#go').disabled=true;$('#go').innerHTML='<span class="spin"></span> Đang xử lý...';
+  try{
+    if(!$('#pane-url').hidden){const url=$('#url').value.trim();if(!url)throw new Error('Hãy nhập link bài báo.');const d=await post('/api/url',{url});setText((d.title?d.title+'. ':'')+d.text)}
+    const text=$('#text').value;const d=await post('/api/predict',{text});render(d);addHist(text,d);
+  }catch(e){showErr(e.message)}
+  reset();
+}
+function render(d,truth){
+  const col={cao:'#16a34a','trung bình':'#d97706',thấp:'#dc2626'}[d.confidence];
+  $('#result').innerHTML=`<div class="topic" style="--c:${d.color}"><div class="ic">${d.icon}</div><div><small>Chuyên mục dự đoán</small><strong>${esc(d.label)}</strong></div><div class="badge"><span style="--b:${col}">Tin cậy ${d.confidence}</span></div></div>
+   ${truth?`<p class="note">Nhãn thật trong dữ liệu: <b>${esc(truth)}</b> ${truth===d.label?'✅ đúng':'❌ khác'}</p>`:''}
+   <div class="sec">Xếp hạng chuyên mục</div>
+   ${d.top.map(t=>`<div class="row2" style="--c:${t.color}"><span>${t.icon} ${esc(t.label)}</span><div class="track"><i data-w="${t.pct}"></i></div><em style="text-align:right;color:var(--muted)">${t.pct}%</em></div>`).join('')}
+   <div class="sec">Từ khóa ảnh hưởng nhiều nhất</div><div class="kw" style="margin-top:8px">${d.keywords.length?d.keywords.map(k=>`<span>${esc(k.word)}</span>`).join(''):'<small>Không có từ khóa nổi bật.</small>'}</div>
+   <div class="bar-row"><a class="btn ghost sm" href="/chu-de/${d.slug}">Xem chuyên mục ${esc(d.label)} →</a><button class="btn ghost sm" id="copy">📋 Sao chép</button></div>
+   <p class="note">Phân tích ${d.words} từ. Độ tin cậy là điểm tương đối giữa các chuyên mục, không phải xác suất tuyệt đối.</p>`;
+  requestAnimationFrame(()=>document.querySelectorAll('#result .track i').forEach(i=>i.style.width=i.dataset.w+'%'));
+  $('#copy').onclick=()=>{navigator.clipboard?.writeText(`Chuyên mục: ${d.label} (${d.pct}%) — từ khóa: ${d.keywords.map(k=>k.word).join(', ')}`);toast('Đã sao chép')};
+}
+function addHist(text,d){const h=store.get('hist',[]);h.unshift({text:text.slice(0,2000),label:d.label,icon:d.icon,color:d.color});store.set('hist',h.slice(0,8));drawHist()}
+function drawHist(){const h=store.get('hist',[]);$('#hist').innerHTML=h.length?h.map((x,i)=>`<li data-i="${i}"><b style="color:${x.color};white-space:nowrap">${x.icon} ${esc(x.label)}</b><span class="t">${esc(x.text.slice(0,70))}</span></li>`).join(''):'<li style="cursor:default;color:var(--muted)">Chưa có lịch sử.</li>';
+  $('#hist').querySelectorAll('li[data-i]').forEach(li=>li.onclick=()=>{setText(h[li.dataset.i].text);run()})}
+$('#hclear').onclick=()=>{store.set('hist',[]);drawHist()};
+$('#go').onclick=run;$('#text').addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter')run()});
+$('#clear').onclick=()=>{$('#text').value='';$('#url').value='';$('#text').oninput();showErr('')};
+$('#rand').onclick=async()=>{try{const d=await fetch('/api/random').then(r=>r.json());setText(d.text);showErr('');const res=await post('/api/predict',{text:d.text});render(res,d.truth);addHist(d.text,res)}catch(e){showErr(e.message)}};
+fetch('/api/samples').then(r=>r.json()).then(list=>{$('#samples').innerHTML=list.map(s=>`<button class="chip" style="--c:${s.color}" data-l="${esc(s.label)}">${s.icon} ${esc(s.label)}</button>`).join('');
+  $('#samples').querySelectorAll('.chip').forEach((c,i)=>c.onclick=()=>{setText(list[i].text);run()})});
+drawHist();
+</script>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends "base.html" %}{% from "_macros.html" import card, sidebar with context %}
+{% block title %}Tìm kiếm: {{ qq }} — VnNews{% endblock %}
+{% block content %}
+<div class="layout"><div>
+  <div class="sec-h"><h2>🔍 Kết quả cho “{{ qq }}”</h2><a>{{ results|length }} bài</a></div>
+  <div class="chips" style="margin-bottom:18px">
+    <a class="chip" style="{{ 'border-color:var(--brand);color:var(--brand)' if not topic }}" href="?q={{ qq|urlencode }}">Tất cả</a>
+    {% for n in NAV %}<a class="chip" style="--c:{{ n.color }};{{ 'border-color:var(--c);color:var(--c)' if topic==n.name }}" href="?q={{ qq|urlencode }}&topic={{ n.name|urlencode }}">{{ n.name }}</a>{% endfor %}</div>
+  {% if results %}<div class="grid2">{% for a in results %}{{ card(a) }}{% endfor %}</div>
+  {% else %}<div class="panel empty"><div class="big">🔎</div><b>{{ 'Không tìm thấy bài phù hợp.' if qq else 'Hãy nhập từ khóa để tìm kiếm.' }}</b><p>Thử từ khóa khác, ví dụ: <a href="?q=ngân hàng" style="color:var(--brand)">ngân hàng</a>, <a href="?q=bóng đá" style="color:var(--brand)">bóng đá</a>, <a href="?q=học sinh" style="color:var(--brand)">học sinh</a>.</p></div>{% endif %}
+</div>{{ sidebar() }}</div>
+{% endblock %}

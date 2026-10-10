@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Giới thiệu đồ án — VnNews{% endblock %}
+{% block content %}
+<div class="pagehead"><div class="big">🎓</div><div><h1>Giới thiệu đồ án</h1><p>Phân loại tin tức tiếng Việt bằng học máy — chạy hoàn toàn trên CPU, không cần GPU hay mô hình ngôn ngữ lớn.</p></div></div>
+<div class="two">
+  <div class="panel"><h3 style="margin-top:0">Quy trình xử lý</h3><ol class="steps">
+    <li><div><b>Thu thập dữ liệu</b><br>{{ STATS.n }} bài báo tiếng Việt, 11 chuyên mục, mỗi chuyên mục 500 bài.</div></li>
+    <li><div><b>Tiền xử lý</b><br>Chuẩn hóa Unicode, chữ thường, bỏ URL, số và dấu câu.</div></li>
+    <li><div><b>Trích xuất đặc trưng TF-IDF</b><br>Unigram + bigram, tối đa 200.000 đặc trưng.</div></li>
+    <li><div><b>Huấn luyện & so sánh</b><br>Naive Bayes, Logistic Regression, Linear SVM, Random Forest; chọn Linear SVM, tinh chỉnh bằng GridSearchCV.</div></li>
+    <li><div><b>Đánh giá</b><br>Chia 70/15/15 có phân tầng; đo Accuracy, Precision, Recall, F1 trên tập kiểm thử.</div></li></ol></div>
+  <div class="panel"><h3 style="margin-top:0">Kết quả</h3>
+    <div class="kpis" style="grid-template-columns:1fr 1fr"><div class="kpi"><b>{{ (STATS.acc*100)|round(1) }}%</b><span>Accuracy</span></div><div class="kpi"><b>{{ (STATS.f1*100)|round(1) }}%</b><span>Macro-F1</span></div></div>
+    <p>Thể thao, Sức khỏe, Xe, Giải trí, Pháp luật đạt F1 trên 0,92. Thời sự và Đời sống thấp hơn vì nội dung giao thoa với chuyên mục khác.</p>
+    <h3>Hạn chế</h3><ul><li>Chưa tách từ tiếng Việt (có thể thêm underthesea).</li><li>Dữ liệu chỉ {{ STATS.n }} bài.</li><li>Ranh giới giữa vài chuyên mục vốn mờ.</li><li>Độ tin cậy là điểm tương đối, không phải xác suất hiệu chỉnh.</li></ul>
+    <a class="btn blue" href="{{ url_for('stats') }}">Xem thống kê chi tiết →</a></div>
+</div>
+<div class="panel"><h3 style="margin-top:0">Công nghệ</h3><div class="chips"><span class="chip">Python</span><span class="chip">scikit-learn</span><span class="chip">TF-IDF</span><span class="chip">LinearSVC</span><span class="chip">Flask</span><span class="chip">Jinja2</span><span class="chip">HTML/CSS/JS</span></div></div>
+{% endblock %}

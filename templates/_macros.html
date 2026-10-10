@@ -1,0 +1,25 @@
+{% macro card(a) %}
+<a class="card" href="{{ url_for('article', aid=a.id) }}" style="--c:{{ a.color }}">
+  <div class="thumb"><span>{{ a.icon }}</span></div>
+  <div><span class="tag">{{ a.label }}</span></div>
+  <h3>{{ a.title }}</h3><p>{{ a.desc }}</p>
+  <div class="meta"><span>⏱ {{ a.minutes }} phút đọc</span><span class="conf" title="Độ tin cậy của AI">🤖 {{ a.pct }}%</span></div>
+</a>
+{% endmacro %}
+{% macro mini(a) %}
+<a class="mini" href="{{ url_for('article', aid=a.id) }}" style="--c:{{ a.color }}">
+  <div class="thumb"><span>{{ a.icon }}</span></div><div><span class="tag">{{ a.label }}</span><h4>{{ a.title }}</h4></div>
+</a>
+{% endmacro %}
+{% macro heat(v, mx) %}{% set k = (v / mx) if mx else 0 %}background:color-mix(in srgb,var(--brand) {{ (k*100)|round|int }}%,transparent);color:{{ '#fff' if k>0.55 else 'inherit' }}{% endmacro %}
+{% macro sidebar() %}
+<aside>
+  <div class="box promo"><h3>✨ Thử phân loại bằng AI</h3><p>Dán nội dung bài báo hoặc link, hệ thống xác định chuyên mục và giải thích kết quả.</p><a class="btn" href="{{ url_for('classify_page') }}">Phân loại ngay →</a></div>
+  <div class="box"><h3>📚 Chuyên mục</h3><ul class="list">
+    {% for n in NAV %}<li><a href="{{ url_for('category', slug=n.slug) }}"><span>{{ n.icon }}</span> {{ n.name }}<b>{{ STATS.counts[n.name] }}</b></a></li>{% endfor %}</ul></div>
+  <div class="box"><h3>📈 Độ chính xác AI</h3>
+    <div class="row2" style="grid-template-columns:90px 1fr 52px"><span>Accuracy</span><div class="track"><i data-w="{{ (STATS.acc*100)|round(1) }}"></i></div><em>{{ (STATS.acc*100)|round(1) }}%</em></div>
+    <div class="row2" style="grid-template-columns:90px 1fr 52px"><span>Macro-F1</span><div class="track"><i data-w="{{ (STATS.f1*100)|round(1) }}"></i></div><em>{{ (STATS.f1*100)|round(1) }}%</em></div>
+    <p class="note">Đo trên {{ STATS.n_test }} bài kiểm thử chưa dùng khi huấn luyện. <a href="{{ url_for('stats') }}" style="color:var(--brand)">Xem chi tiết</a></p></div>
+</aside>
+{% endmacro %}
