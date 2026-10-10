@@ -1,6 +1,6 @@
 """Dự đoán chủ đề bài báo.
-  python do_an/predict.py "Đội tuyển Việt Nam thắng 2-0 ..."
-  python do_an/predict.py            (nhập nhiều dòng, kết thúc bằng Enter trống)
+  python phan-loai-tin-tuc/predict.py "Đội tuyển Việt Nam thắng 2-0 ..."
+  python phan-loai-tin-tuc/predict.py            (nhập nhiều dòng, kết thúc bằng Enter trống)
 """
 import re, sys, unicodedata
 if hasattr(sys.stdout, "reconfigure"):

@@ -7,6 +7,7 @@ Pipeline nhẹ, chạy CPU, **không cần DeepSeek / GPU / mô hình lớn**.
 - Kết quả test: Accuracy ≈ 89,3%, Macro-F1 ≈ 89,3%
 
 ```bash
+cd phan-loai-tin-tuc
 pip install -r requirements.txt
 python train.py          # huấn luyện, sinh outputs/ và model.joblib
 python predict.py "Bộ Giáo dục công bố điểm chuẩn đại học"

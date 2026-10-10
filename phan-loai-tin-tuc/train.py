@@ -1,7 +1,7 @@
 """Huấn luyện & đánh giá mô hình phân loại tin tức tiếng Việt (CPU, không cần deep learning).
 
-Chạy:  python do_an/train.py
-Kết quả: do_an/outputs/ (biểu đồ, bảng, metrics.json) và do_an/model.joblib
+Chạy:  python phan-loai-tin-tuc/train.py
+Kết quả: phan-loai-tin-tuc/outputs/ (biểu đồ, bảng, metrics.json) và phan-loai-tin-tuc/model.joblib
 """
 import json, re, sys, time, unicodedata
 from pathlib import Path
