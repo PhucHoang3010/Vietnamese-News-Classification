@@ -9,8 +9,8 @@ Chạy hoàn toàn trên CPU, không cần GPU hay mô hình ngôn ngữ lớn.
 **Các chức năng khác (không phải phân loại):**
 | Chức năng | Kỹ thuật | Trang |
 |---|---|---|
-| **Thử thách: người vs AI** (ghi kết quả thật, bảng xếp hạng) | Đánh giá với con người (human baseline) | `/thu-thach` |
-| Nói để phân loại / nghe bản tin / phân loại khi gõ | Web Speech API (Chrome, Edge) | `/phan-loai`, `/ban-tin` |
+| **Thử thách: người vs AI** (ghi kết quả thật, bảng xếp hạng, cả lớp chơi qua WiFi) | Đánh giá với con người (human baseline) | `/thu-thach`, `/bang-xep-hang` |
+| Phân loại ngay khi gõ | Dự đoán thời gian thực | `/phan-loai` |
 | Tóm tắt tự động (kèm từ khóa, đo ROUGE) | TextRank / PageRank trên đồ thị câu | `/tom-tat` |
 | Gom sự kiện & chủ đề con | KMeans + TruncatedSVD (học không giám sát) | `/su-kien` |
 | Bản tin nhanh 60 giây | Tóm tắt hàng loạt | `/ban-tin` |
@@ -26,7 +26,10 @@ muốn dùng ảnh thật chỉ cần chép `static/img/<id>.jpg` (id = số bà
 ```bash
 pip install -r requirements.txt
 python app.py          # mở http://127.0.0.1:5000
+python app.py --lan    # CHẾ ĐỘ LỚP HỌC: điện thoại cùng WiFi vào địa chỉ hiện trên màn hình để chơi Thử thách
 ```
+Khi trình bày: mở `/trinh-bay` (kịch bản demo ~7 phút, có nút mở sẵn từng màn hình) và `/bang-xep-hang` (màn hình chiếu, tự cập nhật).
+Mọi chức năng chạy cục bộ, **không cần Internet hay micro**. (Phông chữ lấy từ Google Fonts nếu có mạng, nếu không tự dùng phông dự phòng.)
 
 ## Huấn luyện lại / báo cáo
 ```bash

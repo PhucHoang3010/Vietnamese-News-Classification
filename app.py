@@ -671,11 +671,48 @@ def arena_stats_api():
     return jsonify(arena_stats())
 
 
+# ---------------------------------------------------------------- chế độ lớp học & kịch bản trình bày
+@app.get("/bang-xep-hang")
+def live_board():
+    port = request.host.split(":")[1] if ":" in request.host else "5000"
+    return render_template("board.html", join=f"http://{lan_ip()}:{port}/thu-thach")
+
+
+@app.post("/api/arena/reset")
+def arena_reset():
+    if request.remote_addr not in ("127.0.0.1", "::1"):                 # chỉ máy chiếu (người thuyết trình) mới được làm mới
+        return jsonify(error="Chỉ máy chủ mới được làm mới."), 403
+    with _ALOCK:
+        if ARENA_F.exists():
+            ARENA_F.rename(ARENA_F.with_name(f"arena-{int(time.time())}.bak"))   # lưu bản sao, không xóa
+    return jsonify(ok=True)
+
+
+@app.get("/trinh-bay")
+def guide():
+    return render_template("guide.html")
+
+
 @app.get("/favicon.ico")
 def favicon():
     return "", 204
 
 
+def lan_ip():
+    """Địa chỉ IP trong mạng nội bộ (để điện thoại cùng WiFi truy cập)."""
+    try:
+        with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as so:
+            so.connect(("10.255.255.255", 1))
+            return so.getsockname()[0]
+    except Exception:
+        return "127.0.0.1"
+
+
 if __name__ == "__main__":
-    print("Mở trình duyệt tại http://127.0.0.1:5000")
-    app.run(debug=False)
+    import os, sys
+    lan = "--lan" in sys.argv or bool(os.environ.get("VNNEWS_LAN"))
+    if lan:
+        print(f"\n  Chế độ LỚP HỌC — điện thoại cùng WiFi vào: http://{lan_ip()}:5000/thu-thach\n  Màn hình chiếu: http://127.0.0.1:5000/bang-xep-hang\n")
+    else:
+        print("Mở trình duyệt tại http://127.0.0.1:5000   (thêm --lan để cả lớp cùng chơi qua WiFi)")
+    app.run(host="0.0.0.0" if lan else "127.0.0.1", port=5000, debug=False, threaded=True)

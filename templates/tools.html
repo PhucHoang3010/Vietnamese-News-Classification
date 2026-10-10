@@ -5,9 +5,10 @@
 <div class="grid3">
   {% for icon, name, tech, kind, desc, href in [
    ('🥊','Thử thách: người vs AI','Đánh giá với con người','Nghiên cứu người dùng','Đấu 10 lượt với AI trên bài chưa từng thấy; hệ thống ghi lại kết quả thật của mọi người chơi và so sánh người với AI.', url_for('arena')),
-   ('🎤','Nói để phân loại','Web Speech API','Giọng nói','Nói một đoạn tin, trình duyệt chuyển thành văn bản và AI phân loại ngay (Chrome/Edge).', url_for('classify_page')),
    ('🏷️','Phân loại bài báo','TF-IDF + Linear SVM','Học có giám sát','Xếp bài vào 1 trong 11 chuyên mục. Độ chính xác 89,3% trên tập kiểm thử.', url_for('classify_page')),
    ('📝','Tóm tắt tự động','TextRank (PageRank trên đồ thị câu)','Xử lý ngôn ngữ','Rút 1–6 câu quan trọng nhất của bài hoặc đường link, kèm từ khóa và số phút đọc tiết kiệm được.', url_for('summarize_page')),
+   ('📡','Chế độ lớp học','Bảng xếp hạng trực tiếp','Tương tác','Cả lớp chơi Thử thách bằng điện thoại cùng WiFi; màn hình chiếu cập nhật thống kê người vs AI theo thời gian thực.', url_for('live_board')),
+   ('🎤','Kịch bản trình bày','Hướng dẫn demo 7 phút','Hỗ trợ báo cáo','Từng bước demo, nút mở sẵn màn hình và gợi ý lời nói.', url_for('guide')),
    ('🧩','Sự kiện & chủ đề con','KMeans + TruncatedSVD','Học không giám sát','Không dùng nhãn, AI tự gom các bài cùng câu chuyện: giá vàng, SEA Games, ung thư…', url_for('events')),
    ('⚡','Bản tin nhanh 60 giây','Tóm tắt hàng loạt','Xử lý ngôn ngữ','Mỗi chuyên mục một tin nổi bật, chỉ 2 câu — đọc cả bản tin trong một phút.', url_for('digest')),
    ('🎯','Gợi ý bài đọc','Content-based (cosine TF-IDF)','Hệ gợi ý','Học sở thích từ các bài bạn đã đọc, gợi ý “Dành cho bạn” ngay ở trang chủ.', url_for('home') ~ '#foryou'),

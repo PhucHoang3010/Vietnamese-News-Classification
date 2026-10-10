@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block title %}Bảng xếp hạng trực tiếp — VnNews{% endblock %}
+{% block content %}
+<div class="pagehead" style="align-items:flex-start"><div class="big">📡</div><div style="flex:1"><h1>Thử thách người vs AI — trực tiếp</h1>
+  <p>Cả lớp vào địa chỉ bên dưới bằng điện thoại (cùng WiFi) và chơi 10 lượt. Bảng này tự cập nhật mỗi 4 giây.</p></div>
+  <div class="joinbox"><small>VÀO ĐỊA CHỈ</small><b>{{ join }}</b></div></div>
+<div class="kpis big-kpis" id="kp"></div>
+<div class="two">
+  <div class="panel"><h3 style="margin-top:0">Người vs AI theo chuyên mục</h3><div id="per"></div><div id="conf"></div></div>
+  <div class="panel"><h3 style="margin-top:0">🏆 Bảng xếp hạng</h3><div id="board"></div>
+    <div class="bar-row" style="margin-top:16px"><a class="btn ghost sm" href="{{ url_for('arena') }}">Chơi ngay</a><button class="btn ghost sm" id="reset" style="margin-left:auto">↺ Làm mới (lưu bản sao)</button></div></div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+async function load(){
+  const s=await fetch('/api/arena/stats').then(r=>r.json());
+  if(!s.n){$('#kp').innerHTML='<div class="kpi" style="grid-column:1/-1;text-align:center"><b>Chưa có lượt chơi</b><span>Hãy bảo cả lớp vào địa chỉ ở trên!</span></div>';$('#per').innerHTML='';$('#board').innerHTML='<p class="note">Chờ người chơi…</p>';$('#conf').innerHTML='';return}
+  $('#kp').innerHTML=`<div class="kpi"><b>${s.n}</b><span>lượt chơi · ${s.players} người</span></div><div class="kpi"><b>${s.human}%</b><span>NGƯỜI đúng</span></div><div class="kpi"><b>${s.ai}%</b><span>AI đúng</span></div><div class="kpi"><b>${s.only_h} · ${s.only_a}</b><span>chỉ người đúng · chỉ AI đúng</span></div>`;
+  $('#per').innerHTML=s.per.map(p=>`<div class="row2" style="grid-template-columns:120px 1fr 1fr 74px;margin:7px 0"><span>${p.icon} ${esc(p.label)}</span><div class="track" title="Người"><i style="width:${p.human}%"></i></div><div class="track" title="AI"><i style="width:${p.ai}%;background:repeating-linear-gradient(135deg,var(--brand) 0 4px,transparent 4px 7px)"></i></div><em>${p.human}/${p.ai}%</em></div>`).join('')+'<p class="note">Thanh đặc = người · thanh sọc = AI</p>';
+  $('#conf').innerHTML=s.confused.length?`<div class="sec">Người hay nhầm nhất</div><p class="note" style="margin-top:6px">${s.confused.map(c=>`${esc(c.truth)} → ${esc(c.choice)} (${c.n})`).join(' · ')}</p>`:'';
+  $('#board').innerHTML=s.board.length?`<table class="bigtable"><tr><th>#</th><th>Người chơi</th><th class="num">Đúng</th><th class="num">AI</th><th class="num">Lượt</th></tr>${s.board.map((b,i)=>`<tr><td>${i+1}</td><td><b>${esc(b.player)}</b></td><td class="num"><b>${b.acc}%</b></td><td class="num">${b.ai}%</td><td class="num">${b.n}</td></tr>`).join('')}</table>`:'<p class="note">Cần ít nhất 5 lượt chơi có biệt danh.</p>';
+}
+$('#reset').onclick=async()=>{if(!confirm('Làm mới bảng? Dữ liệu cũ được lưu thành file .bak trong thư mục data.'))return;const r=await fetch('/api/arena/reset',{method:'POST'});toast(r.ok?'Đã làm mới':'Chỉ máy chủ mới làm mới được');load()};
+load();setInterval(load,4000);
+</script>
+{% endblock %}

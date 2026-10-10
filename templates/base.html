@@ -27,7 +27,7 @@
 <footer><div class="wrap">
   <div><h5>VnNews</h5>Trang tin tức mô phỏng với hệ thống học máy phân loại chủ đề tiếng Việt (TF-IDF + Linear SVM). Dữ liệu gồm {{ '{:,}'.format(STATS.n).replace(',', '.') }} bài báo, đồ án môn Học máy.</div>
   <div><h5>Chuyên mục</h5>{% for n in NAV[:6] %}<a href="{{ url_for('category', slug=n.slug) }}">{{ n.name }}</a>{% endfor %}</div>
-  <div><h5>Công cụ AI</h5><a href="{{ url_for('arena') }}">Thử thách: người vs AI</a><a href="{{ url_for('tools') }}">Tất cả công cụ</a><a href="{{ url_for('summarize_page') }}">Tóm tắt tự động</a><a href="{{ url_for('events') }}">Sự kiện & chủ đề con</a><a href="{{ url_for('lab') }}">AI Lab — giải thích</a><a href="{{ url_for('classify_page') }}">Phân loại bài báo</a><a href="{{ url_for('stats') }}">Thống kê mô hình</a><a href="{{ url_for('about') }}">Giới thiệu đồ án</a></div>
+  <div><h5>Công cụ AI</h5><a href="{{ url_for('arena') }}">Thử thách: người vs AI</a><a href="{{ url_for('tools') }}">Tất cả công cụ</a><a href="{{ url_for('guide') }}">Kịch bản trình bày</a><a href="{{ url_for('live_board') }}">Bảng xếp hạng trực tiếp</a><a href="{{ url_for('summarize_page') }}">Tóm tắt tự động</a><a href="{{ url_for('events') }}">Sự kiện & chủ đề con</a><a href="{{ url_for('lab') }}">AI Lab — giải thích</a><a href="{{ url_for('classify_page') }}">Phân loại bài báo</a><a href="{{ url_for('stats') }}">Thống kê mô hình</a><a href="{{ url_for('about') }}">Giới thiệu đồ án</a></div>
 </div></footer>
 <div class="toast" id="toast"></div>
 <script>
@@ -36,11 +36,6 @@ function setTheme(t){document.documentElement.dataset.theme=t;$('#theme').textCo
 setTheme(document.documentElement.dataset.theme);$('#theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
 window.addEventListener('load',()=>document.querySelectorAll('.track i[data-w]').forEach(i=>i.style.width=i.dataset.w+'%'));
-window.speak=(texts,onend)=>{if(!window.speechSynthesis){toast('Trình duyệt không hỗ trợ đọc');return}
- speechSynthesis.cancel();const v=speechSynthesis.getVoices().find(x=>x.lang&&x.lang.toLowerCase().startsWith('vi'));if(!v)toast('Máy chưa có giọng tiếng Việt — có thể đọc chưa chuẩn');
- texts.forEach((t,i)=>{const u=new SpeechSynthesisUtterance(t);u.lang='vi-VN';if(v)u.voice=v;u.rate=1;if(i===texts.length-1&&onend)u.onend=onend;speechSynthesis.speak(u)})};
-window.stopSpeak=()=>window.speechSynthesis&&speechSynthesis.cancel();
-if(window.speechSynthesis)speechSynthesis.getVoices();
 const a=document.querySelector('nav.cats a.on');a&&a.scrollIntoView({inline:'center',block:'nearest'});
 </script>
 {% block scripts %}{% endblock %}

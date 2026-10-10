@@ -107,10 +107,10 @@ if len(rows) >= 20:
     P(f"Kết quả thực tế sau {len(rows)} lượt chơi: người đúng {hh:.1%}, AI đúng {aa:.1%} trên cùng các bài.")
 else:
     P("Số liệu người chơi thực tế được cập nhật trực tiếp trên trang Thử thách của website (chưa đủ lượt chơi tại thời điểm tạo báo cáo).")
-H("6.6 Nhập bằng giọng nói, đọc bản tin và phân loại khi gõ", 2)
-B(["Nói để phân loại: dùng Web Speech API của trình duyệt (Chrome/Edge, tiếng Việt vi-VN) chuyển giọng nói thành văn bản rồi phân loại ngay.",
-   "Nghe bản tin / nghe tóm tắt: dùng Speech Synthesis để đọc to bản tin 60 giây và tóm tắt từng bài.",
-   "Phân loại khi gõ: kết quả cập nhật theo thời gian thực sau mỗi lần ngừng gõ."])
+H("6.6 Chế độ lớp học và phân loại thời gian thực", 2)
+B(["Chế độ lớp học: chạy máy chủ ở chế độ mạng nội bộ (python app.py --lan), cả lớp dùng điện thoại truy cập cùng địa chỉ để chơi Thử thách; màn hình trình chiếu hiển thị bảng xếp hạng và thống kê người so với AI cập nhật trực tiếp.",
+   "Phân loại khi gõ: kết quả cập nhật theo thời gian thực sau mỗi lần ngừng gõ, không cần nhấn nút.",
+   "Toàn bộ chức năng chạy cục bộ, không cần Internet hay thiết bị ngoại vi, nên ổn định khi trình bày."])
 H("7. Hạn chế và hướng phát triển")
 B(["Chưa tách từ tiếng Việt (word segmentation); có thể thêm underthesea/VnCoreNLP để cải thiện.",
    "Có thể thử mô hình học sâu (PhoBERT) khi có GPU – đã cố ý không dùng để chương trình chạy được trên máy yếu.",

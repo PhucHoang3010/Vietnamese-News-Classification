@@ -53,5 +53,6 @@ function draw(d){
 $('#go').onclick=run;
 $('#k').onchange=()=>$('#text').value.trim().length>50&&run();
 $('#rand').onclick=async()=>{const d=await fetch('/api/random?full=1').then(r=>r.json());$('#text').value=d.text;run()};
+if(new URLSearchParams(location.search).get('demo')==='rand')setTimeout(()=>$('#rand').click(),100);
 </script>
 {% endblock %}

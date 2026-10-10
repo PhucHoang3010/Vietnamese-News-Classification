@@ -86,6 +86,7 @@ $('#mixed').onclick=()=>{$('#text').value=MIXED;$('#text').oninput();analyze(tru
 $('#rand').onclick=async()=>{const d=await fetch('/api/random').then(r=>r.json());$('#text').value=d.text;$('#text').oninput();analyze(true)};
 fetch('/api/samples').then(r=>r.json()).then(list=>{$('#samples').innerHTML='<small style="color:var(--muted);align-self:center">Gợi ý:</small>'+list.map(s=>`<button class="chip">${s.icon} ${esc(s.label)}</button>`).join('');
   $('#samples').querySelectorAll('.chip').forEach((c,i)=>c.onclick=()=>{$('#text').value=list[i].text;$('#text').oninput();analyze(true)})});
+if(new URLSearchParams(location.search).get('demo')==='mixed')$('#mixed').click();
 if(PRE){$('#text').value=PRE.text.slice(0,4000);$('#text').oninput();analyze(true)}
 </script>
 {% endblock %}
