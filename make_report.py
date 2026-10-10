@@ -69,16 +69,33 @@ P("Từ khóa đặc trưng nhất của từng chủ đề (trọng số lớn 
 TABLE(pd.DataFrame({"Chủ đề": list(kw), "Top từ khóa": [", ".join(v[:6]) for v in kw.values()]}))
 P(f"Số mẫu dự đoán sai trên tập kiểm thử: {len(err)} / {m['test_size']} (xem file outputs/mau_du_doan_sai.csv).")
 
-H("6. Hệ thống web và chức năng nổi bật")
-P("Mô hình được đóng gói thành website tin tức VnNews (Flask) gồm: trang chủ, 11 chuyên mục, trang đọc bài, tìm kiếm TF-IDF, công cụ phân loại (văn bản/đường link), trang thống kê và giới thiệu. "
-  "Toàn bộ 5.500 bài được mô hình tự động gán chuyên mục; các chỉ số độ chính xác chỉ tính trên tập kiểm thử.")
-H("6.1 AI Lab – giải thích dự đoán (Explainable AI)", 2)
-P("Điểm khác biệt của đồ án là chức năng giải thích vì sao mô hình chọn một chủ đề. Vì Linear SVM là mô hình tuyến tính, điểm của mỗi chủ đề bằng tổng (trọng số × giá trị TF-IDF) nên có thể tách chính xác "
-  "phần đóng góp của từng từ và cụm hai từ mà không cần xấp xỉ như LIME/SHAP. Đóng góp của một từ = (trọng số chủ đề dự đoán − trọng số trung bình các chủ đề còn lại) × TF-IDF.")
-B(["Bản đồ nhiệt từ ngữ: mỗi từ trong bài được tô đậm theo mức ủng hộ chủ đề dự đoán; từ đi ngược được gạch chấm.",
-   "What-if: người dùng bấm bỏ một từ, hệ thống dự đoán lại ngay và cho biết xác suất thay đổi bao nhiêu hoặc chủ đề có bị đổi không (ví dụ bỏ các từ thể thao thì bài chuyển sang Kinh doanh).",
-   "Dải chủ đề theo đoạn: bài được cắt thành các đoạn, mỗi đoạn phân loại riêng; nếu dưới 75% nội dung cùng một chủ đề thì cảnh báo bài đa chủ đề/mơ hồ.",
-   "Phân tích lỗi: trang thống kê liệt kê các bài AI đoán sai nhưng có độ tin cậy cao, kèm liên kết sang AI Lab để xem nguyên nhân."])
+H("6. Hệ thống web và các chức năng mở rộng")
+P("Ngoài bài toán chính (phân loại), mô hình được đóng gói thành website tin tức VnNews (Flask) với các chức năng dùng những kỹ thuật học máy / xử lý ngôn ngữ khác nhau. "
+  "Toàn bộ 5.500 bài được mô hình tự động gán chuyên mục; chỉ số độ chính xác chỉ tính trên tập kiểm thử.")
+ev = json.load(open(O / "summary_eval.json", encoding="utf-8")) if (O / "summary_eval.json").exists() else {}
+cl = json.load(open(O.parent / "data" / "clusters.json", encoding="utf-8")) if (O.parent / "data" / "clusters.json").exists() else {}
+H("6.1 Tóm tắt tự động (TextRank)", 2)
+P("Bài báo được tách thành câu (loại bỏ chú thích ảnh, dòng nguồn), mỗi câu được biểu diễn bằng vector TF-IDF. Đồ thị câu có cạnh là độ tương đồng cosine; chạy PageRank để tìm câu quan trọng nhất, "
+  "cộng thêm điểm cho câu đầu bài và câu gần tiêu đề. Đây là tóm tắt trích rút nên không bịa thêm nội dung.")
+if ev:
+    t = d.add_table(rows=1, cols=4); t.style = "Light Grid Accent 1"
+    for i, c in enumerate(["Phương pháp", "ROUGE-1 F1", "ROUGE-2 F1", "Số bài"]): t.rows[0].cells[i].text = c
+    for k, v in ev.items():
+        cells = t.add_row().cells
+        for i, x in enumerate([k, f"{v['rouge1']:.3f}", f"{v['rouge2']:.3f}", str(v['n'])]): cells[i].text = x
+    P("Đánh giá trên khoảng 400 bài, lấy phần sapo do biên tập viên viết làm bản tham chiếu (2 câu). TextRank cao hơn cả hai phương pháp cơ sở là Lead-2 (hai câu đầu) và chọn ngẫu nhiên.")
+H("6.2 Gom cụm sự kiện / chủ đề con (học không giám sát)", 2)
+sil = sum(c["sil"] for c in cl.values()) / len(cl) if cl else 0
+P("Với mỗi chuyên mục, tiêu đề và sapo được biểu diễn bằng TF-IDF, giảm chiều bằng TruncatedSVD (LSA, 60 chiều) rồi phân cụm KMeans (k bằng số bài chia 26, khoảng 19 cụm mỗi chuyên mục). "
+  "Tên cụm là các cụm từ đặc trưng nhất của cụm so với phần còn lại của chuyên mục; bài tiêu biểu là bài gần tâm cụm nhất. Phương pháp không dùng nhãn nên bổ sung cho bài toán phân loại có giám sát. "
+  f"Độ gắn kết trung bình (silhouette) là {sil:.3f}; giá trị thấp là bình thường với dữ liệu văn bản vì từ vựng giữa các câu chuyện giao thoa nhiều, nhưng nhãn cụm vẫn dễ hiểu (ví dụ “ung thư”, “bóng chuyền”, “ngân hàng”).")
+H("6.3 Gợi ý bài đọc và bản tin nhanh", 2)
+B(["Gợi ý “Dành cho bạn”: hệ gợi ý dựa trên nội dung (content-based). Vector sở thích là trung bình TF-IDF của các bài người dùng đã đọc (lưu trên trình duyệt); bài được gợi ý là các bài có cosine cao nhất chưa đọc.",
+   "Bản tin nhanh 60 giây: tóm tắt hàng loạt, mỗi chuyên mục một tin nổi bật còn 2 câu, hiển thị mức rút gọn nội dung.",
+   "Tìm kiếm: xếp hạng bài theo cosine TF-IDF giữa truy vấn và tiêu đề + sapo."])
+H("6.4 AI Lab – giải thích dự đoán (Explainable AI)", 2)
+P("Vì Linear SVM là mô hình tuyến tính nên điểm của mỗi chủ đề bằng tổng (trọng số × giá trị TF-IDF); có thể tách chính xác đóng góp của từng từ mà không cần xấp xỉ như LIME/SHAP. "
+  "Trang AI Lab tô đậm từng từ theo mức ủng hộ chủ đề dự đoán, cho phép bỏ từ để thử What-if, và phát hiện bài đa chủ đề bằng cách phân loại riêng từng đoạn. Trang thống kê có mục phân tích lỗi các bài AI đoán sai.")
 H("7. Hạn chế và hướng phát triển")
 B(["Chưa tách từ tiếng Việt (word segmentation); có thể thêm underthesea/VnCoreNLP để cải thiện.",
    "Có thể thử mô hình học sâu (PhoBERT) khi có GPU – đã cố ý không dùng để chương trình chạy được trên máy yếu.",

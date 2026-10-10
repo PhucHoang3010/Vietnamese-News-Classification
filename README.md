@@ -4,15 +4,21 @@ Website tin tức tiếng Việt gồm **5.500 bài báo**, mỗi bài được 
 Chạy hoàn toàn trên CPU, không cần GPU hay mô hình ngôn ngữ lớn.
 
 ## Chức năng
-- **Trang chủ** kiểu báo điện tử: tin nổi bật, tin mới, từng chuyên mục
-- **11 chuyên mục** có phân trang (Thời sự, Thế giới, Kinh doanh, Pháp luật, Giáo dục, Sức khỏe, Khoa học, Đời sống, Giải trí, Thể thao, Xe)
-- **Đọc bài** kèm phân tích AI (xác suất, từ khóa quyết định) và bài liên quan
-- **Tìm kiếm** theo nội dung, lọc theo chuyên mục
-- **Công cụ phân loại**: nhập văn bản / link báo, gợi ý mẫu, bài ngẫu nhiên, lịch sử
-- **Thống kê**: Accuracy, F1 từng lớp, ma trận nhầm lẫn, so sánh thuật toán, từ khóa đặc trưng
-- **AI Lab — chức năng nổi bật**: giải thích AI bằng bản đồ nhiệt từ ngữ, bấm bỏ từ để xem dự đoán đổi (what-if), phát hiện bài đa chủ đề, phân tích lỗi
-- Giao diện trắng đen kiểu báo giấy, chế độ sáng/tối, tốt trên điện thoại
-- Ảnh minh họa đen-trắng tự tạo theo chuyên mục; muốn dùng ảnh thật chỉ cần chép `static/img/<id>.jpg` (id = số bài, xem trên URL `/bai/<id>`)
+**Bài toán chính — phân loại**: TF-IDF + Linear SVM xếp bài vào 11 chuyên mục (Accuracy ≈ 89,3%).
+
+**Các chức năng khác (không phải phân loại):**
+| Chức năng | Kỹ thuật | Trang |
+|---|---|---|
+| Tóm tắt tự động (kèm từ khóa, đo ROUGE) | TextRank / PageRank trên đồ thị câu | `/tom-tat` |
+| Gom sự kiện & chủ đề con | KMeans + TruncatedSVD (học không giám sát) | `/su-kien` |
+| Bản tin nhanh 60 giây | Tóm tắt hàng loạt | `/ban-tin` |
+| Gợi ý "Dành cho bạn" theo lịch sử đọc | Content-based, cosine TF-IDF | trang chủ |
+| Tìm kiếm | TF-IDF + cosine | `/tim-kiem` |
+| AI Lab — giải thích dự đoán | Phân rã mô hình tuyến tính (Explainable AI) | `/giai-thich` |
+
+Ngoài ra: trang chủ kiểu báo điện tử, 11 chuyên mục có phân trang, đọc bài kèm bài liên quan, thống kê (ma trận nhầm lẫn, F1, phân tích lỗi),
+giao diện trắng đen kiểu báo giấy, chế độ sáng/tối, tốt trên điện thoại. Ảnh minh họa đen-trắng tự tạo theo chuyên mục;
+muốn dùng ảnh thật chỉ cần chép `static/img/<id>.jpg` (id = số bài, xem trên URL `/bai/<id>`).
 
 ## Chạy
 ```bash
@@ -25,6 +31,7 @@ python app.py          # mở http://127.0.0.1:5000
 python train.py          # huấn luyện, sinh outputs/ và model.joblib
 python build_cache.py    # dự đoán sẵn cho toàn bộ bài -> data/predictions.json
 python predict.py "Bộ Giáo dục công bố điểm chuẩn đại học"
+python eval_summary.py   # đo ROUGE của tóm tắt -> outputs/summary_eval.json
 python make_report.py    # sinh BAO_CAO_DO_AN.docx
 ```
 

@@ -11,23 +11,23 @@
 </head>
 <body>
 <div class="topbar"><div class="wrap"><span>Mọi bài viết được AI tự động phân loại vào 11 chuyên mục</span>
-  <div class="r"><a href="{{ url_for('classify_page') }}">Phân loại</a><a href="{{ url_for('lab') }}">AI Lab</a><a href="{{ url_for('stats') }}">Thống kê</a><a href="{{ url_for('about') }}">Giới thiệu</a></div></div></div>
+  <div class="r"><a href="{{ url_for('classify_page') }}">Phân loại</a><a href="{{ url_for('summarize_page') }}">Tóm tắt</a><a href="{{ url_for('events') }}">Sự kiện</a><a href="{{ url_for('digest') }}">Bản tin 60s</a><a href="{{ url_for('stats') }}">Thống kê</a><a href="{{ url_for('about') }}">Giới thiệu</a></div></div></div>
 <header class="main"><div class="wrap head">
   <a class="logo" href="{{ url_for('home') }}">VnNews<small>Tin tức · AI phân loại</small></a>
   <form class="search" action="{{ url_for('search') }}"><input name="q" value="{{ q }}" placeholder="Tìm kiếm bài báo, chủ đề..." autocomplete="off"><button>Tìm</button></form>
-  <a class="btn" href="{{ url_for('lab') }}">🔬 AI Lab</a>
+  <a class="btn" href="{{ url_for('tools') }}">✦ Công cụ AI</a>
   <button class="icon" id="theme" title="Sáng / tối">🌙</button>
 </div></header>
 <nav class="cats"><div class="wrap">
   <a class="home {{ 'on' if request.endpoint=='home' }}" href="{{ url_for('home') }}">Trang chủ</a>
   {% for n in NAV %}<a style="--c:{{ n.color }}" class="{{ 'on' if request.view_args and request.view_args.get('slug')==n.slug }}" href="{{ url_for('category', slug=n.slug) }}">{{ n.name }}</a>{% endfor %}
-  <a class="lab" href="{{ url_for('lab') }}">🔬 AI Lab</a>
+  <a class="lab" href="{{ url_for('tools') }}">✦ Công cụ AI</a>
 </div></nav>
 <main><div class="wrap">{% block content %}{% endblock %}</div></main>
 <footer><div class="wrap">
   <div><h5>VnNews</h5>Trang tin tức mô phỏng với hệ thống học máy phân loại chủ đề tiếng Việt (TF-IDF + Linear SVM). Dữ liệu gồm {{ '{:,}'.format(STATS.n).replace(',', '.') }} bài báo, đồ án môn Học máy.</div>
   <div><h5>Chuyên mục</h5>{% for n in NAV[:6] %}<a href="{{ url_for('category', slug=n.slug) }}">{{ n.name }}</a>{% endfor %}</div>
-  <div><h5>Công cụ</h5><a href="{{ url_for('lab') }}">AI Lab — giải thích AI</a><a href="{{ url_for('classify_page') }}">Phân loại bài báo</a><a href="{{ url_for('stats') }}">Thống kê mô hình</a><a href="{{ url_for('about') }}">Giới thiệu đồ án</a></div>
+  <div><h5>Công cụ AI</h5><a href="{{ url_for('tools') }}">Tất cả công cụ</a><a href="{{ url_for('summarize_page') }}">Tóm tắt tự động</a><a href="{{ url_for('events') }}">Sự kiện & chủ đề con</a><a href="{{ url_for('lab') }}">AI Lab — giải thích</a><a href="{{ url_for('classify_page') }}">Phân loại bài báo</a><a href="{{ url_for('stats') }}">Thống kê mô hình</a><a href="{{ url_for('about') }}">Giới thiệu đồ án</a></div>
 </div></footer>
 <div class="toast" id="toast"></div>
 <script>

@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block title %}Công cụ AI — VnNews{% endblock %}
+{% block content %}
+<div class="pagehead"><div class="big">✦</div><div><h1>Công cụ AI</h1><p>Ngoài phân loại chuyên mục, hệ thống còn làm nhiều việc khác với bài báo — mỗi công cụ dùng một kỹ thuật học máy / xử lý ngôn ngữ khác nhau.</p></div></div>
+<div class="grid3">
+  {% for icon, name, tech, kind, desc, href in [
+   ('🏷️','Phân loại bài báo','TF-IDF + Linear SVM','Học có giám sát','Xếp bài vào 1 trong 11 chuyên mục. Độ chính xác 89,3% trên tập kiểm thử.', url_for('classify_page')),
+   ('📝','Tóm tắt tự động','TextRank (PageRank trên đồ thị câu)','Xử lý ngôn ngữ','Rút 1–6 câu quan trọng nhất của bài hoặc đường link, kèm từ khóa và số phút đọc tiết kiệm được.', url_for('summarize_page')),
+   ('🧩','Sự kiện & chủ đề con','KMeans + TruncatedSVD','Học không giám sát','Không dùng nhãn, AI tự gom các bài cùng câu chuyện: giá vàng, SEA Games, ung thư…', url_for('events')),
+   ('⚡','Bản tin nhanh 60 giây','Tóm tắt hàng loạt','Xử lý ngôn ngữ','Mỗi chuyên mục một tin nổi bật, chỉ 2 câu — đọc cả bản tin trong một phút.', url_for('digest')),
+   ('🎯','Gợi ý bài đọc','Content-based (cosine TF-IDF)','Hệ gợi ý','Học sở thích từ các bài bạn đã đọc, gợi ý “Dành cho bạn” ngay ở trang chủ.', url_for('home') ~ '#foryou'),
+   ('🔬','AI Lab — giải thích','Phân rã mô hình tuyến tính','Explainable AI','Xem từ nào khiến AI chọn chuyên mục; bỏ từ để thử What-if.', url_for('lab')),
+   ('🔎','Tìm kiếm thông minh','TF-IDF + cosine','Truy hồi thông tin','Tìm theo ngữ nghĩa từ khóa chứ không chỉ khớp chữ.', url_for('search')),
+   ('📊','Thống kê mô hình','Ma trận nhầm lẫn, F1','Đánh giá','Hiệu năng từng lớp, so sánh 4 thuật toán, phân tích bài AI đoán sai.', url_for('stats'))] %}
+  <a class="panel tool" href="{{ href }}"><div class="big">{{ icon }}</div><span class="pill">{{ kind }}</span><h3>{{ name }}</h3><p>{{ desc }}</p><small>Kỹ thuật: <b>{{ tech }}</b></small></a>
+  {% endfor %}
+</div>
+{% endblock %}

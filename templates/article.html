@@ -9,6 +9,7 @@
   <div class="byline"><span>{{ a.minutes }} phút đọc</span><span>AI phân loại: <b>{{ a.label }}</b> ({{ a.pct }}%)</span><a href="{{ url_for('lab', id=a.id) }}" class="pill fill">🔬 Xem AI giải thích</a>
     {% if a.truth != a.label %}<span>Nhãn gốc trong dữ liệu: {{ a.truth }}</span>{% endif %}</div>
   <p class="lead" style="margin-top:18px">{{ a.desc }}</p>
+  <div class="sumbox"><h4>📝 Tóm tắt nhanh bằng AI</h4><ul style="margin:0;padding-left:18px">{% for x in summ %}<li>{{ x }}</li>{% endfor %}</ul><div class="kw" style="margin-top:10px">{% for k in kws %}<span>{{ k }}</span>{% endfor %}</div><div class="note" style="margin:8px 0 0"><a href="{{ url_for('summarize_page') }}" style="text-decoration:underline">Tóm tắt bài của riêng bạn →</a></div></div>
   <figure class="fig" style="margin-left:0;margin-right:0"><div class="thumb"><img src="{{ a.img }}" alt=""></div><div class="figcap">Ảnh minh họa theo chuyên mục “{{ a.label }}”.</div></figure>
   {% if res %}<div class="ai"><h4>AI phân tích bài viết này</h4>
     {% for t in res.top[:3] %}<div class="row" style="--c:{{ t.color }}"><span>{{ t.icon }} {{ t.label }}</span><div class="track"><i data-w="{{ t.pct }}"></i></div><em>{{ t.pct }}%</em></div>{% endfor %}
@@ -18,3 +19,4 @@
 <section class="blk" style="margin-top:30px"><div class="sec-h"><h2>Bài viết liên quan</h2></div><div class="grid2">{% for r in related %}{{ card(r) }}{% endfor %}</div></section>
 </div>{{ sidebar() }}</div>
 {% endblock %}
+{% block scripts %}<script>try{let r=JSON.parse(localStorage.getItem('vn_read')||'[]').filter(x=>x!=={{ a.id }});r.push({{ a.id }});localStorage.setItem('vn_read',JSON.stringify(r.slice(-30)))}catch(e){}</script>{% endblock %}

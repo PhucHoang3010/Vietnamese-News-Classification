@@ -1,0 +1,24 @@
+{% extends "base.html" %}{% from "_macros.html" import sidebar with context %}
+{% block title %}Sự kiện & chủ đề con — VnNews{% endblock %}
+{% block content %}
+<div class="pagehead"><div class="big">🧩</div><div><h1>Sự kiện & chủ đề con</h1><p>AI tự gom các bài cùng câu chuyện — <b>không dùng nhãn</b> (học không giám sát: TF-IDF → SVD → KMeans).</p></div></div>
+<div class="chips" style="margin-bottom:22px"><a class="chip" style="{{ 'background:var(--brand);color:var(--on-brand)' if slug=='all' }}" href="?c=all">Nổi bật nhất</a>
+  {% for n in NAV %}<a class="chip" style="{{ 'background:var(--brand);color:var(--on-brand)' if slug==n.slug }}" href="?c={{ n.slug }}">{{ n.icon }} {{ n.name }}</a>{% endfor %}</div>
+{% if view %}
+  <div class="sec-h"><h2>{{ view.meta[1] }} {{ view.name }} — {{ view.k }} chủ đề con</h2><a>silhouette {{ view.sil }}</a></div>
+  <div class="grid2">{% for g in view.groups %}
+    <div class="panel cluster"><div style="display:flex;gap:8px;align-items:baseline"><span class="pill">{{ g.size }} bài</span><b class="serif" style="font-size:19px">{{ g.label }}</b></div>
+      <div class="track" style="margin:10px 0"><i data-w="{{ (g.size / view.groups[0].size * 100)|round }}"></i></div>
+      <a class="mini" href="{{ url_for('article', aid=g.rep) }}" style="padding-top:4px"><div class="thumb"><img src="{{ ART[g.rep].img }}" alt="" loading="lazy"></div><div><span class="tag">Bài tiêu biểu</span><h4>{{ ART[g.rep].title }}</h4></div></a>
+      <ul class="list">{% for i in g['items'][1:5] %}<li><a href="{{ url_for('article', aid=i) }}" style="font-size:14px"><span style="color:var(--muted)">›</span> {{ ART[i].title[:78] }}{{ '…' if ART[i].title|length>78 }}</a></li>{% endfor %}</ul></div>
+  {% endfor %}</div>
+{% else %}
+  <div class="sec-h"><h2>Chủ đề được nhắc nhiều nhất toàn site</h2><a>{{ top|length }} cụm lớn nhất</a></div>
+  <div class="grid3">{% for t, g in top %}
+    <a class="panel cluster" href="?c={{ TOPICS[t][0] }}"><span class="tag">{{ TOPICS[t][1] }} {{ t }}</span><b class="serif" style="font-size:19px;display:block;margin:4px 0 8px">{{ g.label }}</b><span class="pill fill">{{ g.size }} bài</span>
+      <p class="note" style="margin-bottom:0">{{ ART[g.rep].title[:90] }}{{ '…' if ART[g.rep].title|length>90 }}</p></a>{% endfor %}</div>
+{% endif %}
+<div class="panel" style="margin-top:30px"><h3 style="margin-top:0">Cách hoạt động</h3>
+  <p style="margin:0 0 8px">Với mỗi chuyên mục: (1) biểu diễn tiêu đề + sapo bằng TF-IDF; (2) giảm chiều bằng TruncatedSVD (LSA, 60 chiều); (3) chạy KMeans (k = số bài / 26); (4) đặt tên cụm bằng các cụm từ đặc trưng nhất so với phần còn lại của chuyên mục; (5) bài tiêu biểu là bài gần tâm cụm nhất.</p>
+  <p style="margin:0">Độ gắn kết trung bình (silhouette) = <b>{{ avg_sil }}</b>. Với văn bản, giá trị thấp (&lt; 0,2) là bình thường vì các câu chuyện giao thoa nhiều từ vựng chung; nhãn cụm vẫn rất dễ hiểu (ví dụ “ung thư”, “bóng chuyền”, “ngân hàng”).</p></div>
+{% endblock %}

@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Tóm tắt tự động — VnNews{% endblock %}
+{% block content %}
+<div class="pagehead"><div class="big">📝</div><div><h1>Tóm tắt tự động</h1><p>Dán một bài báo dài hoặc link — AI rút ra những câu quan trọng nhất bằng thuật toán TextRank.</p></div></div>
+<div class="two split" style="align-items:start">
+  <div>
+    <div class="panel" id="input">
+      <div class="tabs"><button class="on" data-tab="text">Nhập văn bản</button><button data-tab="url">Từ link báo</button></div>
+      <div id="pane-text"><textarea id="text" placeholder="Dán nội dung bài báo dài vào đây…"></textarea></div>
+      <div id="pane-url" hidden><input type="url" id="url" placeholder="https://vnexpress.net/..."></div>
+      <div class="bar-row"><button class="btn" id="go">Tóm tắt</button><button class="btn ghost" id="rand">🎲 Bài ngẫu nhiên</button>
+        <label style="margin-left:auto;font-size:14px;color:var(--muted)">Số câu: <b id="kv">3</b> <input type="range" id="k" min="1" max="6" value="3" style="vertical-align:middle"></label></div>
+      <div id="err"></div>
+    </div>
+    <div class="panel" id="orig" style="margin-top:20px" hidden><div class="sec" style="margin-top:0">Văn bản gốc — câu được chọn được tô đậm</div><div class="lab-text" id="origtext" style="line-height:1.9;font-size:16px;margin-top:10px"></div></div>
+  </div>
+  <div>
+    <div class="panel" id="result"><div class="empty"><div class="big">📝</div><b>Chưa có bản tóm tắt</b><br>Dán bài báo hoặc chọn “Bài ngẫu nhiên”.</div></div>
+    <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 6px">Độ chính xác của tóm tắt</h3>
+      <p class="note" style="margin-top:0">ROUGE trên 400 bài, lấy phần sapo do biên tập viên viết làm bản tham chiếu.</p>
+      {% for name in ev %}<div class="row2" style="grid-template-columns:100px 1fr 54px"><span>{{ name }}</span><div class="track"><i style="width:{{ (ev[name].rouge1/0.4*100)|round(1) }}%"></i></div><em>{{ '%.3f'|format(ev[name].rouge1) }}</em></div>{% endfor %}
+      {% if ev %}<p class="note">ROUGE-1 F1. TextRank ({{ '%.3f'|format(ev['TextRank'].rouge1) }}) cao hơn Lead-2 ({{ '%.3f'|format(ev['Lead-2'].rouge1) }}) và chọn ngẫu nhiên ({{ '%.3f'|format(ev['Ngẫu nhiên'].rouge1) }}); ROUGE-2: {{ '%.3f'|format(ev['TextRank'].rouge2) }} so với {{ '%.3f'|format(ev['Lead-2'].rouge2) }}.</p>{% endif %}</div>
+  </div>
+</div>
+<div class="panel" style="margin-top:6px"><h3 style="margin-top:0">Cách hoạt động</h3>
+  <p style="margin:0 0 8px"><b>TextRank</b>: mỗi câu là một đỉnh của đồ thị, cạnh nối hai câu có độ tương đồng TF-IDF cao. Chạy PageRank — câu nào giống nhiều câu quan trọng khác sẽ có điểm cao. Cộng thêm điểm cho câu đầu bài và câu gần tiêu đề (đặc thù văn phong báo chí).</p>
+  <p style="margin:0">Đây là tóm tắt <b>trích rút</b> (chọn nguyên câu có sẵn), nên không bịa thêm nội dung. Tự động bỏ chú thích ảnh và dòng nguồn.</p></div>
+{% endblock %}
+{% block scripts %}
+<script>
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));$('#pane-text').hidden=b.dataset.tab!=='text';$('#pane-url').hidden=b.dataset.tab!=='url'});
+const showErr=m=>$('#err').innerHTML=m?'<div class="err">'+esc(m)+'</div>':'';
+const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error);return d});
+$('#k').oninput=()=>$('#kv').textContent=$('#k').value;
+async function run(){
+  showErr('');$('#go').disabled=true;$('#go').innerHTML='<span class="spin"></span> Đang tóm tắt…';
+  try{
+    if(!$('#pane-url').hidden){const url=$('#url').value.trim();if(!url)throw new Error('Hãy nhập link bài báo.');const d=await post('/api/url',{url});$('#text').value=d.text;document.querySelector('[data-tab=text]').click()}
+    const d=await post('/api/summarize',{text:$('#text').value,k:+$('#k').value});draw(d);
+  }catch(e){showErr(e.message)}
+  $('#go').disabled=false;$('#go').textContent='Tóm tắt';
+}
+function draw(d){
+  $('#result').innerHTML=`<div class="sec" style="margin-top:0">Bản tóm tắt (${d.summary.length} câu)</div>
+   <ol style="padding-left:20px;margin:10px 0">${d.summary.map(s=>`<li style="margin-bottom:10px;font-family:var(--serif);font-size:17px;line-height:1.55">${esc(s)}</li>`).join('')}</ol>
+   <div class="kpis" style="grid-template-columns:repeat(3,1fr);margin:14px 0"><div class="kpi" style="padding:12px"><b style="font-size:24px">${d.words_in}</b><span>từ gốc</span></div><div class="kpi" style="padding:12px"><b style="font-size:24px">${d.words_out}</b><span>từ tóm tắt</span></div><div class="kpi" style="padding:12px"><b style="font-size:24px">−${d.ratio}%</b><span>rút gọn</span></div></div>
+   <p class="note" style="margin:0 0 10px">Tiết kiệm khoảng <b>${d.saved} phút</b> đọc.</p>
+   <div class="sec">Từ khóa</div><div class="kw" style="margin-top:8px">${d.keywords.map(k=>`<span>${esc(k)}</span>`).join('')}</div>
+   <div class="bar-row"><button class="btn ghost sm" id="copy">📋 Sao chép tóm tắt</button></div>`;
+  $('#copy').onclick=()=>{navigator.clipboard?.writeText(d.summary.join(' '));toast('Đã sao chép')};
+  $('#orig').hidden=false;$('#origtext').innerHTML=d.sentences.map(s=>s.picked?`<mark style="background:var(--brand);color:var(--on-brand);padding:2px 4px">${esc(s.t)}</mark>`:`<span style="color:var(--muted)">${esc(s.t)}</span>`).join(' ');
+}
+$('#go').onclick=run;
+$('#k').onchange=()=>$('#text').value.trim().length>50&&run();
+$('#rand').onclick=async()=>{const d=await fetch('/api/random?full=1').then(r=>r.json());$('#text').value=d.text;run()};
+</script>
+{% endblock %}

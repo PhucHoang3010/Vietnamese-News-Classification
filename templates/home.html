@@ -5,7 +5,13 @@
     <div class="in"><span class="tag">{{ hero.icon }} {{ hero.label }}</span><h1>{{ hero.title }}</h1><p>{{ hero.desc[:220] }}{{ '…' if hero.desc|length>220 }}</p></div></a>
   <div class="hero-side">{% for a in side %}{{ mini(a) }}{% endfor %}</div>
 </div>
-<div class="feature"><div class="big">🔬</div><div><h2>AI Lab — nhìn xem AI “nghĩ” gì</h2><p>Mỗi từ trong bài được tô đậm theo mức đóng góp vào kết quả. Bấm bỏ một từ để xem dự đoán thay đổi thế nào, và phát hiện bài trộn nhiều chủ đề.</p></div><a class="btn" href="{{ url_for('lab') }}">Thử ngay →</a></div>
+<div class="trio">
+  <a href="{{ url_for('summarize_page') }}"><span>📝</span><b>Tóm tắt tự động</b><small>Rút 2–3 câu cốt lõi của bài dài — TextRank</small></a>
+  <a href="{{ url_for('events') }}"><span>🧩</span><b>Sự kiện & chủ đề con</b><small>AI tự gom bài cùng câu chuyện — KMeans</small></a>
+  <a href="{{ url_for('digest') }}"><span>⚡</span><b>Bản tin 60 giây</b><small>Mỗi chuyên mục một tin, 2 câu</small></a>
+  <a href="{{ url_for('classify_page') }}"><span>🏷️</span><b>Phân loại bài báo</b><small>11 chuyên mục — độ chính xác 89,3%</small></a>
+</div>
+<section class="blk" id="foryou" hidden><div class="sec-h"><h2>Dành cho bạn</h2><a id="prof"></a></div><div class="foryou-grid" id="foryou-grid"></div></section>
 <div class="layout"><div>
   <section class="blk"><div class="sec-h"><h2>Tin mới nhất</h2></div><div class="grid2">{% for a in latest[:4] %}{{ card(a) }}{% endfor %}</div></section>
   {% for name, items in sections %}{% set m = TOPICS[name] %}
@@ -13,4 +19,14 @@
     <div class="sect">{{ card(items[0]) }}<div class="stack">{% for a in items[1:4] %}{{ mini(a) }}{% endfor %}</div></div></section>
   {% endfor %}
 </div>{{ sidebar() }}</div>
+{% endblock %}
+{% block scripts %}
+<script>
+(async()=>{let ids=[];try{ids=JSON.parse(localStorage.getItem('vn_read')||'[]')}catch(e){}
+ if(!ids.length)return;
+ const d=await fetch('/api/recommend?ids='+ids.slice(-12).join(',')).then(r=>r.json());if(!d.items.length)return;
+ $('#foryou').hidden=false;$('#prof').textContent='Bạn hay đọc: '+d.profile.map(p=>p.icon+' '+p.label+' '+p.pct+'%').join(' · ');
+ $('#foryou-grid').innerHTML=d.items.map(a=>`<a class="card" href="/bai/${a.id}"><div class="thumb"><img src="${a.img}" alt="" loading="lazy"></div><span class="tag">${a.icon} ${esc(a.label)}</span><h3>${esc(a.title)}</h3><p>${esc(a.desc)}</p><div class="meta"><span>${a.minutes} phút đọc</span></div></a>`).join('');
+})();
+</script>
 {% endblock %}

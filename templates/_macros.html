@@ -14,7 +14,7 @@
 {% macro heat(v, mx) %}{% set k = (v / mx) if mx else 0 %}background:color-mix(in srgb,var(--brand) {{ (k*100)|round|int }}%,transparent);color:{{ '#fff' if k>0.55 else 'inherit' }}{% endmacro %}
 {% macro sidebar() %}
 <aside>
-  <div class="box promo"><h3>Thử phân loại bằng AI</h3><p>Dán nội dung bài báo hoặc link, hệ thống xác định chuyên mục và giải thích kết quả.</p><a class="btn" href="{{ url_for('classify_page') }}">Phân loại ngay →</a> <a class="btn ghost" style="margin-top:8px" href="{{ url_for('lab') }}">🔬 AI Lab</a></div>
+  <div class="box promo"><h3>Công cụ AI</h3><p>Phân loại, tóm tắt tự động, gom sự kiện, gợi ý bài đọc — thử ngay với bài báo của bạn.</p><a class="btn" href="{{ url_for('summarize_page') }}">Tóm tắt bài →</a> <a class="btn ghost" style="margin-top:8px" href="{{ url_for('tools') }}">✦ Tất cả công cụ</a></div>
   <div class="box"><h3>Chuyên mục</h3><ul class="list">
     {% for n in NAV %}<li><a href="{{ url_for('category', slug=n.slug) }}"><span>{{ n.icon }}</span> {{ n.name }}<b>{{ STATS.counts[n.name] }}</b></a></li>{% endfor %}</ul></div>
   <div class="box"><h3>Độ chính xác AI</h3>

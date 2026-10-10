@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}Bản tin nhanh 60 giây — VnNews{% endblock %}
+{% block content %}
+<div class="pagehead"><div class="big">⚡</div><div><h1>Bản tin nhanh 60 giây</h1><p>Mỗi chuyên mục một tin nổi bật, được AI tóm tắt còn 2 câu. Rút gọn từ <b>{{ win }}</b> xuống <b>{{ wout }}</b> từ (−{{ (100 - wout*100/win)|round|int }}%).</p></div></div>
+<div style="max-width:820px;margin:0 auto">
+{% for it in items %}{% set a = it.a %}
+<article class="digest-item"><div class="thumb"><img src="{{ a.img }}" alt="" loading="lazy"></div>
+  <div><span class="tag">{{ a.icon }} {{ a.label }}</span><h3 class="serif"><a href="{{ url_for('article', aid=a.id) }}">{{ a.title }}</a></h3>
+  {% for x in it.sum %}<p>{{ x }}</p>{% endfor %}
+  <div class="kw" style="margin-top:8px">{% for k in it.kw %}<span>{{ k }}</span>{% endfor %}</div>
+  <div class="meta"><span>{{ it.win }} từ → {{ it.wout }} từ</span><a class="conf" href="{{ url_for('article', aid=a.id) }}" style="text-decoration:underline">Đọc đầy đủ →</a></div></div></article>
+{% endfor %}</div>
+{% endblock %}

@@ -208,6 +208,119 @@ def paras(s):
 def cards(ids): return [ART[i] for i in ids]
 
 
+# ---------------------------------------------------------------- NLP khác ngoài phân loại: tóm tắt, từ khóa, gom cụm, gợi ý
+from functools import lru_cache
+from sklearn.cluster import KMeans
+from sklearn.decomposition import TruncatedSVD
+from sklearn.metrics import silhouette_score
+from sklearn.preprocessing import normalize
+
+_SENT = re.compile(r"(?<=[.!?…])\s+(?=[A-ZÀ-ỸĐ\"“‘(\[])|\n+")
+
+
+_CREDIT = re.compile(r"\b[A-ZĐ]\.[A-ZĐ]\b|^\s*(Ảnh|Nguồn|Video|Clip|Đồ họa|Theo)\b|\bẢNH\b|ảnh:|Ảnh:|nguồn:|\[(video|clip|ảnh|photo)\]", re.I)
+
+
+def split_sentences(text):
+    """Tách câu, bỏ chú thích ảnh / nguồn và các đoạn dính nhau quá dài."""
+    out = []
+    for x in _SENT.split(text):
+        x = (x or "").strip(); w = len(x.split())
+        if 6 <= w <= 55 and not _CREDIT.search(x) and x[-1:] in ".!?…”\"":
+            out.append(x)
+    return out
+
+
+def summarize(text, k=3, title=""):
+    """Tóm tắt trích rút bằng TextRank: câu quan trọng = câu giống nhiều câu khác (PageRank trên đồ thị độ tương đồng TF-IDF),
+    cộng điểm cho câu đầu bài và câu gần tiêu đề."""
+    sents = split_sentences(text)[:80]
+    n = len(sents)
+    if n <= k:
+        return sents, list(range(n)), sents
+    M = VEC.transform([clean(x) for x in sents])
+    S = (M @ M.T).toarray(); np.fill_diagonal(S, 0)
+    rs = S.sum(1, keepdims=True); rs[rs == 0] = 1
+    P = S / rs; r = np.full(n, 1 / n)
+    for _ in range(50):
+        r = 0.15 / n + 0.85 * (P.T @ r)
+    r = r / (r.max() or 1)
+    lead = 1 / np.sqrt(1 + np.arange(n))
+    ts = (M @ VEC.transform([clean(title)]).T).toarray().ravel() if title else np.zeros(n)
+    score = 0.6 * r + 0.25 * lead + 0.15 * (ts / (ts.max() or 1))
+    pick = sorted(np.argsort(-score)[:k].tolist())
+    return [sents[i] for i in pick], pick, sents
+
+
+def keyphrases(text, n=8):
+    x = VEC.transform([clean(text)]).tocsr()
+    if not x.nnz:
+        return []
+    order = sorted(range(x.nnz), key=lambda j: -x.data[j] * (1.15 if " " in FEATURES[x.indices[j]] else 1))
+    out = []
+    for j in order:
+        term = FEATURES[x.indices[j]]
+        if len(term) < 3 or any(term in c or c in term for c in out):
+            continue
+        out.append(term)
+        if len(out) >= n:
+            break
+    return out
+
+
+@lru_cache(maxsize=2048)
+def article_summary(aid, k=3):
+    a = ART[aid]
+    sm, _, _ = summarize(a["content"], k, a["title"])
+    return sm
+
+
+def _clusters():
+    out = {}
+    for t, ids in BY_TOPIC.items():
+        rows = [IDX[i] for i in ids]; X = SX[rows]
+        kk = max(8, round(len(ids) / 26))
+        Z = normalize(TruncatedSVD(min(60, X.shape[1] - 1), random_state=42).fit_transform(X))
+        km = KMeans(kk, n_init=5, random_state=42).fit(Z)
+        sil = float(silhouette_score(Z, km.labels_))
+        names = np.array(SV.get_feature_names_out())
+        isbi = np.where(np.char.find(names.astype(str), " ") >= 0, 1.4, 1.0)
+        gmean = np.asarray(X.mean(axis=0)).ravel()
+        groups = []
+        for c in range(kk):
+            mem = np.where(km.labels_ == c)[0]
+            if len(mem) < 3:
+                continue
+            cen = np.asarray(X[mem].mean(axis=0)).ravel() - gmean          # đặc trưng riêng của cụm so với cả chuyên mục
+            terms = []
+            for j in np.argsort(-cen * isbi)[:40]:
+                if len(names[j]) < 4 or any(set(names[j].split()) & set(q.split()) for q in terms):
+                    continue
+                terms.append(names[j])
+                if len(terms) == 3:
+                    break
+            rep = mem[np.argmax(Z[mem] @ km.cluster_centers_[c])]
+            members = sorted(mem, key=lambda m: -(Z[m] @ km.cluster_centers_[c]))
+            groups.append({"label": " · ".join(terms), "size": len(mem), "rep": ids[rep], "items": [ids[m] for m in members[:6]]})
+        groups.sort(key=lambda g: -g["size"])
+        out[t] = {"groups": groups, "sil": round(sil, 3), "k": len(groups)}
+    return out
+
+
+_CL = {}
+
+
+def clusters():
+    if not _CL:
+        f = ROOT / "data" / "clusters.json"
+        if f.exists():
+            _CL.update(json.loads(f.read_text(encoding="utf-8")))
+        else:
+            _CL.update(_clusters())
+            f.write_text(json.dumps(_CL, ensure_ascii=False), encoding="utf-8")
+    return _CL
+
+
 # ---------------------------------------------------------------- trang
 @app.get("/")
 def home():
@@ -232,7 +345,7 @@ def article(aid):
     res = analyze(a["title"] + ". " + a["desc"] + " " + a["content"])
     sim = (SX @ SX[IDX[aid]].T).toarray().ravel(); sim[IDX[aid]] = -1
     rel = [IDS[j] for j in np.argsort(-sim)[:4]]
-    return render_template("article.html", a=a, res=res, related=cards(rel))
+    return render_template("article.html", a=a, res=res, related=cards(rel), summ=article_summary(aid, 3), kws=keyphrases(a["title"] + " " + a["content"], 6))
 
 
 @app.get("/tim-kiem")
@@ -324,7 +437,8 @@ def api_samples():
 @app.get("/api/random")
 def api_random():
     a = ART[random.choice(IDS)]
-    return jsonify(text=(a["title"] + ". " + a["desc"] + " " + a["content"])[:1500], truth=a["truth"])
+    full = request.args.get("full")
+    return jsonify(text=(a["content"] if full else a["title"] + ". " + a["desc"] + " " + a["content"])[: 8000 if full else 1500], title=a["title"], truth=a["truth"])
 
 
 # ---------------------------------------------------------------- AI Lab: giải thích dự đoán (Explainable AI)
@@ -411,6 +525,72 @@ def api_explain():
     if not out:
         return jsonify(error="Nội dung quá ngắn. Hãy nhập ít nhất một đoạn văn (khoảng 10 từ trở lên)."), 400
     return jsonify(out)
+
+
+# ---------------------------------------------------------------- chức năng mới: tóm tắt, sự kiện, bản tin, gợi ý
+try:
+    SUMEVAL = json.loads((ROOT / "outputs/summary_eval.json").read_text(encoding="utf-8"))
+except Exception:
+    SUMEVAL = {}
+
+
+@app.get("/cong-cu")
+def tools():
+    return render_template("tools.html")
+
+
+@app.get("/tom-tat")
+def summarize_page():
+    return render_template("summarize.html", ev=SUMEVAL)
+
+
+@app.post("/api/summarize")
+def api_summarize():
+    d = request.get_json(silent=True) or {}
+    text = (d.get("text") or "")[:20000]; k = min(6, max(1, int(d.get("k") or 3)))
+    sents = split_sentences(text)
+    if len(sents) < 3:
+        return jsonify(error="Văn bản quá ngắn để tóm tắt. Hãy dán một bài báo đầy đủ (ít nhất vài câu)."), 400
+    sm, pick, allsents = summarize(text, k, d.get("title", ""))
+    win, wout = len(text.split()), sum(len(x.split()) for x in sm)
+    return jsonify(summary=sm, sentences=[{"t": x, "picked": i in pick} for i, x in enumerate(allsents)], keywords=keyphrases(text, 8),
+                   words_in=win, words_out=wout, ratio=round(100 * (1 - wout / max(win, 1))), saved=max(1, round((win - wout) / 200)))
+
+
+@app.get("/su-kien")
+def events():
+    cl = clusters(); slug = request.args.get("c", "all")
+    name = SLUG.get(slug)
+    allg = sorted(((t, g) for t, c in cl.items() for g in c["groups"]), key=lambda x: -x[1]["size"])[:9]
+    view = None
+    if name:
+        view = {"name": name, "meta": TOPICS[name], **cl[name]}
+    return render_template("events.html", cl=cl, slug=slug, view=view, top=allg, ART=ART, avg_sil=round(sum(c["sil"] for c in cl.values()) / len(cl), 3))
+
+
+@app.get("/ban-tin")
+def digest():
+    items = []
+    for t in ("Thời sự", "Thế giới", "Kinh doanh", "Pháp luật", "Giáo dục", "Sức khỏe", "Khoa học", "Đời sống", "Giải trí", "Thể thao", "Xe"):
+        a = ART[BY_TOPIC[t][0]]
+        sm = article_summary(a["id"], 2)
+        items.append({"a": a, "sum": sm, "kw": keyphrases(a["title"] + " " + a["content"], 4), "win": len(a["content"].split()), "wout": sum(len(x.split()) for x in sm)})
+    return render_template("digest.html", items=items, win=sum(i["win"] for i in items), wout=sum(i["wout"] for i in items))
+
+
+@app.get("/api/recommend")
+def api_recommend():
+    ids = [i for i in (request.args.get("ids", "").split(",")) if i.isdigit() and int(i) in IDX][-12:]
+    if not ids:
+        return jsonify(items=[], profile=[])
+    rows = [IDX[int(i)] for i in ids]
+    cen = np.asarray(SX[rows].mean(axis=0)).ravel()
+    sim = SX @ cen; sim[rows] = -1
+    top = np.argsort(-np.asarray(sim).ravel())[:6]
+    cnt = Counter(ART[int(i)]["label"] for i in ids)
+    prof = [{"label": k, "icon": TOPICS[k][1], "pct": round(100 * v / len(ids))} for k, v in cnt.most_common(4)]
+    keep = ("id", "title", "desc", "label", "icon", "img", "minutes", "pct")
+    return jsonify(items=[{k: ART[IDS[j]][k] for k in keep} for j in top], profile=prof)
 
 
 @app.get("/favicon.ico")
