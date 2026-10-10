@@ -3,6 +3,8 @@
   python do_an/predict.py            (nhập nhiều dòng, kết thúc bằng Enter trống)
 """
 import re, sys, unicodedata
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
 from pathlib import Path
 import joblib
 

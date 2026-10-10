@@ -3,7 +3,7 @@
 Chạy:  python do_an/train.py
 Kết quả: do_an/outputs/ (biểu đồ, bảng, metrics.json) và do_an/model.joblib
 """
-import json, re, time, unicodedata
+import json, re, sys, time, unicodedata
 from pathlib import Path
 
 import joblib
@@ -22,10 +22,14 @@ from sklearn.naive_bayes import ComplementNB
 from sklearn.pipeline import Pipeline
 from sklearn.svm import LinearSVC
 
+if hasattr(sys.stdout, "reconfigure"):
+    sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+
 ROOT = Path(__file__).resolve().parent
-DATA = ROOT.parent / "data/external/viet_online_news_test.csv"
+DATA = ROOT / "../data/external/viet_online_news_test.csv"
 OUT = ROOT / "outputs"; OUT.mkdir(exist_ok=True)
 SEED = 42
+plt.rcParams["font.family"] = "DejaVu Sans"
 
 
 def clean(t: str) -> str:
@@ -36,7 +40,7 @@ def clean(t: str) -> str:
     return re.sub(r"\s+", " ", t).strip()
 
 
-df = pd.read_csv(DATA, usecols=["title", "description", "content", "ground_truth"])
+df = pd.read_csv(DATA, encoding="utf-8", usecols=["title", "description", "content", "ground_truth"])
 df["text"] = (df.title.fillna("") + " " + df.description.fillna("") + " " + df.content.fillna("")).map(clean)
 df = df[df.text.str.len() > 30].drop_duplicates("text").reset_index(drop=True)
 df = df.rename(columns={"ground_truth": "label"})
@@ -59,7 +63,7 @@ models = {
     "Complement Naive Bayes": ComplementNB(alpha=0.3),
     "Logistic Regression": LogisticRegression(C=10, max_iter=1000),
     "Linear SVM": LinearSVC(C=1.0),
-    "Random Forest": RandomForestClassifier(n_estimators=200, n_jobs=-1, random_state=SEED),
+    "Random Forest": RandomForestClassifier(n_estimators=200, n_jobs=1, random_state=SEED),
 }
 rows = []
 for name, clf in models.items():
@@ -75,14 +79,14 @@ plt.xlim(0.5, 1); plt.title("So sánh Macro-F1 trên tập validation"); plt.tig
 # Tinh chỉnh siêu tham số cho Linear SVM trên train (CV 3-fold)
 gs = GridSearchCV(Pipeline([("tfidf", tfidf()), ("clf", LinearSVC())]),
                   {"tfidf__ngram_range": [(1, 1), (1, 2)], "clf__C": [0.1, 0.5, 1, 2]},
-                  scoring="f1_macro", cv=3, n_jobs=-1).fit(X_tr, y_tr)
+                  scoring="f1_macro", cv=3, n_jobs=1).fit(X_tr, y_tr)
 print("Best:", gs.best_params_, gs.best_score_)
 best = gs.best_estimator_
 
 # Đánh giá cuối trên tập test (chỉ dùng 1 lần)
 pt = best.predict(X_te)
 rep = classification_report(y_te, pt, output_dict=True, digits=4)
-pd.DataFrame(rep).T.to_csv(OUT / "bao_cao_phan_loai.csv")
+pd.DataFrame(rep).T.to_csv(OUT / "bao_cao_phan_loai.csv", encoding="utf-8-sig")
 print(classification_report(y_te, pt, digits=4))
 labels = sorted(df.label.unique()); cm = confusion_matrix(y_te, pt, labels=labels)
 plt.figure(figsize=(9, 7)); sns.heatmap(cm, annot=True, fmt="d", cmap="Blues", xticklabels=labels, yticklabels=labels)
@@ -92,15 +96,15 @@ plt.savefig(OUT / "ma_tran_nham_lan.png", dpi=150); plt.close()
 # Từ khóa đặc trưng mỗi chủ đề
 vec, clf = best.named_steps["tfidf"], best.named_steps["clf"]
 names = np.array(vec.get_feature_names_out()); kw = {c: names[np.argsort(clf.coef_[i])[-10:][::-1]].tolist() for i, c in enumerate(clf.classes_)}
-json.dump(kw, open(OUT / "tu_khoa_dac_trung.json", "w"), ensure_ascii=False, indent=1)
+json.dump(kw, open(OUT / "tu_khoa_dac_trung.json", "w", encoding="utf-8"), ensure_ascii=False, indent=1)
 
 # Lỗi tiêu biểu
 err = pd.DataFrame({"that": y_te.values, "du_doan": pt, "doan_van": X_te.str[:200].values})
-err[err.that != err.du_doan].to_csv(OUT / "mau_du_doan_sai.csv", index=False)
+err[err.that != err.du_doan].to_csv(OUT / "mau_du_doan_sai.csv", index=False, encoding="utf-8-sig")
 
 metrics = dict(n_samples=len(df), n_classes=len(labels), best_params={k: str(v) for k, v in gs.best_params_.items()},
-               cv_macro_f1=gs.best_score_, test_accuracy=accuracy_score(y_te, pt), test_macro_f1=f1_score(y_te, pt, average="macro"),
+               cv_macro_f1=float(gs.best_score_), test_accuracy=float(accuracy_score(y_te, pt)), test_macro_f1=float(f1_score(y_te, pt, average="macro")),
                test_size=len(X_te))
-json.dump(metrics, open(OUT / "metrics.json", "w"), indent=1)
+json.dump(metrics, open(OUT / "metrics.json", "w", encoding="utf-8"), indent=1)
 print(metrics)
 joblib.dump(best, ROOT / "model.joblib", compress=3)

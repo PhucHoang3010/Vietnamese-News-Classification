@@ -1,4 +1,4 @@
-"""Sinh báo cáo Word từ kết quả trong outputs/: python do_an/make_report.py"""
+"""Sinh báo cáo Word từ kết quả trong outputs/: python make_report.py"""
 import json
 from pathlib import Path
 import pandas as pd
@@ -7,9 +7,9 @@ from docx.shared import Cm, Pt
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 O = Path(__file__).parent / "outputs"
-m = json.load(open(O / "metrics.json")); bench = pd.read_csv(O / "so_sanh_mo_hinh.csv")
-rep = pd.read_csv(O / "bao_cao_phan_loai.csv", index_col=0); kw = json.load(open(O / "tu_khoa_dac_trung.json"))
-err = pd.read_csv(O / "mau_du_doan_sai.csv")
+m = json.load(open(O / "metrics.json", encoding="utf-8")); bench = pd.read_csv(O / "so_sanh_mo_hinh.csv", encoding="utf-8")
+rep = pd.read_csv(O / "bao_cao_phan_loai.csv", index_col=0, encoding="utf-8-sig"); kw = json.load(open(O / "tu_khoa_dac_trung.json", encoding="utf-8"))
+err = pd.read_csv(O / "mau_du_doan_sai.csv", encoding="utf-8-sig")
 
 d = Document(); d.styles["Normal"].font.name = "Times New Roman"; d.styles["Normal"].font.size = Pt(13)
 def H(t, l=1): d.add_heading(t, l)
@@ -76,7 +76,7 @@ B(["Chưa tách từ tiếng Việt (word segmentation); có thể thêm underth
    "Triển khai thành web/API để người dùng dán bài báo và nhận chủ đề."])
 
 H("7. Hướng dẫn chạy")
-P("pip install -r do_an/requirements.txt\npython do_an/train.py        # huấn luyện + sinh biểu đồ\npython do_an/predict.py \"nội dung bài báo\"\npython do_an/make_report.py  # sinh lại báo cáo")
+P("pip install -r requirements.txt\npython train.py        # huấn luyện + sinh biểu đồ\npython predict.py \"nội dung bài báo\"\npython make_report.py  # sinh lại báo cáo")
 H("8. Kết luận")
 P(f"Hệ thống TF-IDF + Linear SVM đạt Accuracy {m['test_accuracy']:.1%} và Macro-F1 {m['test_macro_f1']:.1%} trên 11 chủ đề, huấn luyện chỉ vài giây trên CPU, "
   "đáp ứng mục tiêu phân loại tin tức tự động mà không cần tài nguyên tính toán lớn.")
