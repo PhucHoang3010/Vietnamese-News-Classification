@@ -26,10 +26,10 @@ CREATE TABLE PHONGCHIEU (
     MaPhong   VARCHAR(10) NOT NULL,
     TenPhong  VARCHAR(50) NOT NULL,
     LoaiPhong VARCHAR(10) NOT NULL,
-    SoGhe     INT         NOT NULL,
+    SucChua   INT         NOT NULL,                   -- số ghế tối đa của phòng
     CONSTRAINT PK_PHONGCHIEU PRIMARY KEY (MaPhong),
     CONSTRAINT CK_PHONG_LoaiPhong CHECK (LoaiPhong IN ('2D', '3D', 'IMAX')),
-    CONSTRAINT CK_PHONG_SoGhe CHECK (SoGhe > 0)
+    CONSTRAINT CK_PHONG_SucChua CHECK (SucChua > 0)
 );
 
 CREATE TABLE SUATCHIEU (
@@ -77,7 +77,7 @@ INSERT INTO PHIM (MaPhim, TenPhim, TheLoai, ThoiLuong, NgayKhoiChieu) VALUES
 ('F02', 'Inside Out 2',      'Hoạt hình',   96, '2024-06-14'),
 ('F03', 'Avengers: Endgame', 'Hành động',  181, '2019-04-26');
 
-INSERT INTO PHONGCHIEU (MaPhong, TenPhong, LoaiPhong, SoGhe) VALUES
+INSERT INTO PHONGCHIEU (MaPhong, TenPhong, LoaiPhong, SucChua) VALUES
 ('R01', 'Phòng 1',     '2D',   120),
 ('R02', 'Phòng 2',     '3D',   100),
 ('R03', 'Phòng IMAX',  'IMAX', 150);
