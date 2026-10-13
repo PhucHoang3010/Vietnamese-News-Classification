@@ -1,7 +1,11 @@
 -- =====================================================================
 -- Đề tài: Quản lý đặt vé rạp chiếu phim
+-- Doanh nghiệp (giả định): Công ty Giải trí Ánh Sao - dữ liệu mô phỏng
 -- Học phần: Hệ quản trị cơ sở dữ liệu - Kiểm tra giữa kỳ lần 1
--- Chạy trong MySQL Workbench / MySQL command line
+--
+-- Chạy trong MySQL Workbench hoặc MySQL command line.
+-- Lưu ý: ràng buộc CHECK chỉ có tác dụng trên MySQL 8.0.16 trở lên
+-- (hoặc MariaDB 10.2 trở lên). MySQL 5.7 bỏ qua CHECK.
 -- =====================================================================
 
 DROP DATABASE IF EXISTS QuanLyRapPhim;
@@ -73,9 +77,11 @@ CREATE TABLE VE (
 -- ---------------------------------------------------------------------
 
 INSERT INTO PHIM (MaPhim, TenPhim, TheLoai, ThoiLuong, NgayKhoiChieu) VALUES
-('F01', 'Mai',               'Tâm lý',     131, '2024-02-10'),
-('F02', 'Inside Out 2',      'Hoạt hình',   96, '2024-06-14'),
-('F03', 'Avengers: Endgame', 'Hành động',  181, '2019-04-26');
+('F01', 'Mai',                     'Tâm lý',     131, '2024-02-10'),
+('F02', 'Inside Out 2',            'Hoạt hình',   96, '2024-06-14'),
+('F03', 'Avengers: Endgame',       'Hành động',  181, '2019-04-26'),
+('F04', 'Lật Mặt 7: Một Điều Ước', 'Gia đình',   138, '2024-04-26'),
+('F05', 'Kung Fu Panda 4',         'Hoạt hình',   94, '2024-03-08');
 
 INSERT INTO PHONGCHIEU (MaPhong, TenPhong, LoaiPhong, SucChua) VALUES
 ('R01', 'Phòng 1',     '2D',   120),
@@ -85,20 +91,30 @@ INSERT INTO PHONGCHIEU (MaPhong, TenPhong, LoaiPhong, SucChua) VALUES
 INSERT INTO SUATCHIEU (MaSuat, MaPhim, MaPhong, NgayChieu, GioBatDau, GiaVe) VALUES
 ('S01', 'F01', 'R01', '2025-03-20', '18:00:00',  90000),
 ('S02', 'F02', 'R02', '2025-03-20', '20:30:00', 110000),
-('S03', 'F03', 'R03', '2025-03-21', '19:00:00', 150000);
+('S03', 'F03', 'R03', '2025-03-21', '19:00:00', 150000),
+('S04', 'F04', 'R01', '2025-03-21', '20:00:00',  90000),
+('S05', 'F05', 'R02', '2025-03-22', '09:30:00',  80000),
+('S06', 'F01', 'R01', '2025-03-22', '19:30:00', 100000);
 
 INSERT INTO KHACHHANG (MaKH, HoTen, SDT, Email) VALUES
 ('KH01', 'Nguyễn Văn An',  '0901234567', 'an.nguyen@example.com'),
 ('KH02', 'Trần Thị Bình',  '0912345678', 'binh.tran@example.com'),
-('KH03', 'Lê Hoàng Cường', '0987654321', 'cuong.le@example.com');
+('KH03', 'Lê Hoàng Cường', '0987654321', 'cuong.le@example.com'),
+('KH04', 'Phạm Thu Dung',  '0933456789', 'dung.pham@example.com'),
+('KH05', 'Võ Minh Khôi',   '0944567890', 'khoi.vo@example.com');
 
 INSERT INTO VE (MaVe, MaSuat, MaKH, SoGhe, NgayDat) VALUES
 ('V01', 'S01', 'KH01', 'A5', '2025-03-18'),
 ('V02', 'S01', 'KH02', 'A6', '2025-03-18'),
-('V03', 'S02', 'KH01', 'B3', '2025-03-19');
+('V03', 'S02', 'KH01', 'B3', '2025-03-19'),
+('V04', 'S03', 'KH03', 'C7', '2025-03-19'),
+('V05', 'S03', 'KH03', 'C8', '2025-03-19'),
+('V06', 'S04', 'KH04', 'D2', '2025-03-20'),
+('V07', 'S05', 'KH05', 'E4', '2025-03-21'),
+('V08', 'S06', 'KH02', 'A6', '2025-03-21');
 
 -- ---------------------------------------------------------------------
--- 3. Xem dữ liệu (chụp màn hình các kết quả này để dán vào slide 4)
+-- 3. Xem dữ liệu (chụp màn hình các kết quả này nếu cần dán vào slide 6)
 -- ---------------------------------------------------------------------
 
 SELECT * FROM PHIM;
@@ -114,3 +130,15 @@ JOIN KHACHHANG kh ON kh.MaKH   = v.MaKH
 JOIN SUATCHIEU sc ON sc.MaSuat = v.MaSuat
 JOIN PHIM p       ON p.MaPhim  = sc.MaPhim
 ORDER BY kh.HoTen;
+
+-- ---------------------------------------------------------------------
+-- 4. Thử vi phạm ràng buộc (slide 7): bỏ dấu -- trước từng lệnh để chạy,
+--    mỗi lệnh phải bị MySQL từ chối và báo lỗi
+-- ---------------------------------------------------------------------
+
+-- INSERT INTO PHIM VALUES ('F06', 'Phim thử', 'Khác', 0, '2025-01-01');                    -- miền giá trị: ThoiLuong > 0
+-- INSERT INTO PHONGCHIEU VALUES ('R04', 'Phòng 4', '4DX', 80);                              -- miền giá trị: LoaiPhong
+-- INSERT INTO PHIM VALUES ('F01', 'Trùng mã', 'Khác', 90, '2025-01-01');                    -- khóa chính: trùng MaPhim
+-- INSERT INTO SUATCHIEU VALUES ('S09', 'F99', 'R01', '2025-03-23', '18:00:00', 90000);      -- khóa ngoại: không có phim F99
+-- INSERT INTO KHACHHANG VALUES ('KH09', 'Thử', '12345', 'thu@example.com');                 -- miền giá trị: SDT phải đủ 10 chữ số
+-- INSERT INTO VE VALUES ('V09', 'S01', 'KH03', 'A5', '2025-03-18');                         -- UNIQUE: ghế A5 của suất S01 đã bán
