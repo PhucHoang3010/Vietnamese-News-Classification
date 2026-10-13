@@ -1,11 +1,16 @@
 {% extends "base.html" %}{% from "_macros.html" import card, mini, sidebar with context %}
 {% block content %}
-<div class="aistrip">🤖 Mỗi bài trên trang này do <b>AI đọc và tự xếp chuyên mục</b>. Bấm vào một bài để xem AI chọn mục nào và vì sao · <a href="#how">Cách hoạt động ↓</a></div>
-<div class="hero">
-  <a class="hero-main" href="{{ url_for('article', aid=hero.id) }}" style="--c:{{ hero.color }}"><img class="bg" src="{{ hero.img }}" alt="">
-    <div class="in"><span class="tag aib">🤖 AI xếp vào {{ hero.icon }} {{ hero.label }} · nghiêng {{ hero.pct }}%</span><h1>{{ hero.title }}</h1><p>{{ hero.desc[:220] }}{{ '…' if hero.desc|length>220 }}</p></div></a>
-  <div class="hero-side">{% for a in side %}{{ mini(a) }}{% endfor %}</div>
-</div>
+<section class="clshero">
+  <div class="cl-l">
+    <span class="kick">🤖 Bài toán của đồ án</span>
+    <h1>AI đọc một bài báo và tự xếp vào đúng chuyên mục</h1>
+    <p class="sub">11 chuyên mục · TF-IDF + Linear SVM · đúng {{ (STATS.acc*100)|round(1) }}% trên {{ STATS.n_test }} bài AI chưa từng thấy</p>
+    <textarea id="hx" spellcheck="false">{{ demo_text }}</textarea>
+    <div class="cl-row"><button class="btn" id="hgo">Phân loại ngay</button><button class="btn ghost" id="hrand">🎲 Bài ngẫu nhiên</button><span class="cnt" id="hcnt"></span></div>
+    <div class="cl-chips" id="hsamples"></div>
+  </div>
+  <div class="cl-r" id="hres"><div class="cl-empty">Đang phân loại…</div></div>
+</section>
 <section class="how" id="how">
   <h2 class="serif">VnNews hoạt động thế nào?</h2>
   <div class="how-steps">
@@ -18,6 +23,12 @@
     <br><span>AI sai:</span> “{{ bad_ex.title }}” → AI xếp <b>{{ bad_ex.icon }} {{ bad_ex.label }}</b>, báo gốc là {{ bad_ex.truth }} ⚠ <a href="{{ url_for('article', aid=bad_ex.id) }}">xem</a>
     · <a href="{{ url_for('classify_page') }}">Tự thử dán một đoạn văn →</a></div>
 </section>
+<h2 class="serif newshead">Kho tin: {{ STATS.n }} bài do AI xếp chuyên mục</h2>
+<div class="hero">
+  <a class="hero-main" href="{{ url_for('article', aid=hero.id) }}" style="--c:{{ hero.color }}"><img class="bg" src="{{ hero.img }}" alt="">
+    <div class="in"><span class="tag aib">🤖 AI xếp vào {{ hero.icon }} {{ hero.label }} · nghiêng {{ hero.pct }}%</span><h1>{{ hero.title }}</h1><p>{{ hero.desc[:220] }}{{ '…' if hero.desc|length>220 }}</p></div></a>
+  <div class="hero-side">{% for a in side %}{{ mini(a) }}{% endfor %}</div>
+</div>
 <a class="arena-banner" href="{{ url_for('arena') }}"><span class="big">🥊</span><div><b class="serif">Bạn có phân loại tin giỏi hơn AI không?</b><small>10 lượt đấu với bài báo AI chưa từng thấy · kết quả người vs AI được ghi lại thật · có bảng xếp hạng</small></div><span class="btn">Chơi ngay →</span></a>
 <div class="trio">
   <a href="{{ url_for('summarize_page') }}"><span>📝</span><b>Tóm tắt tự động</b><small>Rút 2–3 câu cốt lõi của bài dài — TextRank</small></a>
@@ -36,6 +47,32 @@
 {% endblock %}
 {% block scripts %}
 <script>
+const hpost=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error);return d});
+const hwords=t=>(t.trim().match(/\S+/g)||[]).length;
+function hrender(d,meta){
+  const note=meta&&meta.truth?`<p class="cl-truth">Chuyên mục gốc của báo: <b>${esc(meta.truth)}</b> ${meta.truth===d.label?'✓ AI xếp đúng':'⚠ AI xếp khác'}${meta.split==='train'?' · (bài AI đã học)':meta.split==='val'?' · (bài kiểm định)':meta.split==='test'?' · (bài kiểm thử: AI chưa từng thấy)':''}</p>`:'';
+  $('#hres').innerHTML=`<div class="cl-top" style="--c:${d.color}"><span class="ic">${d.icon}</span><div><small>AI xếp bài này vào chuyên mục</small><strong>${esc(d.label)}</strong></div><div class="pc">${d.pct}<small>%</small></div></div>
+   ${note}
+   <div class="cl-bars">${d.top.slice(0,4).map(t=>`<div class="r"><span>${t.icon} ${esc(t.label)}</span><div class="t"><i data-w="${t.pct}"></i></div><em>${t.pct}%</em></div>`).join('')}</div>
+   <div class="cl-why"><small>AI dựa vào các từ:</small>${d.keywords.slice(0,6).map(k=>`<span>${esc(k.word)}</span>`).join('')}</div>
+   <p class="cl-lean">% là mức nghiêng của AI giữa 11 chuyên mục, không phải xác suất đúng.${meta&&meta.id?` <a href="/giai-thich?id=${meta.id}">🔬 Xem AI giải thích vì sao →</a>`:''}</p>`;
+  requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll('#hres .t i').forEach(i=>i.style.width=i.dataset.w+'%'),30));
+}
+async function hrun(meta){
+  const text=$('#hx').value;$('#hcnt').textContent=hwords(text)+' từ';
+  if(hwords(text)<10){$('#hres').innerHTML='<div class="cl-empty">Hãy dán một đoạn văn dài hơn (từ 10 từ trở lên).</div>';return}
+  $('#hgo').disabled=true;
+  try{hrender(await hpost('/api/predict',{text}),meta)}catch(e){$('#hres').innerHTML='<div class="cl-empty">'+esc(e.message)+'</div>'}
+  $('#hgo').disabled=false;
+}
+$('#hgo').onclick=()=>hrun(null);
+$('#hx').addEventListener('keydown',e=>{if(e.ctrlKey&&e.key==='Enter')hrun(null)});
+$('#hx').addEventListener('input',()=>{$('#hcnt').textContent=hwords($('#hx').value)+' từ'});
+$('#hrand').onclick=async()=>{const d=await fetch('/api/random').then(r=>r.json());$('#hx').value=d.text;await hrun({truth:d.truth,id:d.id,split:d.split})};
+fetch('/api/samples').then(r=>r.json()).then(list=>{$('#hsamples').innerHTML=list.map((s,i)=>`<button class="chip" data-i="${i}">${s.icon} ${esc(s.label)}</button>`).join('');
+  $('#hsamples').querySelectorAll('.chip').forEach(c=>c.onclick=()=>{$('#hx').value=list[c.dataset.i].text;hrun(null)})});
+hrun({truth:{{ ok_ex.truth|tojson }},id:{{ ok_ex.id }},split:{{ ok_ex.split|tojson }}});
+
 (async()=>{let ids=[];try{ids=JSON.parse(localStorage.getItem('vn_read')||'[]')}catch(e){}
  if(!ids.length)return;
  const d=await fetch('/api/recommend?ids='+ids.slice(-12).join(',')).then(r=>r.json());if(!d.items.length)return;

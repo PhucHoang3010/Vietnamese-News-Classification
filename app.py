@@ -342,7 +342,7 @@ def home():
     ok_ex = next(ART[i] for i in feat["Thế giới"] if ART[i]["test"] and ART[i]["label"] == ART[i]["truth"])
     wrong = sorted([a for a in ART.values() if a["test"] and a["label"] != a["truth"]], key=lambda a: a["pct"])
     bad_ex = wrong[len(wrong) // 2]                                                           # một bài AI sai điển hình (độ nghiêng trung vị)
-    return render_template("home.html", hero=ART[hero_ids[0]], side=cards(hero_ids[1:]), latest=cards(latest), sections=sections, keywords=KEYWORDS, ok_ex=ok_ex, bad_ex=bad_ex)
+    return render_template("home.html", hero=ART[hero_ids[0]], side=cards(hero_ids[1:]), latest=cards(latest), sections=sections, keywords=KEYWORDS, ok_ex=ok_ex, bad_ex=bad_ex, demo_text=(ok_ex["title"] + ". " + ok_ex["desc"] + " " + ok_ex["content"])[:900])
 
 
 @app.get("/chu-de/<slug>")
@@ -465,7 +465,7 @@ def api_samples():
 def api_random():
     a = ART[random.choice(IDS)]
     full = request.args.get("full")
-    return jsonify(text=(a["content"] if full else a["title"] + ". " + a["desc"] + " " + a["content"])[: 8000 if full else 1500], title=a["title"], truth=a["truth"])
+    return jsonify(text=(a["content"] if full else a["title"] + ". " + a["desc"] + " " + a["content"])[: 8000 if full else 1500], title=a["title"], truth=a["truth"], id=a["id"], split=a["split"])
 
 
 # ---------------------------------------------------------------- AI Lab: giải thích dự đoán (Explainable AI)

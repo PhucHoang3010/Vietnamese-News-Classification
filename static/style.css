@@ -177,3 +177,28 @@ code{background:var(--soft);padding:1px 6px;font-size:14px}
 @media(max-width:1199px){.cls-main{grid-template-columns:1fr}}
 @media(max-width:900px){.how-steps{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:760px){.cls-bars .r{grid-template-columns:116px minmax(0,1fr) 44px}.how-steps{grid-template-columns:1fr}}
+
+/* ===== hero phân loại ở đầu trang chủ ===== */
+.clshero{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:0;border:2px solid var(--rule);margin:6px 0 26px}
+.cl-l{background:var(--brand);color:var(--on-brand);padding:26px 28px}
+.cl-l .kick{font-size:12.5px;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;opacity:.85}
+.cl-l h1{font-family:var(--serif);font-size:34px;line-height:1.15;margin:8px 0 8px}
+.cl-l .sub{margin:0 0 14px;opacity:.85;font-size:14.5px}
+.cl-l textarea{width:100%;min-height:150px;resize:vertical;border:2px solid var(--on-brand);background:var(--surface);color:var(--text);padding:12px 14px;font:inherit;font-size:14.5px;line-height:1.5}
+.cl-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-top:12px}.cl-row .btn{background:var(--on-brand);color:var(--brand);border-color:var(--on-brand)}.cl-row .btn:hover{background:transparent;color:var(--on-brand)}
+.cl-row .btn.ghost{background:transparent;color:var(--on-brand)}.cl-row .btn.ghost:hover{background:var(--on-brand);color:var(--brand)}.cl-row .cnt{margin-left:auto;font-size:13px;opacity:.75}
+.cl-chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}.cl-chips .chip{border:1px solid var(--on-brand);background:transparent;color:var(--on-brand);padding:3px 10px;font-size:13px;cursor:pointer}.cl-chips .chip:hover{background:var(--on-brand);color:var(--brand)}
+.cl-r{background:var(--surface);padding:24px 26px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.cl-empty{color:var(--muted);padding:40px 0;text-align:center}
+.cl-top{display:flex;align-items:center;gap:14px}.cl-top .ic{font-size:44px;filter:grayscale(1)}
+.cl-top small{display:block;font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:1px}
+.cl-top strong{display:block;font-family:var(--serif);font-size:34px;line-height:1.1}
+.cl-top .pc{margin-left:auto;font-size:34px;font-weight:800;font-variant-numeric:tabular-nums;white-space:nowrap}.cl-top .pc small{display:inline;font-size:16px;color:var(--muted);text-transform:none;letter-spacing:0}
+.cl-truth{margin:0;padding:8px 12px;border:1px solid var(--rule);font-size:13.5px;background:var(--alt)}
+.cl-bars .r{display:grid;grid-template-columns:130px minmax(0,1fr) 52px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.cl-bars .t{height:10px;background:var(--soft);border:1px solid var(--line);overflow:hidden}.cl-bars .t i{display:block;height:100%;background:var(--brand);width:0;transition:width .8s cubic-bezier(.2,.8,.2,1)}
+.cl-bars em{font-style:normal;text-align:right;color:var(--muted);font-variant-numeric:tabular-nums}
+.cl-why{display:flex;flex-wrap:wrap;gap:6px;align-items:center}.cl-why small{color:var(--muted);margin-right:4px}.cl-why span{border:1px solid var(--rule);padding:1px 10px;font-weight:600;font-size:13.5px}
+.cl-lean{margin:0;font-size:12.5px;color:var(--muted);line-height:1.5}.cl-lean a{text-decoration:underline;color:var(--text);font-weight:600}
+.newshead{margin:6px 0 14px;font-size:26px;border-top:3px solid var(--rule);padding-top:14px}
+@media(max-width:900px){.clshero{grid-template-columns:1fr}.cl-l h1{font-size:28px}.cl-bars .r{grid-template-columns:112px minmax(0,1fr) 46px}}
