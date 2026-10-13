@@ -1,13 +1,15 @@
 {% extends "base.html" %}{% from "_macros.html" import card, sidebar with context %}
 {% block title %}{{ name }} — VnNews{% endblock %}
 {% block content %}
-<div class="pagehead" style="--c:{{ meta[2] }}"><div class="big">{{ meta[1] }}</div><div><h1>{{ name }}</h1><p>{{ total }} bài viết được AI xếp vào chuyên mục này</p></div>
+<div class="pagehead" style="--c:{{ meta[2] }}"><div class="big">{{ meta[1] }}</div><div><h1>{{ name }}</h1><p>🤖 <b>Trang này do AI lập</b>: {{ total }} bài được AI xếp vào “{{ name }}”, không phải ban biên tập chọn.</p></div>
   <div class="chips" style="margin-left:auto">{% for k in keywords[:8] %}<span class="chip">{{ k }}</span>{% endfor %}</div></div>
 <div class="layout"><div>
-  <div class="grid3" style="grid-template-columns:repeat(2,1fr)">{% for a in items %}{{ card(a) }}{% endfor %}</div>
+  <div class="loc"><a href="?loc=all" class="{{ 'on' if loc=='all' }}">Tất cả ({{ counts.all }}) · mức nghiêng cao nhất trước</a><a href="?loc=test" class="{{ 'on' if loc=='test' }}">Chỉ bài kiểm thử ({{ counts.test }})</a><a href="?loc=sai" class="{{ 'on' if loc=='sai' }}">Chỉ bài AI xếp khác báo gốc ({{ counts.sai }})</a></div>
+  {% if not items %}<p class="note">Không có bài nào trong bộ lọc này.</p>{% endif %}
+  <div class="grid2">{% for a in items %}{{ card(a, cat=False) }}{% endfor %}</div>
   {% if pages>1 %}<div class="pager">
-    {% if page>1 %}<a href="?page={{ page-1 }}">←</a>{% endif %}
-    {% for p in range(1, pages+1) if p==1 or p==pages or (p-page)|abs<=2 %}{% if p==page %}<span class="cur">{{ p }}</span>{% else %}<a href="?page={{ p }}">{{ p }}</a>{% endif %}{% endfor %}
-    {% if page<pages %}<a href="?page={{ page+1 }}">→</a>{% endif %}</div>{% endif %}
+    {% if page>1 %}<a href="?loc={{ loc }}&page={{ page-1 }}">←</a>{% endif %}
+    {% for p in range(1, pages+1) if p==1 or p==pages or (p-page)|abs<=2 %}{% if p==page %}<span class="cur">{{ p }}</span>{% else %}<a href="?loc={{ loc }}&page={{ p }}">{{ p }}</a>{% endif %}{% endfor %}
+    {% if page<pages %}<a href="?loc={{ loc }}&page={{ page+1 }}">→</a>{% endif %}</div>{% endif %}
 </div>{{ sidebar() }}</div>
 {% endblock %}

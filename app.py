@@ -79,7 +79,7 @@ for r in DF.itertuples():
     pr = PRED[str(r.id)]
     desc = r.description.strip() or r.content[:200]
     ART[r.id] = {"id": r.id, "title": r.title.strip(), "desc": desc, "content": r.content, "truth": r.ground_truth, "label": pr["label"],
-                 "pct": pr["pct"], "gap": pr["gap"], "test": pr["test"], "slug": TOPICS[pr["label"]][0], "icon": TOPICS[pr["label"]][1],
+                 "pct": pr["pct"], "gap": pr["gap"], "test": pr["test"], "split": pr["split"], "slug": TOPICS[pr["label"]][0], "icon": TOPICS[pr["label"]][1],
                  "color": TOPICS[pr["label"]][2], "img": f"/img/{r.id}.svg", "minutes": max(1, round(len(r.content.split()) / 200))}
 ORDER = list(ART)
 random.Random(7).shuffle(ORDER)                       # thứ tự cố định nhưng trộn đều các chủ đề
@@ -104,6 +104,16 @@ REPORT = classification_report(_y, _p, output_dict=True, zero_division=0)
 CM = confusion_matrix(_y, _p, labels=CLASSES)
 STATS = {"n": len(ART), "n_test": len(_t), "acc": float(np.mean(np.array(_y) == np.array(_p))), "f1": float(f1_score(_y, _p, average="macro")),
          "counts": Counter(a["label"] for a in ART.values())}
+STATS["n_err"] = int(np.sum(np.array(_y) != np.array(_p)))
+
+
+def _cal(sel):
+    return {"n": len(sel), "acc": round(100 * float(np.mean([a["label"] == a["truth"] for a in sel])), 1) if sel else 0.0}
+
+
+# "mức nghiêng" của AI đáng tin đến đâu (đo trên tập kiểm thử): dùng để giải thích phần trăm hiển thị
+STATS["cal_hi"] = _cal([a for a in _t if a["pct"] >= 95])
+STATS["cal_lo"] = _cal([a for a in _t if a["pct"] < 50])
 try:
     BENCH = list(csv.DictReader(open(ROOT / "outputs/so_sanh_mo_hinh.csv", encoding="utf-8")))
 except Exception:
@@ -325,18 +335,27 @@ def clusters():
 @app.get("/")
 def home():
     feat = {t: BY_TOPIC[t] for t in TOPICS}
-    hero_ids = [feat[t][0] for t in ("Thời sự", "Thể thao", "Kinh doanh", "Khoa học", "Sức khỏe")]
+    first_test = lambda t: next((i for i in feat[t] if ART[i]["test"]), feat[t][0])           # bài nổi bật lấy từ tập kiểm thử (AI chưa từng thấy)
+    hero_ids = [first_test(t) for t in ("Thời sự", "Thể thao", "Kinh doanh", "Khoa học", "Sức khỏe")]
     latest = [i for i in ORDER if i not in hero_ids][:8]
     sections = [(t, cards(feat[t][1:5])) for t in ("Thời sự", "Kinh doanh", "Thể thao", "Giáo dục", "Sức khỏe", "Khoa học")]
-    return render_template("home.html", hero=ART[hero_ids[0]], side=cards(hero_ids[1:]), latest=cards(latest), sections=sections, keywords=KEYWORDS)
+    ok_ex = next(ART[i] for i in feat["Thế giới"] if ART[i]["test"] and ART[i]["label"] == ART[i]["truth"])
+    wrong = sorted([a for a in ART.values() if a["test"] and a["label"] != a["truth"]], key=lambda a: a["pct"])
+    bad_ex = wrong[len(wrong) // 2]                                                           # một bài AI sai điển hình (độ nghiêng trung vị)
+    return render_template("home.html", hero=ART[hero_ids[0]], side=cards(hero_ids[1:]), latest=cards(latest), sections=sections, keywords=KEYWORDS, ok_ex=ok_ex, bad_ex=bad_ex)
 
 
 @app.get("/chu-de/<slug>")
 def category(slug):
     name = SLUG.get(slug) or abort(404)
-    ids = BY_TOPIC[name]; page = max(1, request.args.get("page", 1, type=int)); pages = math.ceil(len(ids) / PER_PAGE)
+    all_ids = BY_TOPIC[name]
+    loc = request.args.get("loc", "all")
+    ids = {"test": [i for i in all_ids if ART[i]["test"]], "sai": [i for i in all_ids if ART[i]["label"] != ART[i]["truth"]]}.get(loc, all_ids)
+    loc = loc if loc in ("test", "sai") else "all"
+    counts = {"all": len(all_ids), "test": sum(ART[i]["test"] for i in all_ids), "sai": sum(ART[i]["label"] != ART[i]["truth"] for i in all_ids)}
+    page = max(1, request.args.get("page", 1, type=int)); pages = max(1, math.ceil(len(ids) / PER_PAGE))
     return render_template("category.html", name=name, meta=TOPICS[name], items=cards(ids[(page - 1) * PER_PAGE: page * PER_PAGE]),
-                           page=page, pages=pages, total=len(ids), keywords=KEYWORDS[name])
+                           page=page, pages=pages, total=len(all_ids), shown=len(ids), loc=loc, counts=counts, keywords=KEYWORDS[name])
 
 
 @app.get("/bai/<int:aid>")
@@ -345,7 +364,15 @@ def article(aid):
     res = analyze(a["title"] + ". " + a["desc"] + " " + a["content"])
     sim = (SX @ SX[IDX[aid]].T).toarray().ravel(); sim[IDX[aid]] = -1
     rel = [IDS[j] for j in np.argsort(-sim)[:4]]
-    return render_template("article.html", a=a, res=res, related=cards(rel), summ=article_summary(aid, 3), kws=keyphrases(a["title"] + " " + a["content"], 6))
+    truth_rank = truth_pct = None
+    if res:
+        for n, t in enumerate(res["top"], 1):
+            if t["label"] == a["truth"]:
+                truth_rank, truth_pct = n, t["pct"]
+    words = [k["word"] for k in (res["keywords"] if res else [])]
+    why = [w for w in words if not (" " not in w and any(" " in o and w in o.split() for o in words))][:6]      # bỏ từ đơn đã nằm trong cụm 2 từ
+    return render_template("article.html", a=a, res=res, related=cards(rel), summ=article_summary(aid, 3), kws=keyphrases(a["title"] + " " + a["content"], 6),
+                           truth_rank=truth_rank, truth_pct=truth_pct, why=why)
 
 
 @app.get("/tim-kiem")
@@ -456,7 +483,7 @@ def _chunks(text, n=3):
 
 def explain(text, mask=(), vs="all"):
     """Giải thích mô hình tuyến tính: đóng góp của từng từ = (trọng số lớp dự đoán − lớp đối chứng) × giá trị TF-IDF."""
-    text = unicodedata.normalize("NFC", text)[:6000]
+    text = unicodedata.normalize("NFC", text)[:30000]
     scrub = _URL.sub(lambda m: " " * len(m.group()), text)
     spans = [(m.start(), m.end(), m.group().lower()) for m in WORD.finditer(scrub)]
     maskset = {w.lower() for w in mask}

@@ -1,20 +1,22 @@
 {% extends "base.html" %}{% from "_macros.html" import card, mini, sidebar with context %}
 {% block content %}
+<div class="aistrip">🤖 Mỗi bài trên trang này do <b>AI đọc và tự xếp chuyên mục</b>. Bấm vào một bài để xem AI chọn mục nào và vì sao · <a href="#how">Cách hoạt động ↓</a></div>
 <div class="hero">
   <a class="hero-main" href="{{ url_for('article', aid=hero.id) }}" style="--c:{{ hero.color }}"><img class="bg" src="{{ hero.img }}" alt="">
-    <div class="in"><span class="tag aib">🤖 AI xếp vào {{ hero.icon }} {{ hero.label }} · {{ hero.pct }}%</span><h1>{{ hero.title }}</h1><p>{{ hero.desc[:220] }}{{ '…' if hero.desc|length>220 }}</p></div></a>
+    <div class="in"><span class="tag aib">🤖 AI xếp vào {{ hero.icon }} {{ hero.label }} · nghiêng {{ hero.pct }}%</span><h1>{{ hero.title }}</h1><p>{{ hero.desc[:220] }}{{ '…' if hero.desc|length>220 }}</p></div></a>
   <div class="hero-side">{% for a in side %}{{ mini(a) }}{% endfor %}</div>
 </div>
-<section class="how">
+<section class="how" id="how">
   <h2 class="serif">VnNews hoạt động thế nào?</h2>
   <div class="how-steps">
-    <div class="hs"><span class="n">1</span><b>Bài báo</b><small>Chỉ có chữ: tiêu đề, mô tả, nội dung. Không ai gắn chuyên mục.</small></div>
-    <div class="hs arr">→</div>
-    <div class="hs"><span class="n">2</span><b>AI đọc</b><small>Mô hình học máy chấm điểm từng chuyên mục dựa vào các từ trong bài.</small></div>
-    <div class="hs arr">→</div>
-    <div class="hs"><span class="n">3</span><b>AI tự xếp mục</b><small>Chọn 1 trong 11 chuyên mục. Mọi trang chuyên mục bên dưới là kết quả của AI.</small></div>
+    <div class="hs"><span class="n">1</span><b>AI học trước</b><small>AI được xem 3.850 bài đã có nhãn chuyên mục để tự rút ra từ nào hay đi với mục nào (TF-IDF + SVM).</small></div>
+    <div class="hs"><span class="n">2</span><b>Bài mới vào</b><small>Với bài mới, AI chỉ nhận chữ: tiêu đề, mô tả, nội dung. Chuyên mục gốc của báo bị giấu.</small></div>
+    <div class="hs"><span class="n">3</span><b>AI xếp mục</b><small>AI chấm điểm 11 chuyên mục rồi chọn mục cao nhất. Mọi mục trên menu và mọi khối chuyên mục ở đây đều do AI xếp.</small></div>
+    <div class="hs"><span class="n">4</span><b>Kiểm tra</b><small>Trên {{ STATS.n_test }} bài AI chưa từng thấy, AI xếp đúng {{ (STATS.acc*100)|round(1) }}%. Vẫn có bài sai.</small></div>
   </div>
-  <div class="how-ex"><span>Ví dụ ngay trên trang này:</span> “{{ hero.title }}” → <b>AI xếp vào {{ hero.icon }} {{ hero.label }} ({{ hero.pct }}%)</b> · <a href="{{ url_for('classify_page') }}">Tự thử dán một đoạn văn →</a></div>
+  <div class="how-ex"><span>AI đúng:</span> “{{ ok_ex.title }}” → AI xếp <b>{{ ok_ex.icon }} {{ ok_ex.label }}</b>, báo gốc cũng xếp {{ ok_ex.truth }} ✓ <a href="{{ url_for('article', aid=ok_ex.id) }}">xem</a>
+    <br><span>AI sai:</span> “{{ bad_ex.title }}” → AI xếp <b>{{ bad_ex.icon }} {{ bad_ex.label }}</b>, báo gốc là {{ bad_ex.truth }} ⚠ <a href="{{ url_for('article', aid=bad_ex.id) }}">xem</a>
+    · <a href="{{ url_for('classify_page') }}">Tự thử dán một đoạn văn →</a></div>
 </section>
 <a class="arena-banner" href="{{ url_for('arena') }}"><span class="big">🥊</span><div><b class="serif">Bạn có phân loại tin giỏi hơn AI không?</b><small>10 lượt đấu với bài báo AI chưa từng thấy · kết quả người vs AI được ghi lại thật · có bảng xếp hạng</small></div><span class="btn">Chơi ngay →</span></a>
 <div class="trio">
@@ -38,7 +40,7 @@
  if(!ids.length)return;
  const d=await fetch('/api/recommend?ids='+ids.slice(-12).join(',')).then(r=>r.json());if(!d.items.length)return;
  $('#foryou').hidden=false;$('#prof').textContent='Bạn hay đọc: '+d.profile.map(p=>p.icon+' '+p.label+' '+p.pct+'%').join(' · ');
- $('#foryou-grid').innerHTML=d.items.map(a=>`<a class="card" href="/bai/${a.id}"><div class="thumb"><img src="${a.img}" alt="" loading="lazy"></div><span class="tag aib">🤖 AI xếp: ${a.icon} ${esc(a.label)} · ${a.pct}%</span><h3>${esc(a.title)}</h3><p>${esc(a.desc)}</p><div class="meta"><span>${a.minutes} phút đọc</span></div></a>`).join('');
+ $('#foryou-grid').innerHTML=d.items.map(a=>`<a class="card" href="/bai/${a.id}"><div class="thumb"><img src="${a.img}" alt="" loading="lazy"></div><span class="tag aib">🤖 AI xếp: ${a.icon} ${esc(a.label)} · nghiêng ${Number(a.pct).toFixed(1)}%</span><h3>${esc(a.title)}</h3><p>${esc(a.desc)}</p><div class="meta"><span>${a.minutes} phút đọc</span></div></a>`).join('');
 })();
 </script>
 {% endblock %}

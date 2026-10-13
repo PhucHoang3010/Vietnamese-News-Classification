@@ -1,21 +1,21 @@
-{% macro card(a) %}
+{% macro card(a, cat=True) %}
 <a class="card" href="{{ url_for('article', aid=a.id) }}" style="--c:{{ a.color }}">
   <div class="thumb"><img src="{{ a.img }}" alt="" loading="lazy"></div>
-  <span class="tag aib">🤖 AI xếp: {{ a.icon }} {{ a.label }} · {{ a.pct }}%</span>
+  <span class="tag aib">🤖 AI xếp:{% if cat %} {{ a.icon }} {{ a.label }} ·{% endif %} nghiêng {{ a.pct }}%</span>{% if a.truth != a.label %}<span class="tag diff">⚠ Báo gốc: {{ a.truth }}</span>{% endif %}
   <h3>{{ a.title }}</h3><p>{{ a.desc }}</p>
-  <div class="meta"><span>{{ a.minutes }} phút đọc</span><span class="conf" title="Mức nghiêng của AI về chuyên mục này">đọc bởi AI</span></div>
+  <div class="meta"><span>{{ a.minutes }} phút đọc</span></div>
 </a>
 {% endmacro %}
 {% macro mini(a) %}
 <a class="mini" href="{{ url_for('article', aid=a.id) }}" style="--c:{{ a.color }}">
-  <div class="thumb"><img src="{{ a.img }}" alt="" loading="lazy"></div><div><span class="tag">🤖 {{ a.label }}</span><h4>{{ a.title }}</h4></div>
+  <div class="thumb"><img src="{{ a.img }}" alt="" loading="lazy"></div><div><span class="tag">🤖 AI xếp: {{ a.label }}</span><h4>{{ a.title }}</h4></div>
 </a>
 {% endmacro %}
 {% macro heat(v, mx) %}{% set k = (v / mx) if mx else 0 %}background:color-mix(in srgb,var(--brand) {{ (k*100)|round|int }}%,transparent);color:{{ '#fff' if k>0.55 else 'inherit' }}{% endmacro %}
 {% macro sidebar() %}
 <aside>
   <div class="box promo"><h3>Công cụ AI</h3><p>Phân loại, tóm tắt tự động, gom sự kiện, gợi ý bài đọc — thử ngay với bài báo của bạn.</p><a class="btn" href="{{ url_for('summarize_page') }}">Tóm tắt bài →</a> <a class="btn ghost" style="margin-top:8px" href="{{ url_for('tools') }}">✦ Tất cả công cụ</a></div>
-  <div class="box"><h3>Chuyên mục</h3><ul class="list">
+  <div class="box"><h3>Chuyên mục (do AI xếp)</h3><ul class="list">
     {% for n in NAV %}<li><a href="{{ url_for('category', slug=n.slug) }}"><span>{{ n.icon }}</span> {{ n.name }}<b>{{ STATS.counts[n.name] }}</b></a></li>{% endfor %}</ul></div>
   <div class="box"><h3>Độ chính xác AI</h3>
     <div class="row2" style="grid-template-columns:90px 1fr 52px"><span>Accuracy</span><div class="track"><i data-w="{{ (STATS.acc*100)|round(1) }}"></i></div><em>{{ (STATS.acc*100)|round(1) }}%</em></div>
