@@ -2,9 +2,20 @@
 {% block content %}
 <div class="hero">
   <a class="hero-main" href="{{ url_for('article', aid=hero.id) }}" style="--c:{{ hero.color }}"><img class="bg" src="{{ hero.img }}" alt="">
-    <div class="in"><span class="tag">{{ hero.icon }} {{ hero.label }}</span><h1>{{ hero.title }}</h1><p>{{ hero.desc[:220] }}{{ '…' if hero.desc|length>220 }}</p></div></a>
+    <div class="in"><span class="tag aib">🤖 AI xếp vào {{ hero.icon }} {{ hero.label }} · {{ hero.pct }}%</span><h1>{{ hero.title }}</h1><p>{{ hero.desc[:220] }}{{ '…' if hero.desc|length>220 }}</p></div></a>
   <div class="hero-side">{% for a in side %}{{ mini(a) }}{% endfor %}</div>
 </div>
+<section class="how">
+  <h2 class="serif">VnNews hoạt động thế nào?</h2>
+  <div class="how-steps">
+    <div class="hs"><span class="n">1</span><b>Bài báo</b><small>Chỉ có chữ: tiêu đề, mô tả, nội dung. Không ai gắn chuyên mục.</small></div>
+    <div class="hs arr">→</div>
+    <div class="hs"><span class="n">2</span><b>AI đọc</b><small>Mô hình học máy chấm điểm từng chuyên mục dựa vào các từ trong bài.</small></div>
+    <div class="hs arr">→</div>
+    <div class="hs"><span class="n">3</span><b>AI tự xếp mục</b><small>Chọn 1 trong 11 chuyên mục. Mọi trang chuyên mục bên dưới là kết quả của AI.</small></div>
+  </div>
+  <div class="how-ex"><span>Ví dụ ngay trên trang này:</span> “{{ hero.title }}” → <b>AI xếp vào {{ hero.icon }} {{ hero.label }} ({{ hero.pct }}%)</b> · <a href="{{ url_for('classify_page') }}">Tự thử dán một đoạn văn →</a></div>
+</section>
 <a class="arena-banner" href="{{ url_for('arena') }}"><span class="big">🥊</span><div><b class="serif">Bạn có phân loại tin giỏi hơn AI không?</b><small>10 lượt đấu với bài báo AI chưa từng thấy · kết quả người vs AI được ghi lại thật · có bảng xếp hạng</small></div><span class="btn">Chơi ngay →</span></a>
 <div class="trio">
   <a href="{{ url_for('summarize_page') }}"><span>📝</span><b>Tóm tắt tự động</b><small>Rút 2–3 câu cốt lõi của bài dài — TextRank</small></a>
@@ -27,7 +38,7 @@
  if(!ids.length)return;
  const d=await fetch('/api/recommend?ids='+ids.slice(-12).join(',')).then(r=>r.json());if(!d.items.length)return;
  $('#foryou').hidden=false;$('#prof').textContent='Bạn hay đọc: '+d.profile.map(p=>p.icon+' '+p.label+' '+p.pct+'%').join(' · ');
- $('#foryou-grid').innerHTML=d.items.map(a=>`<a class="card" href="/bai/${a.id}"><div class="thumb"><img src="${a.img}" alt="" loading="lazy"></div><span class="tag">${a.icon} ${esc(a.label)}</span><h3>${esc(a.title)}</h3><p>${esc(a.desc)}</p><div class="meta"><span>${a.minutes} phút đọc</span></div></a>`).join('');
+ $('#foryou-grid').innerHTML=d.items.map(a=>`<a class="card" href="/bai/${a.id}"><div class="thumb"><img src="${a.img}" alt="" loading="lazy"></div><span class="tag aib">🤖 AI xếp: ${a.icon} ${esc(a.label)} · ${a.pct}%</span><h3>${esc(a.title)}</h3><p>${esc(a.desc)}</p><div class="meta"><span>${a.minutes} phút đọc</span></div></a>`).join('');
 })();
 </script>
 {% endblock %}

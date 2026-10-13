@@ -35,7 +35,7 @@ const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&'
 function setTheme(t){document.documentElement.dataset.theme=t;$('#theme').textContent=t==='dark'?'☀️':'🌙';try{localStorage.setItem('theme',t)}catch(e){}}
 setTheme(document.documentElement.dataset.theme);$('#theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
-window.addEventListener('load',()=>document.querySelectorAll('.track i[data-w]').forEach(i=>i.style.width=i.dataset.w+'%'));
+window.addEventListener('load',()=>document.querySelectorAll('i[data-w]').forEach(i=>i.style.width=i.dataset.w+'%'));
 const a=document.querySelector('nav.cats a.on');a&&a.scrollIntoView({inline:'center',block:'nearest'});
 </script>
 {% block scripts %}{% endblock %}
