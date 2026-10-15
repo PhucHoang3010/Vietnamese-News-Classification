@@ -59,17 +59,18 @@ CREATE TABLE KHACHHANG (
     CONSTRAINT CK_KH_SDT CHECK (SDT REGEXP '^[0-9]{10}$')
 );
 
+-- VE là thực thể yếu: không có mã riêng, phụ thuộc thực thể chủ SUATCHIEU.
+-- Khóa chính = khóa của thực thể chủ (MaSuat) + khóa bộ phận (SoGhe).
 CREATE TABLE VE (
-    MaVe    VARCHAR(10) NOT NULL,
     MaSuat  VARCHAR(10) NOT NULL,
+    SoGhe   VARCHAR(5)  NOT NULL,                 -- khóa bộ phận, ví dụ: A5, B3
     MaKH    VARCHAR(10) NOT NULL,
-    SoGhe   VARCHAR(5)  NOT NULL,                 -- ví dụ: A5, B3
     NgayDat DATE        NOT NULL,
-    CONSTRAINT PK_VE PRIMARY KEY (MaVe),
-    CONSTRAINT FK_VE_SUAT FOREIGN KEY (MaSuat) REFERENCES SUATCHIEU (MaSuat),
-    CONSTRAINT FK_VE_KH   FOREIGN KEY (MaKH)   REFERENCES KHACHHANG (MaKH),
     -- một ghế chỉ được bán một lần cho mỗi suất chiếu
-    CONSTRAINT UQ_VE_Suat_Ghe UNIQUE (MaSuat, SoGhe)
+    CONSTRAINT PK_VE PRIMARY KEY (MaSuat, SoGhe),
+    -- xóa suất chiếu (thực thể chủ) thì các vé của suất đó bị xóa theo
+    CONSTRAINT FK_VE_SUAT FOREIGN KEY (MaSuat) REFERENCES SUATCHIEU (MaSuat) ON DELETE CASCADE,
+    CONSTRAINT FK_VE_KH   FOREIGN KEY (MaKH)   REFERENCES KHACHHANG (MaKH)
 );
 
 -- ---------------------------------------------------------------------
@@ -103,15 +104,15 @@ INSERT INTO KHACHHANG (MaKH, HoTen, SDT, Email) VALUES
 ('KH04', 'Phạm Thu Dung',  '0933456789', 'dung.pham@example.com'),
 ('KH05', 'Võ Minh Khôi',   '0944567890', 'khoi.vo@example.com');
 
-INSERT INTO VE (MaVe, MaSuat, MaKH, SoGhe, NgayDat) VALUES
-('V01', 'S01', 'KH01', 'A5', '2025-03-18'),
-('V02', 'S01', 'KH02', 'A6', '2025-03-18'),
-('V03', 'S02', 'KH01', 'B3', '2025-03-19'),
-('V04', 'S03', 'KH03', 'C7', '2025-03-19'),
-('V05', 'S03', 'KH03', 'C8', '2025-03-19'),
-('V06', 'S04', 'KH04', 'D2', '2025-03-20'),
-('V07', 'S05', 'KH05', 'E4', '2025-03-21'),
-('V08', 'S06', 'KH02', 'A6', '2025-03-21');
+INSERT INTO VE (MaSuat, SoGhe, MaKH, NgayDat) VALUES
+('S01', 'A5', 'KH01', '2025-03-18'),
+('S01', 'A6', 'KH02', '2025-03-18'),
+('S02', 'B3', 'KH01', '2025-03-19'),
+('S03', 'C7', 'KH03', '2025-03-19'),
+('S03', 'C8', 'KH03', '2025-03-19'),
+('S04', 'D2', 'KH04', '2025-03-20'),
+('S05', 'E4', 'KH05', '2025-03-21'),
+('S06', 'A6', 'KH02', '2025-03-21');
 
 -- ---------------------------------------------------------------------
 -- 3. Xem dữ liệu (chụp màn hình các kết quả này nếu cần dán vào slide 6)
@@ -141,4 +142,4 @@ ORDER BY kh.HoTen;
 -- INSERT INTO PHIM VALUES ('F01', 'Trùng mã', 'Khác', 90, '2025-01-01');                    -- khóa chính: trùng MaPhim
 -- INSERT INTO SUATCHIEU VALUES ('S09', 'F99', 'R01', '2025-03-23', '18:00:00', 90000);      -- khóa ngoại: không có phim F99
 -- INSERT INTO KHACHHANG VALUES ('KH09', 'Thử', '12345', 'thu@example.com');                 -- miền giá trị: SDT phải đủ 10 chữ số
--- INSERT INTO VE VALUES ('V09', 'S01', 'KH03', 'A5', '2025-03-18');                         -- UNIQUE: ghế A5 của suất S01 đã bán
+-- INSERT INTO VE VALUES ('S01', 'A5', 'KH03', '2025-03-18');                                -- khóa chính: ghế A5 của suất S01 đã bán
