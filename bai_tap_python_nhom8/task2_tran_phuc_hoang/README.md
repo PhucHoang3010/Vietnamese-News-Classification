@@ -36,6 +36,7 @@ Cuối cùng script thử lưu 3 dữ liệu sai và cả 3 đều bị cơ sở
 | Ràng buộc | Luật đặt trong cơ sở dữ liệu, dữ liệu sai luật sẽ bị từ chối (UNIQUE, NOT NULL, CHECK…) |
 | Chuẩn hóa bảng (normalization) | Thông tin nào lặp lại thì tách ra bảng riêng, chỗ khác chỉ lưu mã |
 | Quan hệ 1 – nhiều | Một dòng bảng này nối với nhiều dòng bảng kia (1 ứng viên – nhiều hồ sơ) |
+| ERD | Sơ đồ thực thể – quan hệ: vẽ các bảng, cột và đường nối quan hệ giữa các bảng (slide 7) |
 | ISO 8601 | Chuẩn quốc tế ghi ngày dạng năm-tháng-ngày, ví dụ `2026-06-15` |
 
 ## Câu hỏi có thể bị hỏi
@@ -52,3 +53,4 @@ Cuối cùng script thử lưu 3 dữ liệu sai và cả 3 đều bị cơ sở
 10. **"25 ngày tuyển trung bình" tính thế nào?** – Lấy ngày cập nhật trừ ngày nộp của những người đã nhận việc, rồi tính trung bình.
 11. **Số liệu ở slide 9 lấy từ đâu?** – Từ việc chạy `tao_kho_du_lieu.py` với dữ liệu mẫu tự tạo, không phải dữ liệu thật của công ty.
 12. **Phần của em khác gì Task 1?** – Task 1 thiết kế quy trình ETL và kiến trúc tổng thể. Task 2 đặt quy tắc chuẩn hóa cho từng thông tin và thiết kế chi tiết 6 bảng mà ETL sẽ đổ dữ liệu vào.
+13. **ERD của em nằm ở đâu, đọc thế nào?** – Ở slide 7. Mỗi ô là một bảng (thực thể), có tên cột, PK và FK. Mỗi đường nối đi từ cột FK của bảng chính sang cột PK của bảng kia. Đầu ghi `1` là phía bảng xung quanh, đầu ghi `n` là phía bảng chính, nghĩa là quan hệ một – nhiều (1 ứng viên có nhiều hồ sơ).

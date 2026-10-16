@@ -28,7 +28,7 @@ File slide: `2431540018_TranPhucHoang.pptx` · Thời lượng: khoảng 10 phú
 ### Slide 3 – 5 nhóm thông tin chính (1 phút)
 **Câu chốt:** Dữ liệu tuyển dụng gồm 5 nhóm thông tin, và cả 5 gặp nhau ở hồ sơ ứng tuyển.
 **Lời nói:** "Đây là đúng 5 thông tin đề bài gợi ý: ứng viên, vị trí, nguồn, vòng phỏng vấn và trạng thái." Đọc lướt dòng mô tả dưới mỗi ô. "Năm nhóm này gặp nhau ở **hồ sơ ứng tuyển**. Ví dụ hồ sơ của anh An: An là ứng viên, nộp vào vị trí Data Analyst, qua nguồn TopCV, đang ở vòng Phỏng vấn, trạng thái Không đạt."
-**Chỉ vào:** dải màu xanh đậm phía dưới khi nói câu "1 hồ sơ nối cả 5 nhóm".
+**Chỉ vào:** dải màu xanh đậm phía dưới khi nói câu "1 hồ sơ nối cả 5 nhóm". Nói thêm: "Năm nhóm này sẽ thành các bảng trong sơ đồ ERD ở slide 7."
 **Chuyển:** "Mỗi nhóm thông tin cần một quy tắc ghi chung."
 
 ### Slide 4 – Quy tắc chuẩn hóa (1 phút 30 giây)
@@ -54,10 +54,10 @@ File slide: `2431540018_TranPhucHoang.pptx` · Thời lượng: khoảng 10 phú
 **Lời nói:** "Bên trái là cách lưu chung một bảng. Thầy thấy 'Data Analyst – Phòng Dữ liệu' bị lặp lại ở cả 3 dòng, chữ đỏ là phần bị lặp. Nếu công ty đổi tên phòng thì phải sửa từng dòng, sót một dòng là dữ liệu mâu thuẫn. Bên phải là cách của em: hồ sơ chỉ lưu mã số 1, 2. Tên thật nằm một lần duy nhất ở bảng vi_tri và bảng nguon. Đổi tên thì chỉ sửa một chỗ. Cách làm này trong môn cơ sở dữ liệu gọi là chuẩn hóa bảng."
 **Chuyển:** "Áp dụng cách tách này cho cả 5 nhóm thông tin, em được mô hình 6 bảng."
 
-### Slide 7 – Mô hình kho dữ liệu 6 bảng (1 phút 30 giây)
-**Câu chốt:** Một bảng chính ở giữa lưu các lần nộp hồ sơ, nối với 5 bảng thông tin xung quanh.
-**Lời nói:** "Ở giữa là bảng chính ho_so_ung_tuyen, mỗi dòng là một lần nộp hồ sơ. Xung quanh là 5 bảng thông tin. Thầy xem ô chú thích: PK là khóa chính, mã riêng của mỗi dòng, không bao giờ trùng. FK là khóa ngoại, cột lưu mã để nối sang bảng khác."
-**Chỉ vào:** lần theo từng đường nối. "Hồ sơ của An là một dòng trong bảng chính. Cột ma_ung_vien trỏ sang dòng của An trong bảng ung_vien. Cột ma_vi_tri trỏ sang Data Analyst. ma_vong trỏ sang Phỏng vấn, ma_trang_thai trỏ sang Không đạt. Một ứng viên có thể nộp nhiều vị trí, nên một ứng viên nối với nhiều hồ sơ. Đó là quan hệ một – nhiều."
+### Slide 7 – Sơ đồ ERD 6 bảng (1 phút 30 giây)
+**Câu chốt:** Đây là sơ đồ ERD (sơ đồ thực thể – quan hệ): một bảng chính ở giữa lưu các lần nộp hồ sơ, nối với 5 bảng thông tin xung quanh bằng quan hệ 1 – n.
+**Lời nói:** "Đây là sơ đồ ERD của kho dữ liệu. Ở giữa là bảng chính ho_so_ung_tuyen, mỗi dòng là một lần nộp hồ sơ. Xung quanh là 5 bảng thông tin. Thầy xem ô chú thích: PK là khóa chính, mã riêng của mỗi dòng, không bao giờ trùng. FK là khóa ngoại, cột lưu mã để nối sang bảng khác."
+**Chỉ vào:** lần theo từng đường nối. "Hồ sơ của An là một dòng trong bảng chính. Cột ma_ung_vien trỏ sang dòng của An trong bảng ung_vien. Cột ma_vi_tri trỏ sang Data Analyst. ma_vong trỏ sang Phỏng vấn, ma_trang_thai trỏ sang Không đạt. Mỗi đường nối đi từ cột FK của bảng chính sang cột PK của bảng kia. Đầu ghi số 1 là phía bảng xung quanh, đầu ghi chữ n là phía bảng chính. Nghĩa là một ứng viên có thể nộp nhiều vị trí, nên một ứng viên nối với nhiều hồ sơ. Đó là quan hệ một – nhiều."
 **Thêm:** "Cột diem_ai là chỗ để phần AI của nhóm ghi điểm. Đây cũng là bản chi tiết của sơ đồ hình ngôi sao mà bạn Vy đã giới thiệu, em thêm bảng trang_thai."
 **Chuyển:** "Thiết kế xong, em viết lệnh SQL tạo bảng và đặt luật để chặn dữ liệu sai."
 
@@ -105,7 +105,8 @@ python tao_kho_du_lieu.py
 
 ## Nếu thầy hỏi
 
-Xem 12 câu hỏi kèm gợi ý trả lời trong `README.md`. Ba câu dễ bị hỏi nhất:
+Xem 13 câu hỏi kèm gợi ý trả lời trong `README.md`. Bốn câu dễ bị hỏi nhất:
+- **ERD là gì, nằm ở đâu?** Là sơ đồ thực thể – quan hệ, vẽ các bảng, cột và đường nối quan hệ giữa các bảng. ERD của em ở slide 7.
 - **PK và FK khác nhau thế nào?** PK là mã riêng của dòng trong chính bảng đó. FK là cột lưu mã của bảng khác để nối hai bảng.
 - **Sao không để chung một bảng?** Vì thông tin bị lặp, sửa dễ sót, dữ liệu mâu thuẫn.
 - **Sao phải tách vòng và trạng thái?** Để biết ứng viên bị loại ở vòng nào.
