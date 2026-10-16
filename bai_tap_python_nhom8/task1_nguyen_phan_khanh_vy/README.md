@@ -8,6 +8,7 @@ Nguyễn Phan Khánh Vy · MSSV 2431540032 · Lớp 24ĐHTT01
 | File | Dùng để làm gì |
 |---|---|
 | `2431540032_NguyenPhanKhanhVy.pptx` | 10 slide để nộp. Lời thuyết trình cho từng slide nằm trong phần **Notes** dưới mỗi slide |
+| `kich_ban_thuyet_trinh.md` | Kịch bản nói chi tiết từng slide: câu chốt, lời nói mẫu, chỗ cần chỉ tay, cách chạy demo |
 | `etl_demo.py` | Code Python chạy thử ETL (số liệu ở slide 9 lấy từ đây) |
 | `du_lieu_mau/` | Dữ liệu mẫu tự tạo cho 3 nguồn: file HR, web tuyển dụng, Google Form |
 

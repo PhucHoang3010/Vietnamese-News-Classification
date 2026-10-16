@@ -8,6 +8,7 @@ Trần Phúc Hoàng · MSSV 2431540018 · Lớp 24ĐHTT01
 | File | Dùng để làm gì |
 |---|---|
 | `2431540018_TranPhucHoang.pptx` | 10 slide để nộp. Lời thuyết trình cho từng slide nằm trong phần **Notes** dưới mỗi slide |
+| `kich_ban_thuyet_trinh.md` | Kịch bản nói chi tiết từng slide: câu chốt, lời nói mẫu, chỗ cần chỉ tay, cách chạy demo |
 | `kho_du_lieu.sql` | Lệnh tạo 6 bảng của kho dữ liệu (chạy được trên PostgreSQL và SQLite) |
 | `tao_kho_du_lieu.py` | Code Python chuẩn hóa dữ liệu rồi lưu vào 6 bảng (số liệu ở slide 9 lấy từ đây) |
 | `du_lieu_mau/ho_so_tong_hop.csv` | Dữ liệu mẫu tự tạo, cố tình ghi lộn xộn như khi nhiều người cùng nhập |
