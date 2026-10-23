@@ -105,7 +105,7 @@ python tao_kho_du_lieu.py
 
 ## Nếu thầy hỏi
 
-Xem 13 câu hỏi kèm gợi ý trả lời trong `README.md`. Bốn câu dễ bị hỏi nhất:
+Xem 14 câu hỏi kèm gợi ý trả lời trong `README.md`. Bốn câu dễ bị hỏi nhất:
 - **ERD là gì, nằm ở đâu?** Là sơ đồ thực thể – quan hệ, vẽ các bảng, cột và đường nối quan hệ giữa các bảng. ERD của em ở slide 7.
 - **PK và FK khác nhau thế nào?** PK là mã riêng của dòng trong chính bảng đó. FK là cột lưu mã của bảng khác để nối hai bảng.
 - **Sao không để chung một bảng?** Vì thông tin bị lặp, sửa dễ sót, dữ liệu mâu thuẫn.

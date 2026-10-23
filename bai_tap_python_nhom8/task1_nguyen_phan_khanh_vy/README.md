@@ -48,3 +48,5 @@ Kết quả: đọc 315 dòng → bỏ 4 dòng trống, 5 email sai, 13 hồ sơ
 8. **Người bị loại tính thế nào trong biểu đồ?** – Chỉ tính là đã nộp hồ sơ, vì dữ liệu không ghi họ bị loại ở vòng nào.
 9. **"Trang thử API" của FastAPI là gì?** – FastAPI tự tạo trang `/docs`, ở đó có thể bấm thử từng API mà không cần viết thêm code.
 10. **Phần của em liên quan gì tới các bạn khác?** – Dữ liệu sạch trong kho là đầu vào cho phần AI chấm điểm hồ sơ và cho dashboard của nhóm.
+11. **ERD của em đâu?** – Slide 7 là ERD mức khái niệm: 5 thực thể (Hồ sơ ứng tuyển, Ứng viên, Vị trí tuyển, Nguồn hồ sơ, Vòng tuyển) và quan hệ một – nhiều giữa chúng, ví dụ một ứng viên có nhiều hồ sơ. ERD chi tiết với từng cột, khóa chính, khóa ngoại nằm ở slide 7 trong file Task 2 của bạn Hoàng, vì đó là phần "mô hình kho dữ liệu".
+12. **Star schema khác ERD thế nào?** – ERD là cách vẽ sơ đồ thực thể – quan hệ. Star schema là một kiểu thiết kế kho dữ liệu: khi vẽ bằng ERD thì có hình ngôi sao, một bảng chính ở giữa và các bảng thông tin xung quanh.

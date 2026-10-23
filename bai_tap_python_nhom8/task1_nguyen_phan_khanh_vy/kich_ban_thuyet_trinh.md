@@ -19,6 +19,7 @@ File slide: `2431540032_NguyenPhanKhanhVy.pptx` · Thời lượng: khoảng 10 
 ### Slide 1 – Bìa (30 giây)
 **Lời nói:** "Em chào thầy và các bạn. Em là Nguyễn Phan Khánh Vy, nhóm trưởng nhóm 8. Đề tài của nhóm em là Kho dữ liệu tuyển dụng có AI phân tích pipeline ứng viên. Em trình bày Task 1: phân tích bài toán, quy trình ETL và kiến trúc công nghệ."
 **Chỉ vào:** 4 bước bên phải. "Bài của em đi đúng 4 bước này: dữ liệu tuyển dụng đang rời rạc, Python gom và làm sạch, lưu vào PostgreSQL, rồi dùng để báo cáo và cho AI phân tích."
+**Nói thêm:** "Trong bài có đủ 3 sơ đồ: sơ đồ luồng ETL ở slide 5, sơ đồ ERD ở slide 7 và sơ đồ kiến trúc ở slide 8."
 
 ### Slide 2 – Đặt vấn đề và mục tiêu (1 phút)
 **Câu chốt:** Hồ sơ nằm rải rác nên không thống kê được. Task 1 gom tất cả về một chỗ.
@@ -49,10 +50,11 @@ File slide: `2431540032_NguyenPhanKhanhVy.pptx` · Thời lượng: khoảng 10 
 **Chỉ vào code bên phải:** "Mỗi bước là một dòng code Python dùng thư viện pandas. Ví dụ dòng đầu, str.strip() bỏ khoảng trắng thừa, str.title() viết hoa chữ cái đầu. Dòng cuối, drop_duplicates xóa hồ sơ trùng email và vị trí, nên Huy chỉ còn một dòng."
 **Chuyển:** "Dữ liệu sạch rồi thì lưu vào đâu? Em thiết kế cơ sở dữ liệu PostgreSQL."
 
-### Slide 7 – Thiết kế cơ sở dữ liệu (1 phút)
-**Câu chốt:** Cơ sở dữ liệu thiết kế hình ngôi sao: một bảng chính ở giữa, bốn bảng thông tin xung quanh.
-**Lời nói:** "Ở giữa là bảng Hồ sơ ứng tuyển, mỗi lần nộp hồ sơ là một dòng. Hồ sơ của anh Huy là một dòng ở đây. Xung quanh là các bảng Ứng viên, Vị trí tuyển, Nguồn hồ sơ và Vòng tuyển. Nhờ vậy muốn biết bao nhiêu người qua vòng phỏng vấn hay nguồn nào tốt nhất, chỉ cần một câu truy vấn."
-**Thêm:** "Thiết kế chi tiết từng bảng do bạn Hoàng trình bày ở Task 2."
+### Slide 7 – Sơ đồ ERD mức khái niệm (1 phút 30 giây)
+**Câu chốt:** Đây là ERD mức khái niệm của hệ thống: 5 thực thể và quan hệ một – nhiều giữa chúng. ERD chi tiết nằm ở Task 2 của bạn Hoàng.
+**Lời nói:** "Slide này là sơ đồ ERD ở mức khái niệm, tức là chỉ vẽ các thực thể và quan hệ giữa chúng, chưa đi vào từng cột. Hệ thống có 5 thực thể: ở giữa là Hồ sơ ứng tuyển, mỗi lần nộp hồ sơ là một dòng, hồ sơ của anh Huy là một dòng ở đây. Xung quanh là Ứng viên, Vị trí tuyển, Nguồn hồ sơ và Vòng tuyển."
+**Chỉ vào từng đường nối, nói ra quan hệ:** "Mỗi đường nối là một quan hệ một – nhiều. Một ứng viên có thể có nhiều hồ sơ, vì một người nộp được nhiều vị trí. Một vị trí nhận nhiều hồ sơ. Một nguồn mang về nhiều hồ sơ. Một vòng tuyển có nhiều hồ sơ đang ở vòng đó. Đầu 'một' nằm ở các bảng xung quanh, đầu 'nhiều' nằm ở Hồ sơ ứng tuyển. Thiết kế hình ngôi sao này giúp đếm số người qua từng vòng hay theo từng nguồn chỉ bằng một câu truy vấn."
+**Nối sang Task 2:** "Vì các task trong nhóm không trùng nhau, ERD chi tiết với từng cột, khóa chính, khóa ngoại và ký hiệu 1 – n thuộc phần 'mô hình kho dữ liệu' của bạn Hoàng, ở slide 7 trong file Task 2. Ở đó bạn Hoàng tách thêm thực thể Trạng thái."
 **Chuyển:** "Cơ sở dữ liệu là một phần trong kiến trúc chung của cả hệ thống."
 
 ### Slide 8 – Kiến trúc công nghệ (1 phút 30 giây)
@@ -89,7 +91,9 @@ python etl_demo.py
 
 ## Nếu thầy hỏi
 
-Xem 10 câu hỏi kèm gợi ý trả lời trong `README.md`. Thêm hai câu dễ bị hỏi:
+Xem 12 câu hỏi kèm gợi ý trả lời trong `README.md`. Các câu dễ bị hỏi nhất:
+- **ERD của em đâu?** Slide 7 là ERD mức khái niệm: các thực thể và quan hệ một – nhiều. ERD chi tiết với cột, khóa chính, khóa ngoại nằm ở slide 7 trong file Task 2 của bạn Hoàng, vì đó là phần "mô hình kho dữ liệu".
+- **Star schema khác ERD thế nào?** ERD là cách vẽ sơ đồ thực thể – quan hệ. Star schema là một kiểu thiết kế kho dữ liệu: vẽ bằng ERD thì có hình ngôi sao, một bảng chính ở giữa và các bảng thông tin xung quanh.
 - **Frontend và backend của nhóm là gì?** Frontend là Streamlit, phần giao diện người dùng nhìn thấy. Backend là Python ETL, PostgreSQL, FastAPI và phần AI, chạy phía sau để xử lý và lưu dữ liệu.
 - **Streamlit viết bằng Python, sao gọi là frontend?** Vì việc của nó trong hệ thống là làm giao diện, nên nó đóng vai frontend.
 
