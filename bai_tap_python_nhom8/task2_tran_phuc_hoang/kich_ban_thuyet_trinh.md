@@ -19,6 +19,7 @@ File slide: `2431540018_TranPhucHoang.pptx` · Thời lượng: khoảng 10 phú
 ### Slide 1 – Bìa (30 giây)
 **Lời nói:** "Em chào thầy và các bạn. Em là Trần Phúc Hoàng, thành viên nhóm 8, đề tài Kho dữ liệu tuyển dụng có AI phân tích pipeline ứng viên. Em trình bày Task 2: chuẩn hóa dữ liệu ứng viên và mô hình kho dữ liệu. Bạn Vy ở Task 1 đã nói quy trình tổng quát. Phần của em đi sâu vào hai việc: đặt quy tắc ghi dữ liệu thống nhất, và thiết kế chi tiết các bảng để lưu."
 **Chỉ vào:** 4 bước bên phải. "Bài của em đi đúng 4 bước này, từ trên xuống."
+**Nói thêm:** "Sơ đồ ERD của kho dữ liệu nằm ở slide 7."
 
 ### Slide 2 – Đặt vấn đề và mục tiêu (1 phút)
 **Câu chốt:** Mỗi người ghi một kiểu thì máy tính đếm sai, nên cần quy tắc chung và cấu trúc bảng chung.
@@ -60,6 +61,8 @@ File slide: `2431540018_TranPhucHoang.pptx` · Thời lượng: khoảng 10 phú
 **Chỉ vào:** lần theo từng đường nối. "Hồ sơ của An là một dòng trong bảng chính. Cột ma_ung_vien trỏ sang dòng của An trong bảng ung_vien. Cột ma_vi_tri trỏ sang Data Analyst. ma_vong trỏ sang Phỏng vấn, ma_trang_thai trỏ sang Không đạt. Mỗi đường nối đi từ cột FK của bảng chính sang cột PK của bảng kia. Đầu ghi số 1 là phía bảng xung quanh, đầu ghi chữ n là phía bảng chính. Nghĩa là một ứng viên có thể nộp nhiều vị trí, nên một ứng viên nối với nhiều hồ sơ. Đó là quan hệ một – nhiều."
 **Thêm:** "Cột diem_ai là chỗ để phần AI của nhóm ghi điểm. Đây cũng là bản chi tiết của sơ đồ hình ngôi sao mà bạn Vy đã giới thiệu, em thêm bảng trang_thai."
 **Chuyển:** "Thiết kế xong, em viết lệnh SQL tạo bảng và đặt luật để chặn dữ liệu sai."
+
+> **Nếu file đã nộp là bản cũ** (slide 7 ghi "Mô hình kho dữ liệu: 6 bảng", đường nối không có số 1 và chữ n): nội dung vẫn là ERD đầy đủ vì có bảng, cột, PK, FK và đường nối. Mở đầu bằng câu: "Đây là sơ đồ ERD của kho dữ liệu." Khi chỉ vào từng đường nối, nói thêm: "Mỗi đường nối đi từ cột FK của bảng chính sang bảng kia, là quan hệ một – nhiều: đầu nối vào bảng xung quanh là một, đầu nối vào bảng hồ sơ là nhiều."
 
 ### Slide 8 – Tạo bảng và ràng buộc (1 phút 30 giây)
 **Câu chốt:** Cơ sở dữ liệu tự từ chối dữ liệu sai nhờ 5 loại ràng buộc.
