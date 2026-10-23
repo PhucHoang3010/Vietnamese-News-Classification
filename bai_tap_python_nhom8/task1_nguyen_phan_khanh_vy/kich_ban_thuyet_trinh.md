@@ -52,10 +52,12 @@ File slide: `2431540032_NguyenPhanKhanhVy.pptx` · Thời lượng: khoảng 10 
 
 ### Slide 7 – Sơ đồ ERD mức khái niệm (1 phút 30 giây)
 **Câu chốt:** Đây là ERD mức khái niệm của hệ thống: 5 thực thể và quan hệ một – nhiều giữa chúng. ERD chi tiết nằm ở Task 2 của bạn Hoàng.
-**Lời nói:** "Slide này là sơ đồ ERD ở mức khái niệm, tức là chỉ vẽ các thực thể và quan hệ giữa chúng, chưa đi vào từng cột. Hệ thống có 5 thực thể: ở giữa là Hồ sơ ứng tuyển, mỗi lần nộp hồ sơ là một dòng, hồ sơ của anh Huy là một dòng ở đây. Xung quanh là Ứng viên, Vị trí tuyển, Nguồn hồ sơ và Vòng tuyển."
-**Chỉ vào từng đường nối, nói ra quan hệ:** "Mỗi đường nối là một quan hệ một – nhiều. Một ứng viên có thể có nhiều hồ sơ, vì một người nộp được nhiều vị trí. Một vị trí nhận nhiều hồ sơ. Một nguồn mang về nhiều hồ sơ. Một vòng tuyển có nhiều hồ sơ đang ở vòng đó. Đầu 'một' nằm ở các bảng xung quanh, đầu 'nhiều' nằm ở Hồ sơ ứng tuyển. Thiết kế hình ngôi sao này giúp đếm số người qua từng vòng hay theo từng nguồn chỉ bằng một câu truy vấn."
+**Lời nói:** "Slide này là sơ đồ ERD ở mức khái niệm, tức là vẽ các thực thể và mối liên kết giữa chúng, chưa đi vào từng cột. Thầy xem ô ký hiệu dưới cùng: hình chữ nhật là thực thể, hình thoi là mối liên kết, PK là khóa chính. Hệ thống có 5 thực thể: ở giữa là Hồ sơ ứng tuyển, mỗi lần nộp hồ sơ là một dòng, hồ sơ của anh Huy là một dòng ở đây. Xung quanh là Ứng viên, Vị trí tuyển, Nguồn hồ sơ và Vòng tuyển."
+**Chỉ vào từng hình thoi, đọc to mối liên kết:** "Ứng viên **nộp** hồ sơ, Vị trí tuyển **nhận** hồ sơ, Nguồn **mang về** hồ sơ, Vòng tuyển **có** hồ sơ. Số 1 và chữ n trên đường nối là quan hệ một – nhiều: một ứng viên nộp được nhiều hồ sơ vì một người nộp được nhiều vị trí. Hồ sơ nằm ở giữa theo hình ngôi sao, nên đếm số người qua từng vòng hay theo từng nguồn chỉ cần một câu truy vấn."
 **Nối sang Task 2:** "Vì các task trong nhóm không trùng nhau, ERD chi tiết với từng cột, khóa chính, khóa ngoại và ký hiệu 1 – n thuộc phần 'mô hình kho dữ liệu' của bạn Hoàng, ở slide 7 trong file Task 2. Ở đó bạn Hoàng tách thêm thực thể Trạng thái."
 **Chuyển:** "Cơ sở dữ liệu là một phần trong kiến trúc chung của cả hệ thống."
+
+> **Nếu thầy chấm trên file bản cũ** (slide 7 ghi "Thiết kế cơ sở dữ liệu PostgreSQL", không có hình thoi và số 1, n): mở đầu bằng câu "Đây là sơ đồ ERD mức khái niệm", rồi chỉ vào từng đường nối và nói ra quan hệ một – nhiều như trên.
 
 ### Slide 8 – Kiến trúc công nghệ (1 phút 30 giây)
 **Câu chốt:** Hệ thống gồm backend là phần chạy phía sau, và frontend là phần giao diện người dùng nhìn thấy.
