@@ -1,0 +1,49 @@
+HƯỚNG DẪN CHẠY — Website VnNews (Phân loại tin tức tiếng Việt)
+
+CÁCH NHANH NHẤT (Windows)
+  Giải nén, bấm đúp file CHAY.bat. Lần đầu chờ vài phút (tự tạo môi trường .venv, cài thư viện, chạy website).
+  Khi màn hình hiện dòng "Mở trình duyệt tại http://127.0.0.1:5000" thì mở trình duyệt vào địa chỉ đó.
+
+CÁCH GÕ TAY
+  1) Giải nén TOÀN BỘ thư mục (phải có app.py, templates, static, data, model.joblib).
+  2) Cần Python 3.10 trở lên. Mở PowerShell / Terminal tại thư mục vừa giải nén:
+
+       python -m venv .venv
+       .venv\Scripts\activate            (Mac/Linux: source .venv/bin/activate)
+       pip install -r requirements.txt
+
+  3) Chạy website:
+
+       python app.py
+
+     * LẦN ĐẦU MẤT 1–3 PHÚT (nạp thư viện, mô hình, dựng chỉ mục tìm kiếm). ĐỪNG BẤM Ctrl+C khi chưa thấy dòng
+       "Mở trình duyệt tại http://127.0.0.1:5000".
+     * Câu hỏi đầu tiên ở trang Hỏi AI có thể phải chờ thêm vài giây (chỉ mục hỏi đáp dựng ở luồng nền).
+     * Muốn máy khác cùng WiFi cũng mở được: python app.py --lan
+
+  4) Các trang chính
+       /              Trang chủ: dán văn bản để AI phân loại ngay, bài nổi bật, Hỏi AI
+       /hoi-ai        Hỏi AI về tin tức (trích câu trả lời có dẫn nguồn; mỗi bài cũng có ô "Hỏi AI về bài này")
+       /giai-thich    AI Lab: AI giải thích vì sao chọn chuyên mục (điểm nhấn)
+       /thong-ke      Thống kê mô hình, ma trận nhầm lẫn, phân tích lỗi
+       /tom-tat  /su-kien  /ban-tin  /phan-loai  /gioi-thieu
+
+NẾU GẶP LỖI
+  - Báo lỗi phiên bản scikit-learn khi nạp model.joblib:
+       python train.py          (huấn luyện lại, mất vài phút, tạo lại model.joblib)
+       python build_cache.py    (dự đoán sẵn cho 5.500 bài)
+       python app.py
+  - Không biết lỗi ở đâu:   python kiem_tra_moi_truong.py   (in phiên bản Python, thời gian nạp từng thư viện, thử nạp mô hình)
+  - Lỡ bấm Ctrl+C khi đang nạp: chạy lại python app.py rồi chờ.
+  - Báo cổng 5000 đang bận: đóng cửa sổ đang chạy website cũ rồi chạy lại.
+
+CÁC LỆNH KHÁC
+  python predict.py "Bộ Giáo dục công bố điểm chuẩn đại học"     phân loại một đoạn văn trong Terminal
+  python eval_summary.py                                          đo ROUGE của tóm tắt
+  python make_report.py                                           tạo lại BAO_CAO_DO_AN.docx
+  python experiments/exp2_ablation.py                             chạy lại từng thí nghiệm (exp1 … exp8; phần tách từ cần: pip install pyvi)
+
+TÀI LIỆU TRÌNH BÀY: thư mục trinh-bay/ (slide .pptx và kịch bản thuyết trình .docx), báo cáo: BAO_CAO_DO_AN.docx.
+
+Không cần Internet, GPU hay mô hình lớn. (Phông chữ lấy từ Google Fonts nếu có mạng, không có thì dùng phông dự phòng.)
+Phiên bản đã chạy thử: Python 3.13, scikit-learn 1.9.1, Flask 3.1, pandas 3.0, numpy 2.5.

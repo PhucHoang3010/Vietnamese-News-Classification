@@ -39,6 +39,7 @@ python app.py                   # mở http://127.0.0.1:5000
 - Gặp lỗi phiên bản scikit-learn khi nạp mô hình: chạy `python train.py` rồi `python build_cache.py` để tạo lại `model.joblib` và dự đoán sẵn.
 - Không biết lỗi ở đâu: `python kiem_tra_moi_truong.py` (in phiên bản Python, thời gian nạp từng thư viện, thử nạp mô hình).
 
+Hướng dẫn chi tiết từng bước và cách xử lý lỗi: `HUONG-DAN-CHAY.txt`. Slide và kịch bản thuyết trình (không demo, chia 5 người): thư mục `trinh-bay/`.
 Mọi chức năng chạy cục bộ, **không cần Internet hay micro**. (Phông chữ lấy từ Google Fonts nếu có mạng, nếu không tự dùng phông dự phòng.)
 
 ## Huấn luyện lại / báo cáo
