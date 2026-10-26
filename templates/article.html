@@ -25,10 +25,27 @@
   </section>
   <p class="lead" style="margin-top:18px">{{ a.desc }}</p>
   <div class="sumbox"><h4>📝 Tóm tắt nhanh bằng AI</h4><ul style="margin:0;padding-left:18px">{% for x in summ %}<li>{{ x }}</li>{% endfor %}</ul><div class="kw" style="margin-top:10px">{% for k in kws %}<span>{{ k }}</span>{% endfor %}</div><div class="note" style="margin:8px 0 0"><a href="{{ url_for('summarize_page') }}" style="text-decoration:underline">Tóm tắt bài của riêng bạn →</a></div></div>
+  <div class="askart"><h4>💬 Hỏi AI về bài này</h4>
+    <form id="aaf" class="askbox sm"><input id="aaq" placeholder="Ví dụ: Bài nói gì về “{{ kws[0] if kws else 'chủ đề này' }}”?" autocomplete="off" maxlength="300"><button class="btn sm">Hỏi</button></form>
+    {% if kws %}<div class="chips" style="margin-top:8px">{% for k in kws[:3] %}<button type="button" class="chip" data-q="Bài nói gì về {{ k }}?">{{ k }}</button>{% endfor %}</div>{% endif %}
+    <div id="aao"></div></div>
   <figure class="fig" style="margin-left:0;margin-right:0"><div class="thumb"><img src="{{ a.img }}" alt=""></div><div class="figcap">Ảnh minh họa theo chuyên mục “{{ a.label }}”.</div></figure>
   <div class="body" style="margin-top:20px">{% for p in a.content|paras %}<p>{{ p }}</p>{% endfor %}</div>
 </article>
 <section class="blk" style="margin-top:30px"><div class="sec-h"><h2>Bài viết liên quan</h2></div><div class="grid2">{% for r in related %}{{ card(r) }}{% endfor %}</div></section>
 </div>{{ sidebar() }}</div>
 {% endblock %}
-{% block scripts %}<script>try{let r=JSON.parse(localStorage.getItem('vn_read')||'[]').filter(x=>x!=={{ a.id }});r.push({{ a.id }});localStorage.setItem('vn_read',JSON.stringify(r.slice(-30)))}catch(e){}</script>{% endblock %}
+{% block scripts %}<script>
+(()=>{const aid={{ a.id }};
+ const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||'Lỗi');return d});
+ function hl(t,T){T=new Set(T);return t.split(/(\s+)/).map(w=>T.has(w.toLowerCase().replace(/[^\p{L}\p{N}]/gu,''))?'<mark>'+esc(w)+'</mark>':esc(w)).join('')}
+ async function go(q){q=q.trim();if(!q)return;$('#aao').innerHTML='<p class="note">Đang tìm trong bài…</p>';
+  try{const d=await post('/api/ask',{q,aid});
+   $('#aao').innerHTML=(d.abstain||!d.answers.length)?`<div class="qa-none"><b>Bài này không nhắc đến điều bạn hỏi.</b> <a href="/hoi-ai?q=${encodeURIComponent(q)}">Hỏi toàn bộ kho tin →</a></div>`:
+    `<div class="qa-art">${d.answers.slice(0,2).map(r=>`<p>“${hl(r.text,d.terms)}”</p>`).join('')}<small>Độ chắc chắn: ${d.confidence} · AI trích nguyên văn từ bài này · <a href="/hoi-ai?q=${encodeURIComponent(q)}">Hỏi cả kho tin →</a></small></div>`}
+  catch(e){$('#aao').innerHTML='<div class="err">'+esc(e.message)+'</div>'}}
+ $('#aaf').onsubmit=e=>{e.preventDefault();go($('#aaq').value)};
+ document.querySelectorAll('.askart .chip').forEach(c=>c.onclick=()=>{$('#aaq').value=c.dataset.q;go(c.dataset.q)});
+})();
+</script>
+<script>try{let r=JSON.parse(localStorage.getItem('vn_read')||'[]').filter(x=>x!=={{ a.id }});r.push({{ a.id }});localStorage.setItem('vn_read',JSON.stringify(r.slice(-30)))}catch(e){}</script>{% endblock %}

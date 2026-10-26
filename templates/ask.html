@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+{% block title %}Hỏi AI về tin tức — VnNews{% endblock %}
+{% block content %}
+<div class="pagehead"><div class="big">💬</div><div><h1>Hỏi AI về tin tức</h1><p>Gõ một câu hỏi: AI tìm các bài liên quan trong kho {{ '{:,}'.format(STATS.n).replace(',', '.') }} bài và <b>trích đúng câu trả lời, luôn dẫn nguồn</b>. AI không tự bịa nội dung.</p></div></div>
+<div class="two split" style="align-items:start">
+  <div>
+    <form id="askf" class="askbox"><input id="aq" value="{{ q }}" placeholder="Ví dụ: Giá vàng trong nước biến động thế nào?" autocomplete="off" maxlength="300"><button class="btn" id="ago">Hỏi AI</button></form>
+    <div class="chips" id="ex" style="margin:12px 0 22px">{% for e in examples %}<button type="button" class="chip" data-q="{{ e }}">{{ e }}</button>{% endfor %}</div>
+    <div id="aout"><div class="panel empty"><div class="big">💬</div><b>Hãy đặt một câu hỏi</b><br>Chọn một câu gợi ý ở trên hoặc tự gõ câu hỏi về tin tức.</div></div>
+  </div>
+  <div>
+    <div class="panel"><h3 style="margin:0 0 8px">AI trả lời thế nào?</h3>
+      <ol class="qa-how"><li><b>Tìm bài</b> liên quan nhất bằng TF-IDF trên tiêu đề, sapo và nội dung.</li><li><b>Chọn câu</b> giống câu hỏi nhất trong các bài đó.</li><li><b>Dẫn nguồn</b>: mỗi câu kèm bài gốc và chuyên mục do AI phân loại.</li><li><b>Biết dừng</b>: nếu không có bài nào phù hợp, AI nói “chưa tìm thấy” thay vì đoán.</li></ol>
+      <p class="note">AI chỉ trích nguyên văn câu trong bài, không tự sinh nội dung. Hãy mở bài gốc để kiểm tra.</p></div>
+    <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 8px">AI được kiểm tra thế nào?</h3>
+      <p style="margin:0 0 8px;font-size:14px">Thử với 5.500 bài: lấy <b>tiêu đề</b> làm câu hỏi, tìm trong kho (đã bỏ chính tiêu đề đó) rồi xem AI có tìm lại đúng bài không.</p>
+      <table class="qa-eval"><tr><td>Đúng bài ở vị trí 1</td><td><b>86,5%</b></td></tr><tr><td>Đúng bài trong 5 kết quả đầu</td><td><b>96,2%</b></td></tr><tr><td>Độ chắc chắn <b>cao</b> → đúng bài</td><td><b>≈ 96%</b></td></tr><tr><td>Độ chắc chắn <b>trung bình</b> → đúng bài</td><td><b>≈ 91%</b></td></tr><tr><td>Độ chắc chắn <b>thấp</b> → đúng bài</td><td><b>66–86%</b></td></tr></table>
+      <p class="note">Đây là thử nghiệm tìm lại bài (không phải chấm điểm câu trả lời của người dùng thật), số liệu trong <code>outputs/experiments/qa_*.csv</code>.</p></div>
+    <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 8px;display:flex">Câu hỏi gần đây <button class="btn ghost sm" id="hclr" style="margin-left:auto">Xóa</button></h3><ul class="hist" id="hist"></ul></div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
+const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||'Lỗi');return d});
+function hl(text,terms){const T=new Set(terms);return text.split(/(\s+)/).map(w=>{const k=w.toLowerCase().replace(/[^\p{L}\p{N}]/gu,'');return T.has(k)?'<mark>'+esc(w)+'</mark>':esc(w)}).join('')}
+function drawHist(){const h=store.get('qhist',[]);$('#hist').innerHTML=h.length?h.map((q,i)=>`<li data-i="${i}"><span class="t">${esc(q)}</span></li>`).join(''):'<li style="cursor:default;color:var(--muted)">Chưa có câu hỏi.</li>';
+  $('#hist').querySelectorAll('li[data-i]').forEach(li=>li.onclick=()=>{$('#aq').value=h[li.dataset.i];ask()})}
+function render(d){
+  const cc={cao:'hi','trung bình':'mid',thấp:'lo'}[d.confidence];
+  const cat=d.cat&&d.scope!=='bài'?`<span class="qcat" title="Chuyên mục mà AI đã xếp cho các bài tìm được (bỏ phiếu theo độ liên quan)">🏷 Chủ đề: <b>${d.cat.icon} ${esc(d.cat.label)}</b> <small>(${d.cat.share}% bài tìm được)</small></span>`:'';
+  const head=`<div class="qa-head">${cat}<span class="qconf ${cc}" title="Dựa trên độ giống giữa câu hỏi và bài báo; không phải xác suất đúng">Độ chắc chắn: <b>${d.confidence}</b></span><span class="qms">⏱ ${d.ms} ms</span></div>`;
+  if(d.abstain||!d.answers.length){
+    $('#aout').innerHTML=head+`<div class="panel qa-none"><b>Mình chưa tìm thấy thông tin phù hợp trong ${d.scope==='bài'?'bài này':'kho tin'}.</b><p>Thử diễn đạt khác, thêm tên riêng hoặc từ khóa cụ thể hơn. AI không đoán khi không có căn cứ.</p></div>`+
+      (d.sources.length&&d.scope!=='bài'?`<h4 class="qa-h">Bài gần nhất (độ khớp thấp)</h4><div class="qa-src">${d.sources.slice(0,3).map(src).join('')}</div>`:'');
+    return}
+  const b=d.answers[0],rest=d.answers.slice(1);
+  $('#aout').innerHTML=head+`<div class="panel qa-best"><small>TRẢ LỜI (trích nguyên văn từ bài báo)</small><p class="bestq">“${hl(b.text,d.terms)}”</p><a class="srcline" href="/bai/${b.id}">${b.icon} ${esc(b.label)} · ${esc(b.title)} →</a></div>`+
+    (rest.length?`<h4 class="qa-h">Các câu liên quan khác</h4>`+rest.map(r=>`<div class="qa-row"><p>“${hl(r.text,d.terms)}”</p><a class="srcline" href="/bai/${r.id}">${r.icon} ${esc(r.label)} · ${esc(r.title)} →</a></div>`).join(''):'')+
+    (d.scope!=='bài'?`<h4 class="qa-h">Nguồn</h4><div class="qa-src">${d.sources.map(src).join('')}</div>`:'')+
+    `<p class="note">Chuyên mục hiển thị là do AI phân loại. AI chỉ trích câu có sẵn trong bài và có thể chọn chưa đúng ý, hãy mở bài gốc để kiểm tra.</p>`;
+}
+const src=a=>`<a class="mini" href="/bai/${a.id}"><div class="thumb"><img src="${a.img}" alt="" loading="lazy"></div><div><span class="tag">🤖 AI xếp: ${esc(a.label)}</span><h4>${esc(a.title)}</h4></div></a>`;
+async function ask(){
+  const q=$('#aq').value.trim();if(!q)return;
+  $('#ago').disabled=true;$('#ago').innerHTML='<span class="spin"></span> Đang tìm...';
+  try{const d=await post('/api/ask',{q});render(d);const h=store.get('qhist',[]).filter(x=>x!==q);h.unshift(q);store.set('qhist',h.slice(0,8));drawHist()}
+  catch(e){$('#aout').innerHTML='<div class="err">'+esc(e.message)+'</div>'}
+  $('#ago').disabled=false;$('#ago').textContent='Hỏi AI';
+}
+$('#askf').onsubmit=e=>{e.preventDefault();ask()};
+document.querySelectorAll('#ex .chip').forEach(c=>c.onclick=()=>{$('#aq').value=c.dataset.q;ask()});
+$('#hclr').onclick=()=>{store.set('qhist',[]);drawHist()};
+drawHist();if($('#aq').value.trim())ask();
+</script>
+{% endblock %}

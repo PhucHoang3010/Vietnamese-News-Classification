@@ -1,0 +1,30 @@
+{
+ "auc_thuc_vs_ngau_nhien": 0.9822667438016528,
+ "thresholds": [
+  {
+   "nguong": 0.05,
+   "tu_choi_nham_truy_van_that": 0.0001818181818181818,
+   "tra_loi_nham_truy_van_ngau_nhien": 0.9372727272727273
+  },
+  {
+   "nguong": 0.08,
+   "tu_choi_nham_truy_van_that": 0.010545454545454545,
+   "tra_loi_nham_truy_van_ngau_nhien": 0.4570909090909091
+  },
+  {
+   "nguong": 0.1,
+   "tu_choi_nham_truy_van_that": 0.038,
+   "tra_loi_nham_truy_van_ngau_nhien": 0.142
+  },
+  {
+   "nguong": 0.12,
+   "tu_choi_nham_truy_van_that": 0.08581818181818182,
+   "tra_loi_nham_truy_van_ngau_nhien": 0.026545454545454546
+  },
+  {
+   "nguong": 0.15,
+   "tu_choi_nham_truy_van_that": 0.17527272727272727,
+   "tra_loi_nham_truy_van_ngau_nhien": 0.0014545454545454545
+  }
+ ]
+}

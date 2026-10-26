@@ -125,6 +125,12 @@ except Exception:
     BENCH = []
 
 app = Flask(__name__)
+
+
+@app.template_filter("vn")
+def _vn(x):
+    """Số có dấu chấm ngăn cách hàng nghìn kiểu Việt Nam: 5500 -> 5.500."""
+    return f"{int(x):,}".replace(",", ".")
 app.json.ensure_ascii = False
 IMG_DIR = ROOT / "static" / "img"
 NAV = [{"name": k, "slug": v[0], "icon": v[1], "color": v[2]} for k, v in TOPICS.items()]
@@ -625,101 +631,106 @@ def api_recommend():
     return jsonify(items=[{k: ART[IDS[j]][k] for k in keep} for j in top], profile=prof)
 
 
-# ---------------------------------------------------------------- Thử thách: Con người vs AI (ghi kết quả thật vào data/arena.jsonl)
-import threading, time
-ARENA_F = ROOT / "data" / "arena.jsonl"
-_ALOCK = threading.Lock()
-TEST_IDS = [i for i, a in ART.items() if a["test"]]            # chỉ dùng bài kiểm thử: AI chưa từng thấy khi huấn luyện
+# ---------------------------------------------------------------- Hỏi AI về tin tức: hỏi đáp CÓ DẪN NGUỒN (truy hồi + trích câu, không tự sinh nội dung)
+import threading
+QA = {"AX": None}
+QA_READY = threading.Event()
+_STOPQ = set("là gì nào sao thế bao nhiêu ai đâu khi không có được của và các những này đó thì mà ở tại cho với trong về như hay hoặc bị đã sẽ đang rất cũng còn hôm nay vậy ra làm".split())
+QA_W_CONTENT, QA_W_TITLE = 0.7, 0.3                    # trọng số chỉ mục nội dung / tiêu đề+sapo (chọn bằng thí nghiệm experiments/exp8_qa.py)
+QA_ABSTAIN, QA_MID, QA_HIGH = 0.10, 0.20, 0.30         # ngưỡng điểm của bài cao nhất: không trả lời / trung bình / cao (exp8: đúng bài ≈ 66–86% / 91% / 96%; ngưỡng 0,10: từ chối nhầm 3,8% câu hỏi thật, trả lời nhầm 14,2% câu ngẫu nhiên)
+QA_EXAMPLES = ["Giá vàng trong nước biến động thế nào?", "Nga dùng UAV phá hủy pháo tự hành của Ukraine như thế nào?", "Mitsubishi Destinator ra mắt ở Việt Nam khi nào?",
+               "Thông tư 29 về dạy thêm có hiệu lực khi nào?", "Nên ăn rau sống thế nào cho đúng?", "Xanh SM đạt giải thưởng gì?"]
 
 
-def arena_rows():
-    if not ARENA_F.exists():
-        return []
-    out = []
-    for line in ARENA_F.read_text(encoding="utf-8").splitlines():
-        try:
-            out.append(json.loads(line))
-        except Exception:
-            pass
-    return out
+def _build_qa_index():
+    """Chỉ mục nội dung toàn bài cho hỏi đáp. Dựng ở luồng nền để website khởi động nhanh (mất vài chục giây lần đầu)."""
+    try:
+        QA["AX"] = VEC.transform([clean(ART[i]["title"] + " " + ART[i]["desc"] + " " + ART[i]["content"]) for i in IDS])
+    finally:
+        QA_READY.set()
 
 
-def arena_stats():
-    rows = arena_rows(); n = len(rows)
-    if not n:
-        return {"n": 0}
-    h = [r["choice"] == r["truth"] for r in rows]; a = [r["ai"] == r["truth"] for r in rows]
-    both = sum(x and y for x, y in zip(h, a)); only_h = sum(x and not y for x, y in zip(h, a))
-    only_a = sum(y and not x for x, y in zip(h, a)); neither = n - both - only_h - only_a
-    per = []
-    for c in CLASSES:
-        rr = [r for r in rows if r["truth"] == c]
-        if rr:
-            per.append({"label": c, "icon": TOPICS[c][1], "n": len(rr), "human": round(100 * sum(r["choice"] == c for r in rr) / len(rr)),
-                        "ai": round(100 * sum(r["ai"] == c for r in rr) / len(rr))})
-    pl = {}
-    for r in rows:
-        p = (r.get("player") or "").strip()
-        if p:
-            d = pl.setdefault(p, [0, 0, 0]); d[0] += 1; d[1] += r["choice"] == r["truth"]; d[2] += r["ai"] == r["truth"]
-    board = sorted(({"player": p, "n": v[0], "acc": round(100 * v[1] / v[0]), "ai": round(100 * v[2] / v[0])} for p, v in pl.items() if v[0] >= 5),
-                   key=lambda x: (-x["acc"], -x["n"]))[:10]
-    conf = Counter((r["truth"], r["choice"]) for r in rows if r["choice"] != r["truth"]).most_common(5)
-    return {"n": n, "human": round(100 * sum(h) / n, 1), "ai": round(100 * sum(a) / n, 1), "both": both, "only_h": only_h, "only_a": only_a, "neither": neither,
-            "per": per, "board": board, "players": len(pl), "confused": [{"truth": t, "choice": c, "n": k} for (t, c), k in conf]}
+threading.Thread(target=_build_qa_index, daemon=True).start()
 
 
-@app.get("/thu-thach")
-def arena():
-    return render_template("arena.html")
+def qa_answer(q, aid=None, ka=8, ks=3):
+    """Trả lời câu hỏi bằng cách (1) tìm các bài liên quan, (2) chọn các CÂU giống câu hỏi nhất trong các bài đó và dẫn nguồn.
+    Nếu aid được đưa ra thì chỉ tìm trong bài đó."""
+    qfull = clean(q)
+    if len(qfull.split()) < 2:
+        raise ValueError("Hãy nhập câu hỏi dài hơn một chút (ít nhất 2 từ).")
+    if not QA_READY.wait(240) or QA["AX"] is None:
+        raise RuntimeError("Chỉ mục hỏi đáp chưa sẵn sàng, hãy thử lại sau vài giây.")
+    t0 = time.time()                                    # chỉ đo thời gian trả lời, không tính thời gian chờ dựng chỉ mục lần đầu
+    qc = " ".join(w for w in qfull.split() if w not in _STOPQ) or qfull
+    qv = VEC.transform([qc])
+    s = QA_W_CONTENT * (QA["AX"] @ qv.T).toarray().ravel() + QA_W_TITLE * (SX @ SV.transform([qc]).T).toarray().ravel()
+    cand = [IDX[aid]] if aid is not None else [int(j) for j in np.argsort(-s)[:ka] if s[j] > 0]
+    top_s = float(s[cand[0]]) if cand else 0.0
+    smax = float(s.max()) or 1.0
+    rows = []
+    for j in cand:
+        a = ART[IDS[j]]
+        sents = split_sentences(a["desc"] + "\n" + a["content"])[:150]
+        if not sents:
+            continue
+        c = (VEC.transform([clean(x) for x in sents]) @ qv.T).toarray().ravel()
+        rel = min(1.0, float(s[j]) / smax)
+        for n, (x, cc) in enumerate(zip(sents, c)):
+            if cc > 0:
+                rows.append((float(cc) * (0.75 + 0.25 * rel) + (0.01 if n < 2 else 0.0), float(cc), x, a["id"]))
+    rows.sort(key=lambda r: -r[0])
+    ans, seen, per = [], set(), Counter()
+    for _, cc, x, i in rows:
+        if x[:60] in seen or per[i] >= 2:
+            continue
+        seen.add(x[:60]); per[i] += 1
+        a = ART[i]
+        ans.append({"text": x, "score": round(cc, 3), "id": i, "title": a["title"], "label": a["label"], "icon": a["icon"]})
+        if len(ans) >= ks:
+            break
+    if aid is not None:
+        best = ans[0]["score"] if ans else 0.0
+        conf = "cao" if best >= 0.35 else "trung bình" if best >= 0.2 else "thấp"
+        abstain = best < 0.12
+    else:
+        conf = "cao" if top_s >= QA_HIGH else "trung bình" if top_s >= QA_MID else "thấp"
+        abstain = top_s < QA_ABSTAIN or not ans
+    # Chủ đề câu hỏi = chuyên mục AI đã xếp cho các bài tìm được (bỏ phiếu theo điểm liên quan); phân loại trực tiếp câu hỏi ngắn thì không đủ tin cậy
+    vote = Counter()
+    for j in cand[:5]:
+        vote[ART[IDS[j]]["label"]] += float(s[j])
+    cat = None
+    if vote and sum(vote.values()) > 0:
+        lab, w = vote.most_common(1)[0]
+        cat = {"label": lab, "icon": TOPICS[lab][1], "share": round(100 * w / sum(vote.values()))}
+    src = [ART[IDS[j]] for j in cand[:4]]
+    return {"q": q, "scope": "bài" if aid is not None else "kho", "abstain": bool(abstain), "confidence": conf, "top_score": round(top_s, 3), "ms": round((time.time() - t0) * 1000),
+            "cat": cat,
+            "terms": [w for w in qc.split() if len(w) > 1], "answers": ans,
+            "sources": [{"id": a["id"], "title": a["title"], "label": a["label"], "icon": a["icon"], "img": a["img"], "minutes": a["minutes"]} for a in src]}
 
 
-@app.get("/api/arena/next")
-def arena_next():
-    seen = {int(x) for x in request.args.get("seen", "").split(",") if x.isdigit()}
-    pool = [i for i in TEST_IDS if i not in seen] or TEST_IDS
-    a = ART[random.choice(pool)]
-    return jsonify(id=a["id"], title=a["title"], desc=a["desc"], snippet=a["content"][:360].rsplit(" ", 1)[0] + "…")
+@app.get("/hoi-ai")
+def ask_page():
+    return render_template("ask.html", examples=QA_EXAMPLES, q=request.args.get("q", "")[:300])
 
 
-@app.post("/api/arena/answer")
-def arena_answer():
+@app.post("/api/ask")
+def api_ask():
     d = request.get_json(silent=True) or {}
-    aid, choice = d.get("id"), d.get("choice")
-    a = ART.get(aid) if isinstance(aid, int) else None
-    if not a or not a["test"] or choice not in CLASSES:
-        return jsonify(error="Dữ liệu không hợp lệ."), 400
-    player = re.sub(r"[^\w .\-À-ỹ]", "", str(d.get("player") or ""))[:20].strip()
-    row = {"t": int(time.time()), "player": player, "aid": aid, "choice": choice, "truth": a["truth"], "ai": a["label"], "ai_pct": a["pct"]}
-    with _ALOCK:
-        ARENA_F.parent.mkdir(exist_ok=True)
-        with open(ARENA_F, "a", encoding="utf-8") as f:
-            f.write(json.dumps(row, ensure_ascii=False) + "\n")
-    return jsonify(truth=a["truth"], ai=a["label"], ai_pct=a["pct"], ai_icon=a["icon"], truth_icon=TOPICS[a["truth"]][1], url=f"/bai/{aid}")
+    aid = d.get("aid")
+    if aid is not None and (not isinstance(aid, int) or aid not in ART):
+        return jsonify(error="Bài viết không tồn tại."), 400
+    try:
+        return jsonify(qa_answer(str(d.get("q", ""))[:300], aid))
+    except ValueError as e:
+        return jsonify(error=str(e)), 400
+    except RuntimeError as e:
+        return jsonify(error=str(e)), 503
 
 
-@app.get("/api/arena/stats")
-def arena_stats_api():
-    return jsonify(arena_stats())
-
-
-# ---------------------------------------------------------------- chế độ lớp học & kịch bản trình bày
-@app.get("/bang-xep-hang")
-def live_board():
-    port = request.host.split(":")[1] if ":" in request.host else "5000"
-    return render_template("board.html", join=f"http://{lan_ip()}:{port}/thu-thach")
-
-
-@app.post("/api/arena/reset")
-def arena_reset():
-    if request.remote_addr not in ("127.0.0.1", "::1"):                 # chỉ máy chiếu (người thuyết trình) mới được làm mới
-        return jsonify(error="Chỉ máy chủ mới được làm mới."), 403
-    with _ALOCK:
-        if ARENA_F.exists():
-            ARENA_F.rename(ARENA_F.with_name(f"arena-{int(time.time())}.bak"))   # lưu bản sao, không xóa
-    return jsonify(ok=True)
-
-
+# ---------------------------------------------------------------- kịch bản trình bày
 @app.get("/trinh-bay")
 def guide():
     return render_template("guide.html")
@@ -744,7 +755,7 @@ if __name__ == "__main__":
     import os, sys
     lan = "--lan" in sys.argv or bool(os.environ.get("VNNEWS_LAN"))
     if lan:
-        print(f"\n  Chế độ LỚP HỌC — điện thoại cùng WiFi vào: http://{lan_ip()}:5000/thu-thach\n  Màn hình chiếu: http://127.0.0.1:5000/bang-xep-hang\n")
+        print(f"\n  Chế độ MẠNG NỘI BỘ — máy khác cùng WiFi mở được website tại: http://{lan_ip()}:5000\n")
     else:
-        print("Mở trình duyệt tại http://127.0.0.1:5000   (thêm --lan để cả lớp cùng chơi qua WiFi)")
+        print("Mở trình duyệt tại http://127.0.0.1:5000   (thêm --lan để máy khác cùng WiFi cũng mở được)")
     app.run(host="0.0.0.0" if lan else "127.0.0.1", port=5000, debug=False, threaded=True)

@@ -7,7 +7,7 @@
 {% block content %}
 <div class="pagehead"><div class="big">📊</div><div><h1>Thống kê & hiệu năng mô hình</h1><p>Số liệu đo trên tập kiểm thử — những bài mô hình chưa từng thấy khi huấn luyện.</p></div></div>
 <div class="kpis">
-  <div class="kpi"><b>{{ STATS.n }}</b><span>Bài báo trong hệ thống</span></div>
+  <div class="kpi"><b>{{ STATS.n|vn }}</b><span>Bài báo trong hệ thống</span></div>
   <div class="kpi"><b>{{ (STATS.acc*100)|round(1) }}%</b><span>Accuracy (tập kiểm thử)</span></div>
   <div class="kpi"><b>{{ (STATS.f1*100)|round(1) }}%</b><span>Macro-F1</span></div>
   <div class="kpi"><b>{{ STATS.n_test }}</b><span>Bài kiểm thử</span></div>

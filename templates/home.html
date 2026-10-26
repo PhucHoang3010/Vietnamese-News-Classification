@@ -23,13 +23,15 @@
     <br><span>AI sai:</span> “{{ bad_ex.title }}” → AI xếp <b>{{ bad_ex.icon }} {{ bad_ex.label }}</b>, báo gốc là {{ bad_ex.truth }} ⚠ <a href="{{ url_for('article', aid=bad_ex.id) }}">xem</a>
     · <a href="{{ url_for('classify_page') }}">Tự thử dán một đoạn văn →</a></div>
 </section>
-<h2 class="serif newshead">Kho tin: {{ STATS.n }} bài do AI xếp chuyên mục</h2>
+<h2 class="serif newshead">Kho tin: {{ STATS.n|vn }} bài do AI xếp chuyên mục</h2>
 <div class="hero">
   <a class="hero-main" href="{{ url_for('article', aid=hero.id) }}" style="--c:{{ hero.color }}"><img class="bg" src="{{ hero.img }}" alt="">
     <div class="in"><span class="tag aib">🤖 AI xếp vào {{ hero.icon }} {{ hero.label }} · nghiêng {{ hero.pct }}%</span><h1>{{ hero.title }}</h1><p>{{ hero.desc[:220] }}{{ '…' if hero.desc|length>220 }}</p></div></a>
   <div class="hero-side">{% for a in side %}{{ mini(a) }}{% endfor %}</div>
 </div>
-<a class="arena-banner" href="{{ url_for('arena') }}"><span class="big">🥊</span><div><b class="serif">Bạn có phân loại tin giỏi hơn AI không?</b><small>10 lượt đấu với bài báo AI chưa từng thấy · kết quả người vs AI được ghi lại thật · có bảng xếp hạng</small></div><span class="btn">Chơi ngay →</span></a>
+<section class="askban"><div class="ab-l"><span class="big">💬</span><div><b class="serif">Hỏi AI về tin tức</b><small>Gõ một câu hỏi: AI tìm trong {{ STATS.n|vn }} bài và trích câu trả lời, luôn dẫn nguồn.</small></div></div>
+  <form action="{{ url_for('ask_page') }}" method="get" class="ab-f"><input name="q" placeholder="Ví dụ: Giá vàng trong nước biến động thế nào?" autocomplete="off" maxlength="300"><button class="btn">Hỏi AI</button></form>
+  <div class="ab-ex">{% for e in ['Giá vàng trong nước biến động thế nào?', 'Mitsubishi Destinator ra mắt ở Việt Nam khi nào?', 'Thông tư 29 về dạy thêm có hiệu lực khi nào?'] %}<a href="{{ url_for('ask_page', q=e) }}">{{ e }}</a>{% endfor %}</div></section>
 <div class="trio">
   <a href="{{ url_for('summarize_page') }}"><span>📝</span><b>Tóm tắt tự động</b><small>Rút 2–3 câu cốt lõi của bài dài — TextRank</small></a>
   <a href="{{ url_for('events') }}"><span>🧩</span><b>Sự kiện & chủ đề con</b><small>AI tự gom bài cùng câu chuyện — KMeans</small></a>

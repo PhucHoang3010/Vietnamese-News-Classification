@@ -3,8 +3,8 @@
 {% block content %}
 <div class="pagehead"><div class="big">🎤</div><div><h1>Kịch bản trình bày (khoảng 7 phút)</h1><p>Mỗi bước có nút mở sẵn đúng màn hình cần demo và gợi ý lời nói. Mọi thứ chạy cục bộ, không cần Internet hay micro.</p></div></div>
 <div class="panel" style="margin-bottom:22px"><h3 style="margin-top:0">Chuẩn bị trước buổi báo cáo</h3><ol style="margin:0;padding-left:20px">
-  <li>Chạy <code>python app.py --lan</code> (để cả lớp chơi bằng điện thoại cùng WiFi) — hoặc <code>python app.py</code> nếu chỉ demo một máy.</li>
-  <li>Mở sẵn các tab bên dưới; thử bấm 1 lượt Thử thách để chắc chắn mọi thứ hoạt động.</li>
+  <li>Chạy <code>python app.py</code> (lần đầu chờ 1–3 phút, đừng bấm Ctrl+C). Câu hỏi đầu tiên ở trang Hỏi AI có thể chờ vài chục giây để lập chỉ mục.</li>
+  <li>Mở sẵn các tab bên dưới; thử hỏi 1 câu ở trang Hỏi AI để chắc chắn mọi thứ hoạt động.</li>
   <li>Nếu mất mạng: trang vẫn chạy, chỉ đổi sang phông chữ dự phòng.</li></ol></div>
 <div class="steps-guide">
 {% for t, mins, href, btn, say in [
@@ -13,7 +13,7 @@
  ('Giải thích AI — What-if', '1,5', url_for('lab') ~ '?demo=mixed', 'Mở AI Lab (bài đa chủ đề)', ['Từ càng đậm càng khiến AI chọn chuyên mục đó.','Bấm bỏ các từ thể thao → dự đoán đổi sang Kinh doanh. Dải đoạn cho thấy bài trộn 2 chủ đề.','Nhờ mô hình tuyến tính nên giải thích chính xác, không cần xấp xỉ.']),
  ('Tóm tắt tự động', '1', url_for('summarize_page') ~ '?demo=rand', 'Mở tóm tắt (bài ngẫu nhiên)', ['TextRank: câu quan trọng = câu giống nhiều câu khác (PageRank).','Đánh giá bằng ROUGE trên 400 bài: TextRank 0,286 > Lead-2 0,271 > ngẫu nhiên 0,214.']),
  ('Học không giám sát: gom sự kiện', '0,5', url_for('events') ~ '?c=suc-khoe', 'Mở gom cụm (Sức khỏe)', ['Không dùng nhãn, KMeans tự tìm các chủ đề con: “ung thư”, “bệnh viện”, “chăm sóc da”…','Bổ sung cho bài toán phân loại có giám sát.']),
- ('Thử thách cả lớp (điểm nhấn)', '2', url_for('live_board'), 'Mở bảng trực tiếp để chiếu', ['Mời cả lớp vào địa chỉ trên màn hình, mỗi người chơi 10 lượt đấu với AI.','Bảng xếp hạng và thống kê người vs AI cập nhật theo thời gian thực — đây là đánh giá với con người thật.','Chỉ ra chuyên mục người và AI cùng nhầm → ranh giới nhãn vốn mơ hồ.']),
+ ('Hỏi AI về tin tức', '1,5', url_for('ask_page') ~ '?q=Giá vàng trong nước biến động thế nào?', 'Mở Hỏi AI', ['Gõ câu hỏi, AI tìm các bài liên quan rồi TRÍCH nguyên văn câu trả lời, kèm bài gốc và chuyên mục do AI phân loại.','AI không tự sinh nội dung; hỏi điều không có trong kho tin thì AI từ chối trả lời (“chưa tìm thấy”).','Độ chắc chắn dựa trên độ giống giữa câu hỏi và bài; đo trên 5.500 truy vấn là tiêu đề, bài đúng nằm trong top 5 ở khoảng 96%.']),
  ('Hạn chế & kết luận', '0,5', url_for('about'), 'Mở giới thiệu', ['Hạn chế: chưa tách từ tiếng Việt, dữ liệu 5.500 bài, ranh giới một số chuyên mục mờ.','Hướng phát triển: PhoBERT khi có GPU, thu thập tin thời gian thực qua RSS.'])] %}
 <div class="panel gstep"><div class="num serif">{{ loop.index }}</div><div style="flex:1"><div style="display:flex;gap:10px;align-items:baseline;flex-wrap:wrap"><h3 style="margin:0">{{ t }}</h3><span class="pill">~{{ mins }} phút</span></div>
   <ul style="margin:8px 0 12px;padding-left:18px;color:var(--muted)">{% for x in say %}<li>{{ x }}</li>{% endfor %}</ul><a class="btn sm" href="{{ href }}" target="_blank">{{ btn }} ↗</a></div></div>
