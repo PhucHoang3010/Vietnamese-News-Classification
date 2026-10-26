@@ -1,6 +1,6 @@
 """Thí nghiệm 5 — 'Độ tin cậy' của mô hình có đáng tin không? (hiệu chỉnh xác suất + dự đoán có chọn lọc)
 Mô hình: Linear SVM cuối. So 4 cách tạo 'xác suất' trên tập TEST chính thức (tham số hiệu chỉnh chỉ học trên train/val):
-  1) softmax(3×điểm)  — cách website đang dùng   2) softmax(T×điểm), T chọn trên tập val (temperature scaling)
+  1) softmax(3×điểm)  — hệ số ban đầu của website   2) softmax(T×điểm), T chọn trên tập val (temperature scaling) — website hiện dùng T làm tròn 4,3
   3) CalibratedClassifierCV (Platt, 5-fold trên train)   4) Logistic Regression
 """
 import sys, time, ast
@@ -46,7 +46,7 @@ f = lambda k: -np.log(np.clip(softmax(sv, k)[np.arange(len(yv_i)), yv_i], 1e-12,
 Tbest = float(minimize_scalar(f, bounds=(0.5, 60), method="bounded").x)
 cal = CalibratedClassifierCV(LinearSVC(C=C), method="sigmoid", cv=5).fit(A, ytr)
 lr = LogisticRegression(max_iter=2000, **lrp).fit(A, ytr)
-P = {"softmax(3×điểm) — website": softmax(st, 3), f"softmax({Tbest:.1f}×điểm) — chọn trên val": softmax(st, Tbest),
+P = {"softmax(3×điểm) — hệ số ban đầu": softmax(st, 3), f"softmax({Tbest:.1f}×điểm) — T chọn trên val, website dùng": softmax(st, Tbest),
      "Platt (CalibratedClassifierCV)": cal.predict_proba(T), "Logistic Regression": lr.predict_proba(T)}
 rows, rels = [], {}
 for n, p in P.items():
@@ -55,12 +55,13 @@ res = pd.DataFrame(rows); res.to_csv(OUT / "calibration_results.csv", index=Fals
 save_json(dict(T=Tbest, C=C), "calibration_T.json")
 fig, axs = plt.subplots(1, 4, figsize=(14, 3.7), sharey=True)
 for ax, (n, r) in zip(axs, rels.items()):
-    ax.plot([0, 1], [0, 1], "--", color="#999"); r = np.array(r)
-    ax.plot(r[:, 0], r[:, 1], "o-", color="#0b1b33"); ax.set_title(n, fontsize=9); ax.set_xlabel("độ tin cậy dự đoán"); ax.set_xlim(0, 1); ax.set_ylim(0, 1)
+    ax.plot([0, 1], [0, 1], "--", color="#999"); r = np.array(r); r = r[r[:, 2] >= 10]          # chỉ vẽ nhóm có từ 10 bài trở lên (nhóm quá ít bài rất nhiễu)
+    ax.plot(r[:, 0], r[:, 1], "-", color="#0b1b33"); ax.scatter(r[:, 0], r[:, 1], s=12 + r[:, 2] ** 0.7 * 3, color="#0b1b33", zorder=3, clip_on=False)
+    ax.set_title(n, fontsize=9); ax.set_xlabel("độ tin cậy dự đoán (kích thước chấm ∝ số bài)"); ax.set_xlim(0, 1); ax.set_ylim(0, 1)
     ax.text(.04, .9, f"ECE = {res.set_index('method').loc[n, 'ECE']:.3f}", fontsize=9)
 axs[0].set_ylabel("tỉ lệ đúng thực tế"); plt.tight_layout(); plt.savefig(OUT / "calibration.png", dpi=150); plt.close()
 # dự đoán có chọn lọc: bỏ bớt bài kém chắc chắn
-p0 = softmax(st, 3); s = np.sort(p0, 1); gap = s[:, -1] - s[:, -2]; ok = p0.argmax(1) == yt_i
+p0 = softmax(st, 4.3); s = np.sort(p0, 1); gap = s[:, -1] - s[:, -2]; ok = p0.argmax(1) == yt_i      # đúng hệ số T mà website dùng
 order = np.argsort(-gap); rc = []
 for cov in (1.0, .9, .8, .7, .6, .5, .4, .3):
     k = int(round(cov * len(gap))); rc.append(dict(coverage=cov, n=k, accuracy=float(ok[order[:k]].mean()), min_gap=float(gap[order[k - 1]])))

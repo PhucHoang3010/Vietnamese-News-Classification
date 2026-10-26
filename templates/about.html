@@ -12,7 +12,7 @@
   <div class="panel"><h3 style="margin-top:0">Kết quả</h3>
     <div class="kpis" style="grid-template-columns:1fr 1fr"><div class="kpi"><b>{{ (STATS.acc*100)|round(1) }}%</b><span>Accuracy</span></div><div class="kpi"><b>{{ (STATS.f1*100)|round(1) }}%</b><span>Macro-F1</span></div></div>
     <p>Thể thao, Sức khỏe, Xe, Giải trí, Pháp luật đạt F1 trên 0,92. Thời sự và Đời sống thấp hơn vì nội dung giao thoa với chuyên mục khác.</p>
-    <h3>Hạn chế</h3><ul><li>Đã thử tách từ tiếng Việt bằng pyvi: Macro-F1 chỉ tăng 0,24 điểm (p ≈ 0,24, chưa đáng kể) nên không dùng.</li><li>Dữ liệu chỉ {{ STATS.n|vn }} bài.</li><li>Ranh giới giữa vài chuyên mục vốn mờ.</li><li>Độ tin cậy là điểm tương đối, không phải xác suất hiệu chỉnh.</li></ul>
+    <h3>Hạn chế</h3><ul><li>Đã thử tách từ tiếng Việt bằng pyvi: Macro-F1 chỉ tăng 0,24 điểm (p ≈ 0,24, chưa đáng kể) nên không dùng.</li><li>Dữ liệu chỉ {{ STATS.n|vn }} bài.</li><li>Ranh giới giữa vài chuyên mục vốn mờ.</li><li>Phần trăm hiển thị đã hiệu chỉnh nhiệt độ trên tập kiểm định (lệch trung bình ECE 3,2% trên tập kiểm thử) nhưng chưa phải xác suất tuyệt đối.</li></ul>
     <a class="btn blue" href="{{ url_for('stats') }}">Xem thống kê chi tiết →</a></div>
 </div>
 <div class="panel"><h3 style="margin-top:0">Công nghệ</h3><div class="chips"><span class="chip">Python</span><span class="chip">scikit-learn</span><span class="chip">TF-IDF</span><span class="chip">LinearSVC</span><span class="chip">Flask</span><span class="chip">Jinja2</span><span class="chip">HTML/CSS/JS</span></div></div>

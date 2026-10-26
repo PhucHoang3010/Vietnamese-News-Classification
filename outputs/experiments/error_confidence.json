@@ -1,0 +1,13 @@
+{
+ "pct_correct": 92.8708276797829,
+ "pct_wrong": 67.50909090909092,
+ "gap_correct": 0.8955997286295794,
+ "gap_wrong": 0.519125,
+ "truth_rank2": 61,
+ "truth_rank3plus": 27,
+ "n_wrong": 88,
+ "n_wrong_pct_ge_80": 27,
+ "n_all_pct_ge_80": 672,
+ "n_wrong_pct_ge_90": 17,
+ "n_all_pct_ge_90": 605
+}

@@ -1,0 +1,53 @@
+﻿truth,pred,n
+Thời sự,Pháp luật,6
+Thời sự,Kinh doanh,5
+Thời sự,Đời sống,4
+Giáo dục,Thời sự,3
+Xe,Kinh doanh,3
+Đời sống,Thời sự,3
+Đời sống,Thế giới,3
+Kinh doanh,Giáo dục,2
+Khoa học,Thời sự,2
+Thế giới,Xe,2
+Đời sống,Giải trí,2
+Thế giới,Đời sống,2
+Sức khỏe,Thời sự,2
+Kinh doanh,Đời sống,2
+Khoa học,Kinh doanh,2
+Thế giới,Sức khỏe,2
+Thế giới,Thời sự,2
+Giáo dục,Giải trí,2
+Giải trí,Giáo dục,2
+Khoa học,Giáo dục,2
+Thế giới,Kinh doanh,2
+Thế giới,Pháp luật,2
+Thế giới,Giáo dục,2
+Kinh doanh,Pháp luật,1
+Khoa học,Giải trí,1
+Kinh doanh,Khoa học,1
+Khoa học,Xe,1
+Khoa học,Thế giới,1
+Giáo dục,Đời sống,1
+Giải trí,Khoa học,1
+Giáo dục,Thế giới,1
+Giáo dục,Thể thao,1
+Giáo dục,Sức khỏe,1
+Giải trí,Thế giới,1
+Giải trí,Thời sự,1
+Giải trí,Đời sống,1
+Thể thao,Kinh doanh,1
+Pháp luật,Thời sự,1
+Kinh doanh,Thời sự,1
+Kinh doanh,Sức khỏe,1
+Kinh doanh,Xe,1
+Sức khỏe,Giáo dục,1
+Pháp luật,Xe,1
+Thời sự,Khoa học,1
+Thời sự,Xe,1
+Thể thao,Sức khỏe,1
+Thời sự,Giáo dục,1
+Xe,Đời sống,1
+Đời sống,Kinh doanh,1
+Đời sống,Khoa học,1
+Đời sống,Pháp luật,1
+Đời sống,Thể thao,1

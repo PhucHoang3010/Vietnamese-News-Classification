@@ -8,6 +8,7 @@ from sklearn.model_selection import train_test_split
 
 ROOT = Path(__file__).resolve().parent
 SEED = 42
+TEMP = 4.3          # phải trùng với TEMP trong app.py (hệ số nhiệt độ chọn trên tập kiểm định, xem experiments/exp5_calibration.py)
 
 
 def clean(t):
@@ -27,7 +28,7 @@ def build():
     va, te = train_test_split(tmp, test_size=0.50, stratify=tmp.ground_truth, random_state=SEED)
     test_ids = set(te.id.astype(int)); val_ids = set(va.id.astype(int)); train_ids = set(tr.id.astype(int))
     S = model.decision_function(df.text)
-    p = np.exp(S * 3); p /= p.sum(1, keepdims=True)
+    p = np.exp((S - S.max(axis=1, keepdims=True)) * TEMP); p /= p.sum(1, keepdims=True)
     cls = list(model.classes_); out = {}
     for i, r in enumerate(df.itertuples()):
         o = np.argsort(-p[i])

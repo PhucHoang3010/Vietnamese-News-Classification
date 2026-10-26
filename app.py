@@ -25,6 +25,7 @@ print(f"  ✓ đã nạp mô hình ({time.time() - _T0:.0f}s)", flush=True)
 VEC, CLF = model.named_steps["tfidf"], model.named_steps["clf"]
 FEATURES = np.array(VEC.get_feature_names_out())
 CLASSES = list(model.classes_)
+TEMP = 4.3          # hệ số nhiệt độ của softmax(TEMP × điểm SVM), chọn trên tập kiểm định (experiments/exp5_calibration.py): sai lệch hiệu chỉnh ECE trên tập kiểm thử giảm từ 7,6% xuống 3,2%
 
 TOPICS = {  # tên: (slug, icon, màu)
     "Thời sự": ("thoi-su", "📰", "#111111"), "Thế giới": ("the-gioi", "🌍", "#111111"),
@@ -61,7 +62,7 @@ def analyze(text):
     if len(x.split()) < 8:
         return None
     vec = VEC.transform([x]); s = CLF.decision_function(vec)[0]
-    p = np.exp(s * 3); p /= p.sum(); order = np.argsort(-p)
+    p = np.exp((s - s.max()) * TEMP); p /= p.sum(); order = np.argsort(-p)
     top = [{"label": CLASSES[i], "pct": round(float(p[i]) * 100, 1), "icon": TOPICS[CLASSES[i]][1], "color": TOPICS[CLASSES[i]][2],
             "slug": TOPICS[CLASSES[i]][0]} for i in order[:5]]
     k = int(order[0]); contrib = vec.multiply(CLF.coef_[k]).tocsr()
