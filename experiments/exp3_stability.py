@@ -20,7 +20,7 @@ from sklearn.svm import LinearSVC
 
 plt.rcParams["font.family"] = "DejaVu Sans"
 df, i_tr, i_va, i_te = load(); check_split(df, i_tr, i_va, i_te)
-tun = pd.read_csv(OUT / "tuning_results.csv"); P = {r.model: ast.literal_eval(r.best_params) for r in tun.itertuples()}
+_g = load_json("tuning_grids.json"); P = {k: max(v, key=lambda r: r["cv_mean"])["params"] for k, v in _g.items() if v and v[0]["params"]}
 svmC = load_json("tuning_results_best_svm.json")["C"]
 mk = {"Linear SVM": lambda: LinearSVC(C=svmC),
       "Complement Naive Bayes": lambda: ComplementNB(**P["Complement Naive Bayes"]),
@@ -69,7 +69,10 @@ models = [c for c in tp.columns if c not in ("id", "truth") and not c.startswith
 svm = "Linear SVM"
 # dùng dự đoán của mô hình SVM cuối (C theo quy tắc 1 SE) thay vì C tốt nhất của thí nghiệm 1 nếu khác nhau
 vec = tfidf(); Xa = vec.fit_transform(df.text.iloc[i_tr]); Xt = vec.transform(df.text.iloc[i_te])
-final = LinearSVC(C=svmC).fit(Xa, df.label.iloc[i_tr]); tp[svm] = final.predict(Xt)
+ytr_ = df.label.iloc[i_tr]
+for _n, _f in mk.items():
+    tp[_n] = _f().fit(Xa, ytr_).predict(Xt)                      # tính lại dự đoán test cho 3 mô hình dùng tham số cuối
+final = LinearSVC(C=svmC).fit(Xa, ytr_)
 def mf1(p, t): return f1_score(t, p, average="macro")
 def boot(p):
     c = (p == truth)

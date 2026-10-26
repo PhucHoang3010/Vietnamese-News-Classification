@@ -1,5 +1,8 @@
 """Website tin tức VnNews — AI tự động phân loại chủ đề.   python app.py   →  http://127.0.0.1:5000"""
 import csv, ipaddress, json, math, random, re, socket, unicodedata
+import time
+_T0 = time.time()
+print("VnNews đang khởi động… Lần đầu (nhất là trên Windows) có thể mất 1–3 phút vì đang nạp thư viện. Vui lòng KHÔNG bấm Ctrl+C.", flush=True)
 from collections import Counter
 from html.parser import HTMLParser
 from pathlib import Path
@@ -18,6 +21,7 @@ PER_PAGE = 12
 
 # ---------------------------------------------------------------- mô hình
 model = joblib.load(ROOT / "model.joblib")
+print(f"  ✓ đã nạp mô hình ({time.time() - _T0:.0f}s)", flush=True)
 VEC, CLF = model.named_steps["tfidf"], model.named_steps["clf"]
 FEATURES = np.array(VEC.get_feature_names_out())
 CLASSES = list(model.classes_)
@@ -93,6 +97,7 @@ IDS = list(ART)
 IDX = {i: n for n, i in enumerate(IDS)}
 SV = TfidfVectorizer(ngram_range=(1, 2), sublinear_tf=True, min_df=1, max_df=0.5)
 SX = SV.fit_transform([clean(ART[i]["title"] + " " + ART[i]["title"] + " " + ART[i]["desc"]) for i in IDS])
+print(f"  ✓ đã dựng chỉ mục tìm kiếm ({time.time() - _T0:.0f}s)", flush=True)
 
 # từ khóa đặc trưng từng chủ đề
 KEYWORDS = {c: [FEATURES[j] for j in np.argsort(CLF.coef_[k])[-14:][::-1]] for k, c in enumerate(CLASSES)}

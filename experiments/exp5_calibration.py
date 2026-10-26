@@ -17,7 +17,7 @@ from sklearn.svm import LinearSVC
 plt.rcParams["font.family"] = "DejaVu Sans"
 df, i_tr, i_va, i_te = load(); check_split(df, i_tr, i_va, i_te)
 C = load_json("tuning_results_best_svm.json")["C"]
-tun = pd.read_csv(OUT / "tuning_results.csv"); lrp = ast.literal_eval(tun[tun.model == "Logistic Regression"].best_params.iloc[0])
+lrp = max(load_json("tuning_grids.json")["Logistic Regression"], key=lambda r: r["cv_mean"])["params"]
 vec = tfidf().fit(df.text.iloc[i_tr]); A, V, T = (vec.transform(df.text.iloc[i]) for i in (i_tr, i_va, i_te))
 ytr, yva, yte = (df.label.iloc[i].values for i in (i_tr, i_va, i_te))
 svm = LinearSVC(C=C).fit(A, ytr); cls = svm.classes_
