@@ -6,13 +6,15 @@
   {% for icon, name, tech, kind, desc, href in [
    ('💬','Hỏi AI về tin tức','TF-IDF + chọn câu có dẫn nguồn','Hỏi đáp','Gõ câu hỏi, AI tìm các bài liên quan và trích đúng câu trả lời kèm nguồn; không tự bịa, không có căn cứ thì từ chối.', url_for('ask_page')),
    ('🏷️','Phân loại bài báo','TF-IDF + Linear SVM','Học có giám sát','Xếp bài vào 1 trong 11 chuyên mục. Độ chính xác 89,3% trên tập kiểm thử.', url_for('classify_page')),
+   ('↔','Gắn nhiều chuyên mục có bảo đảm','Conformal prediction (theo từng chuyên mục)','Độ tin cậy','Bài mơ hồ thì AI nêu 2–3 chuyên mục thay vì ép chọn một; bài chắc chắn chỉ 1. Bảo đảm thống kê 90 / 95 / 99%.', url_for('stats') ~ '#conf'),
    ('📝','Tóm tắt tự động','TextRank (PageRank trên đồ thị câu)','Xử lý ngôn ngữ','Rút 1–6 câu quan trọng nhất của bài hoặc đường link, kèm từ khóa và số phút đọc tiết kiệm được.', url_for('summarize_page')),
    ('🎤','Kịch bản trình bày','Hướng dẫn demo 7 phút','Hỗ trợ báo cáo','Từng bước demo, nút mở sẵn màn hình và gợi ý lời nói.', url_for('guide')),
    ('🧩','Sự kiện & chủ đề con','KMeans + TruncatedSVD','Học không giám sát','Không dùng nhãn, AI tự gom các bài cùng câu chuyện: giá vàng, SEA Games, ung thư…', url_for('events')),
    ('⚡','Bản tin nhanh 60 giây','Tóm tắt hàng loạt','Xử lý ngôn ngữ','Mỗi chuyên mục một tin nổi bật, chỉ 2 câu — đọc cả bản tin trong một phút.', url_for('digest')),
    ('🎯','Gợi ý bài đọc','Content-based (cosine TF-IDF)','Hệ gợi ý','Học sở thích từ các bài bạn đã đọc, gợi ý “Dành cho bạn” ngay ở trang chủ.', url_for('home') ~ '#foryou'),
    ('🔬','AI Lab — giải thích','Phân rã mô hình tuyến tính','Explainable AI','Xem từ nào khiến AI chọn chuyên mục; bỏ từ để thử What-if.', url_for('lab')),
-   ('🔎','Tìm kiếm thông minh','TF-IDF + cosine','Truy hồi thông tin','Tìm theo ngữ nghĩa từ khóa chứ không chỉ khớp chữ.', url_for('search')),
+   ('🔎','Tìm kiếm nâng cao','Boolean (AND/OR/NOT, trường, cụm từ) + LSA','Truy hồi thông tin','Tìm theo trường (tiêu đề, sapo, nội dung, chuyên mục), loại trừ từ, cụm từ, từ*, không phân biệt dấu; có chế độ tìm theo nghĩa và bộ lọc.', url_for('search')),
+   ('📚','Bộ sưu tập cá nhân','Lưu bài, gắn thẻ, hỏi đáp trong tập bài đã lưu','Quản lý tài liệu','Lưu bài, gắn thẻ riêng, xem thành phần chuyên mục, xuất JSON/CSV và hỏi AI trong các bài đã lưu.', url_for('library')),
    ('📊','Thống kê mô hình','Ma trận nhầm lẫn, F1','Đánh giá','Hiệu năng từng lớp, so sánh 4 thuật toán, phân tích bài AI đoán sai.', url_for('stats'))] %}
   <a class="panel tool" href="{{ href }}"><div class="big">{{ icon }}</div><span class="pill">{{ kind }}</span><h3>{{ name }}</h3><p>{{ desc }}</p><small>Kỹ thuật: <b>{{ tech }}</b></small></a>
   {% endfor %}

@@ -11,7 +11,7 @@
 </head>
 <body>
 <div class="topbar"><div class="wrap"><span>Mọi bài viết được AI tự động phân loại vào 11 chuyên mục</span>
-  <div class="r"><a href="{{ url_for('classify_page') }}">Phân loại</a><a href="{{ url_for('ask_page') }}">Hỏi AI</a><a href="{{ url_for('summarize_page') }}">Tóm tắt</a><a href="{{ url_for('events') }}">Sự kiện</a><a href="{{ url_for('digest') }}">Bản tin 60s</a><a href="{{ url_for('stats') }}">Thống kê</a><a href="{{ url_for('about') }}">Giới thiệu</a></div></div></div>
+  <div class="r"><a href="{{ url_for('classify_page') }}">Phân loại</a><a href="{{ url_for('ask_page') }}">Hỏi AI</a><a href="{{ url_for('library') }}">📚 Bộ sưu tập<span class="libcount"></span></a><a href="{{ url_for('summarize_page') }}">Tóm tắt</a><a href="{{ url_for('events') }}">Sự kiện</a><a href="{{ url_for('digest') }}">Bản tin 60s</a><a href="{{ url_for('stats') }}">Thống kê</a><a href="{{ url_for('about') }}">Giới thiệu</a></div></div></div>
 <header class="main"><div class="wrap head">
   <a class="logo" href="{{ url_for('home') }}">VnNews<small>Tin tức · AI phân loại</small></a>
   <form class="search" action="{{ url_for('search') }}"><input name="q" value="{{ q }}" placeholder="Tìm kiếm bài báo, chủ đề..." autocomplete="off"><button>Tìm</button></form>
@@ -38,6 +38,36 @@ setTheme(document.documentElement.dataset.theme);$('#theme').onclick=()=>setThem
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
 window.addEventListener('load',()=>document.querySelectorAll('i[data-w]').forEach(i=>i.style.width=i.dataset.w+'%'));
 const a=document.querySelector('nav.cats a.on');a&&a.scrollIntoView({inline:'center',block:'nearest'});
+/* Bộ sưu tập cá nhân: lưu trong trình duyệt (localStorage), không gửi lên máy chủ */
+const Lib={
+  load(){try{return JSON.parse(localStorage.getItem('vn_lib'))||{}}catch(e){return {}}},
+  save(v){try{localStorage.setItem('vn_lib',JSON.stringify(v))}catch(e){}this.badge()},
+  has(id){return String(id) in this.load()},
+  toggle(id){const v=this.load();if(String(id) in v)delete v[id];else v[id]={t:[],ts:Date.now()};this.save(v);return String(id) in v},
+  tags(id){return (this.load()[id]||{}).t||[]},
+  addTag(id,t){t=String(t).trim().slice(0,30);if(!t)return;const v=this.load();if(!v[id])return;if(!v[id].t.includes(t))v[id].t.push(t);this.save(v)},
+  delTag(id,t){const v=this.load();if(!v[id])return;v[id].t=v[id].t.filter(x=>x!==t);this.save(v)},
+  clear(){this.save({})},
+  count(){return Object.keys(this.load()).length},
+  badge(){document.querySelectorAll('.libcount').forEach(e=>e.textContent=this.count()||'')}
+};
+window.addEventListener('load',()=>Lib.badge());
+/* Tập chuyên mục có bảo đảm (conformal): chip chuyên mục + nút chọn mức 90/95/99% */
+const TOP={{ TOPICS|tojson }},CF={{ (STATS.conf or {})|tojson }},vnum=x=>String(x).replace('.',',');
+function renderSets(el,sets,main,opt){
+  opt=opt||{};if(!el)return;if(!sets||!sets['95']){el.hidden=true;return}
+  el.hidden=false;let k=opt.k||'95';
+  const draw=()=>{
+    const L=sets[k]||[],oth=L.filter(c=>c!==main),st=CF[k]||{};
+    const chips=L.map(c=>`<a class="cs-chip${c===main?' main':''}" href="/chu-de/${TOP[c][0]}">${TOP[c][1]} ${esc(c)}${c===main?'<small>AI chọn</small>':''}</a>`).join('');
+    const verdict=oth.length?`AI chưa chắc: bài này có thể thuộc ${L.length} chuyên mục.`:'Ở mức bảo đảm này AI chỉ cần nêu 1 chuyên mục.';
+    el.innerHTML=`<div class="cs-h"><b>↔ Chuyên mục có thể thuộc</b><span class="cs-tg">${['90','95','99'].map(x=>`<button type="button" data-k="${x}" class="${x===k?'on':''}">${x}%</button>`).join('')}</span></div>
+      <div class="cs-set">${chips}</div>
+      <p class="cs-note">${verdict} Mức bảo đảm ${k}%: với bài AI chưa từng thấy, tập này chứa chuyên mục đúng ở ít nhất khoảng ${k}% bài${st.coverage?` (đo trên bài kiểm thử: ${vnum(st.coverage)}%, trung bình ${vnum(st.avg_size)} chuyên mục/bài)`:''}. Đây là bảo đảm trung bình trên nhiều bài, không phải cho từng bài.${opt.note?' '+esc(opt.note):''}</p>`;
+    el.querySelectorAll('.cs-tg button').forEach(b=>b.onclick=()=>{k=b.dataset.k;draw()});
+  };
+  draw();
+}
 </script>
 {% block scripts %}{% endblock %}
 </body></html>

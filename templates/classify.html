@@ -46,9 +46,11 @@ function render(d,truth){
    ${truth?`<p class="note">Nhãn thật trong dữ liệu: <b>${esc(truth)}</b> ${truth===d.label?'✅ đúng':'❌ khác'}</p>`:''}
    <div class="sec">Xếp hạng chuyên mục</div>
    ${d.top.map(t=>`<div class="row2" style="--c:${t.color}"><span>${t.icon} ${esc(t.label)}</span><div class="track"><i data-w="${t.pct}"></i></div><em style="text-align:right;color:var(--muted)">${t.pct}%</em></div>`).join('')}
+   <div class="cs" id="rcs"></div>
    <div class="sec">Từ khóa ảnh hưởng nhiều nhất</div><div class="kw" style="margin-top:8px">${d.keywords.length?d.keywords.map(k=>`<span>${esc(k.word)}</span>`).join(''):'<small>Không có từ khóa nổi bật.</small>'}</div>
    <div class="bar-row"><a class="btn ghost sm" href="/chu-de/${d.slug}">Xem chuyên mục ${esc(d.label)} →</a><button class="btn ghost sm" id="copy">📋 Sao chép</button></div>
    <p class="note">Phân tích ${d.words} từ. Độ tin cậy là điểm tương đối giữa các chuyên mục, không phải xác suất tuyệt đối.</p>`;
+  renderSets($('#rcs'),d.sets,d.label);
   requestAnimationFrame(()=>document.querySelectorAll('#result .track i').forEach(i=>i.style.width=i.dataset.w+'%'));
   $('#copy').onclick=()=>{navigator.clipboard?.writeText(`Chuyên mục: ${d.label} (${d.pct}%) — từ khóa: ${d.keywords.map(k=>k.word).join(', ')}`);toast('Đã sao chép')};
 }

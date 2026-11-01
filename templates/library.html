@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Bộ sưu tập của tôi — VnNews{% endblock %}
+{% block content %}
+<div class="pagehead"><div class="big">📚</div><div><h1>Bộ sưu tập của tôi</h1><p>Lưu bài, gắn thẻ riêng, xuất danh sách, hỏi AI trong các bài đã lưu. Danh sách nằm trong trình duyệt của bạn (không lưu trên máy chủ); chỉ khi hỏi AI hoặc xem gợi ý thì số thứ tự bài được gửi đi để tìm.</p></div></div>
+<div id="empty" class="panel empty" hidden><div class="big">📚</div><b>Bộ sưu tập đang trống</b><p>Mở một bài báo rồi bấm “☆ Lưu vào bộ sưu tập”, hoặc bấm ☆ ở kết quả tìm kiếm. <a href="{{ url_for('search') }}?q=ngân hàng" style="text-decoration:underline">Thử tìm kiếm →</a></p></div>
+<div id="lib" hidden>
+  <div class="lib-bar"><div class="chips" id="tagbar"></div><span class="lib-act"><button class="btn ghost sm" id="exj" type="button">⬇ JSON</button><button class="btn ghost sm" id="exc" type="button">⬇ CSV</button><button class="btn ghost sm" id="clr" type="button">Xóa tất cả</button></span></div>
+  <div class="two split" style="align-items:start">
+    <div id="list"></div>
+    <div>
+      <div class="panel"><h3 style="margin:0 0 10px">Thành phần theo chuyên mục (AI xếp)</h3><div id="mix"></div></div>
+      <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 8px">💬 Hỏi AI trong bộ sưu tập</h3>
+        <form id="qf" class="askbox sm"><input id="qi" placeholder="Hỏi về các bài đã lưu…" maxlength="300" autocomplete="off"><button class="btn sm">Hỏi</button></form><div id="qo"></div></div>
+      <div class="panel" style="margin-top:20px"><h3 style="margin:0 0 8px">Gợi ý thêm từ bộ sưu tập</h3><div id="rec"><p class="note">Đang tìm…</p></div></div>
+    </div>
+  </div>
+</div>
+{% endblock %}
+{% block scripts %}
+<script>
+let items=[],tagF=null;
+const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||'Lỗi');return d});
+function hl(t,T){T=new Set(T);return t.split(/(\s+)/).map(w=>T.has(w.toLowerCase().replace(/[^\p{L}\p{N}]/gu,''))?'<mark>'+esc(w)+'</mark>':esc(w)).join('')}
+async function load(){
+  const v=Lib.load(),ids=Object.keys(v);
+  $('#empty').hidden=ids.length>0;$('#lib').hidden=!ids.length;if(!ids.length)return;
+  const d=await fetch('/api/articles?ids='+ids.join(',')).then(r=>r.json());
+  items=d.items.map(a=>({...a,t:(v[a.id]||{}).t||[],ts:(v[a.id]||{}).ts||0})).sort((a,b)=>b.ts-a.ts);
+  draw();recs();
+}
+function draw(){
+  const all=[...new Set(items.flatMap(a=>a.t))].sort();if(tagF&&!all.includes(tagF))tagF=null;
+  $('#tagbar').innerHTML=`<button class="chip ${tagF?'':'on'}" data-t="">Tất cả (${items.length})</button>`+all.map(t=>`<button class="chip ${tagF===t?'on':''}" data-t="${esc(t)}">#${esc(t)} (${items.filter(a=>a.t.includes(t)).length})</button>`).join('');
+  $('#tagbar').querySelectorAll('button').forEach(b=>b.onclick=()=>{tagF=b.dataset.t||null;draw()});
+  const show=items.filter(a=>!tagF||a.t.includes(tagF));
+  $('#list').innerHTML=show.map(a=>`<article class="lib-item"><a class="thumb" href="/bai/${a.id}"><img src="${a.img}" alt="" loading="lazy"></a><div>
+    <span class="tag aib">🤖 AI xếp: ${a.icon} ${esc(a.label)}</span>${a.others&&a.others.length?`<span class="tag xs">↔ cũng: ${a.others.slice(0,2).map(esc).join(', ')}</span>`:''}
+    <h3><a href="/bai/${a.id}">${esc(a.title)}</a></h3><p>${esc(a.desc.slice(0,170))}${a.desc.length>170?'…':''}</p>
+    <div class="ltags">${a.t.map(t=>`<span class="ltag">${esc(t)} <button type="button" data-id="${a.id}" data-d="${esc(t)}" title="Bỏ thẻ">✕</button></span>`).join('')}<input class="lt-in" data-id="${a.id}" placeholder="+ thẻ" maxlength="30"><button type="button" class="rm" data-id="${a.id}">Bỏ lưu</button></div></div></article>`).join('')||'<p class="note">Không có bài nào với thẻ này.</p>';
+  $('#list').querySelectorAll('button[data-d]').forEach(b=>b.onclick=()=>{Lib.delTag(b.dataset.id,b.dataset.d);sync()});
+  $('#list').querySelectorAll('.lt-in').forEach(i=>i.onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();Lib.addTag(i.dataset.id,i.value);sync()}});
+  $('#list').querySelectorAll('.rm').forEach(b=>b.onclick=()=>{Lib.toggle(b.dataset.id);sync(true)});
+  const cnt={};items.forEach(a=>cnt[a.label]=(cnt[a.label]||0)+1);const mx=Math.max(...Object.values(cnt));
+  $('#mix').innerHTML=Object.entries(cnt).sort((a,b)=>b[1]-a[1]).map(([k,n])=>`<div class="row2"><span>${esc(k)}</span><div class="track"><i style="width:${100*n/mx}%"></i></div><em style="text-align:right;color:var(--muted)">${n}</em></div>`).join('');
+}
+function sync(reload){const v=Lib.load();if(reload){load();return}items.forEach(a=>a.t=(v[a.id]||{}).t||[]);draw()}
+async function recs(){
+  const ids=Object.keys(Lib.load()).slice(-12);
+  try{const d=await fetch('/api/recommend?ids='+ids.join(',')).then(r=>r.json());
+   $('#rec').innerHTML=d.items.length?d.items.slice(0,5).map(a=>`<a class="mini" href="/bai/${a.id}"><div class="thumb"><img src="${a.img}" alt="" loading="lazy"></div><div><span class="tag">🤖 AI xếp: ${esc(a.label)}</span><h4>${esc(a.title)}</h4></div></a>`).join(''):'<p class="note">Chưa có gợi ý.</p>'}
+  catch(e){$('#rec').innerHTML=''}
+}
+$('#qf').onsubmit=async e=>{e.preventDefault();const q=$('#qi').value.trim();if(!q)return;$('#qo').innerHTML='<p class="note">Đang tìm trong bộ sưu tập…</p>';
+  try{const d=await post('/api/ask',{q,aids:items.map(a=>a.id)});
+   $('#qo').innerHTML=(d.abstain||!d.answers.length)?`<div class="qa-none"><b>Các bài đã lưu chưa nhắc đến điều bạn hỏi.</b><p>Thử hỏi khác hoặc <a href="/hoi-ai?q=${encodeURIComponent(q)}" style="text-decoration:underline">hỏi cả kho tin →</a></p></div>`:
+    d.answers.map(r=>`<div class="qa-row"><p>“${hl(r.text,d.terms)}”</p><a class="srcline" href="/bai/${r.id}">${r.icon} ${esc(r.label)} · ${esc(r.title)} →</a></div>`).join('')+`<p class="note">Độ chắc chắn: ${d.confidence} · AI chỉ trích câu có sẵn trong các bài bạn đã lưu.</p>`}
+  catch(err){$('#qo').innerHTML='<div class="err">'+esc(err.message)+'</div>'}};
+function dl(name,mime,text){const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:mime}));a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+$('#exj').onclick=()=>dl('bo-suu-tap.json','application/json',JSON.stringify(items.map(a=>({id:a.id,tieu_de:a.title,chuyen_muc_AI:a.label,bao_goc:a.truth,the:a.t,duong_dan:'/bai/'+a.id})),null,1));
+$('#exc').onclick=()=>{const q=s=>'"'+String(s).replace(/"/g,'""')+'"';dl('bo-suu-tap.csv','text/csv;charset=utf-8','﻿'+['id,tieu_de,chuyen_muc_AI,bao_goc,the,duong_dan'].concat(items.map(a=>[a.id,q(a.title),q(a.label),q(a.truth),q(a.t.join('; ')),'/bai/'+a.id].join(','))).join('\n'))};
+$('#clr').onclick=()=>{if(confirm('Xóa toàn bộ bộ sưu tập?')){Lib.clear();load()}};
+load();
+</script>
+{% endblock %}

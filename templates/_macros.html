@@ -1,7 +1,7 @@
 {% macro card(a, cat=True) %}
 <a class="card" href="{{ url_for('article', aid=a.id) }}" style="--c:{{ a.color }}">
   <div class="thumb"><img src="{{ a.img }}" alt="" loading="lazy"></div>
-  <span class="tag aib">🤖 AI xếp:{% if cat %} {{ a.icon }} {{ a.label }} ·{% endif %} nghiêng {{ a.pct }}%</span>{% if a.truth != a.label %}<span class="tag diff">⚠ Báo gốc: {{ a.truth }}</span>{% endif %}
+  <span class="tag aib">🤖 AI xếp:{% if cat %} {{ a.icon }} {{ a.label }} ·{% endif %} nghiêng {{ a.pct }}%</span>{% if a.truth != a.label %}<span class="tag diff">⚠ Báo gốc: {{ a.truth }}</span>{% endif %}{% if a.others %}<span class="tag xs" title="AI thấy bài này cũng có thể thuộc các chuyên mục sau (bảo đảm 95%)">↔ cũng: {% for o in a.others[:2] %}{{ TOPICS[o][1] }} {{ o }}{{ ', ' if not loop.last }}{% endfor %}</span>{% endif %}
   <h3>{{ a.title }}</h3><p>{{ a.desc }}</p>
   <div class="meta"><span>{{ a.minutes }} phút đọc</span></div>
 </a>

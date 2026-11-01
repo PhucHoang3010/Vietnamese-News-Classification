@@ -25,6 +25,12 @@ print(f"  ✓ đã nạp mô hình ({time.time() - _T0:.0f}s)", flush=True)
 VEC, CLF = model.named_steps["tfidf"], model.named_steps["clf"]
 FEATURES = np.array(VEC.get_feature_names_out())
 CLASSES = list(model.classes_)
+try:
+    import conformal                                           # dự đoán có bảo đảm: AI nêu TẬP chuyên mục (xem conformal.py, experiments/exp9_conformal.py)
+    CONF = json.loads((ROOT / "data/conformal.json").read_text(encoding="utf-8"))
+    assert CONF["classes"] == CLASSES
+except Exception:
+    CONF = None
 TEMP = 4.3          # hệ số nhiệt độ của softmax(TEMP × điểm SVM), chọn trên tập kiểm định (experiments/exp5_calibration.py): sai lệch hiệu chỉnh ECE trên tập kiểm thử giảm từ 7,6% xuống 3,2%
 
 TOPICS = {  # tên: (slug, icon, màu)
@@ -69,8 +75,14 @@ def analyze(text):
     idx = contrib.indices[np.argsort(-contrib.data)][:8] if contrib.nnz else []
     kws = [{"word": FEATURES[i], "weight": round(float(contrib[0, i]), 3)} for i in idx if contrib[0, i] > 0]
     gap = float(p[order[0]] - p[order[1]])
+    sets = None
+    if CONF:
+        sets = {}
+        for al in CONF["alphas"]:
+            m = conformal.predict_sets(s[None, :], CONF["thresholds"][str(al)])[0]
+            sets[str(round((1 - al) * 100))] = [CLASSES[j] for j in np.argsort(-s) if m[j]]
     return {"label": top[0]["label"], "icon": top[0]["icon"], "color": top[0]["color"], "slug": top[0]["slug"], "pct": top[0]["pct"],
-            "confidence": "cao" if gap > 0.5 else "trung bình" if gap > 0.2 else "thấp", "top": top, "keywords": kws, "words": len(x.split())}
+            "confidence": "cao" if gap > 0.5 else "trung bình" if gap > 0.2 else "thấp", "top": top, "keywords": kws, "words": len(x.split()), "sets": sets}
 
 
 # ---------------------------------------------------------------- dữ liệu bài báo
@@ -85,7 +97,8 @@ for r in DF.itertuples():
     desc = r.description.strip() or r.content[:200]
     ART[r.id] = {"id": r.id, "title": r.title.strip(), "desc": desc, "content": r.content, "truth": r.ground_truth, "label": pr["label"],
                  "pct": pr["pct"], "gap": pr["gap"], "test": pr["test"], "split": pr["split"], "slug": TOPICS[pr["label"]][0], "icon": TOPICS[pr["label"]][1],
-                 "color": TOPICS[pr["label"]][2], "img": f"/img/{r.id}.svg", "minutes": max(1, round(len(r.content.split()) / 200))}
+                 "color": TOPICS[pr["label"]][2], "img": f"/img/{r.id}.svg", "minutes": max(1, round(len(r.content.split()) / 200)),
+                 "sets": pr.get("sets") or {}, "mg": pr.get("mg") or {}, "others": [c for c in (pr.get("sets") or {}).get("95", []) if c != pr["label"]]}
 ORDER = list(ART)
 random.Random(7).shuffle(ORDER)                       # thứ tự cố định nhưng trộn đều các chủ đề
 BY_TOPIC = {t: [i for i in ORDER if ART[i]["label"] == t] for t in TOPICS}
@@ -120,8 +133,26 @@ def _cal(sel):
 # "mức nghiêng" của AI đáng tin đến đâu (đo trên tập kiểm thử): dùng để giải thích phần trăm hiển thị
 STATS["cal_hi"] = _cal([a for a in _t if a["pct"] >= 95])
 STATS["cal_lo"] = _cal([a for a in _t if a["pct"] < 50])
-try:
-    BENCH = list(csv.DictReader(open(ROOT / "outputs/so_sanh_mo_hinh.csv", encoding="utf-8")))
+
+
+def _conf_stats():
+    """Độ phủ thực tế của tập chuyên mục có bảo đảm trên các bài kiểm thử (đo lại từ dữ liệu, không ghi cứng)."""
+    out = {}
+    for k in ("90", "95", "99"):
+        ts = [a for a in _t if a["sets"].get(k)]
+        if not ts:
+            continue
+        hit = [a["truth"] in a["sets"][k] for a in ts]; size = [len(a["sets"][k]) for a in ts]; one = [z == 1 for z in size]
+        out[k] = {"target": int(k), "coverage": round(100 * float(np.mean(hit)), 1), "avg_size": round(float(np.mean(size)), 2), "single": round(100 * float(np.mean(one))),
+                  "single_acc": round(100 * float(np.mean([h for h, o in zip(hit, one) if o])), 1) if any(one) else None,
+                  "wrong": sum(a["label"] != a["truth"] for a in ts), "rescued": sum(a["label"] != a["truth"] and h for a, h in zip(ts, hit))}
+    return out
+
+
+STATS["conf"] = _conf_stats() if CONF else {}
+try:       # bảng so sánh công bằng: mọi mô hình đều được chỉnh tham số bằng CV 5-fold (experiments/exp1_tuning.py)
+    BENCH = [r for r in csv.DictReader(open(ROOT / "outputs/experiments/tuning_final.csv", encoding="utf-8-sig")) if not r["model"].startswith("Đoán")]
+    BENCH.sort(key=lambda r: -float(r["cv_macro_f1_mean"]))
 except Exception:
     BENCH = []
 
@@ -344,6 +375,24 @@ def clusters():
 
 
 # ---------------------------------------------------------------- trang
+_DEMO = []
+
+
+def pick_demo():
+    """Bài mẫu cho ô phân loại ở trang chủ: bài kiểm thử AI xếp đúng, mơ hồ giữa 2 chuyên mục (để thấy ngay tập chuyên mục có bảo đảm)."""
+    if _DEMO:
+        return _DEMO[0]
+    if CONF:
+        for i in ORDER:
+            a = ART[i]
+            if a["test"] and a["label"] == a["truth"] and len(a["sets"].get("95", [])) == 2 and a["pct"] < 97:
+                r = analyze((a["title"] + ". " + a["desc"] + " " + a["content"])[:900])          # đúng đoạn văn sẽ hiện ở ô nhập
+                if r and r["label"] == a["truth"] and r["sets"] and len(r["sets"]["95"]) == 2:
+                    _DEMO.append(a); return a
+    _DEMO.append(None)
+    return None
+
+
 @app.get("/")
 def home():
     feat = {t: BY_TOPIC[t] for t in TOPICS}
@@ -351,10 +400,11 @@ def home():
     hero_ids = [first_test(t) for t in ("Thời sự", "Thể thao", "Kinh doanh", "Khoa học", "Sức khỏe")]
     latest = [i for i in ORDER if i not in hero_ids][:8]
     sections = [(t, cards(feat[t][1:5])) for t in ("Thời sự", "Kinh doanh", "Thể thao", "Giáo dục", "Sức khỏe", "Khoa học")]
-    ok_ex = next(ART[i] for i in feat["Thế giới"] if ART[i]["test"] and ART[i]["label"] == ART[i]["truth"])
+    ok_ex = pick_demo() or next(ART[i] for i in feat["Thế giới"] if ART[i]["test"] and ART[i]["label"] == ART[i]["truth"])
     wrong = sorted([a for a in ART.values() if a["test"] and a["label"] != a["truth"]], key=lambda a: a["pct"])
     bad_ex = wrong[len(wrong) // 2]                                                           # một bài AI sai điển hình (độ nghiêng trung vị)
-    return render_template("home.html", hero=ART[hero_ids[0]], side=cards(hero_ids[1:]), latest=cards(latest), sections=sections, keywords=KEYWORDS, ok_ex=ok_ex, bad_ex=bad_ex, demo_text=(ok_ex["title"] + ". " + ok_ex["desc"] + " " + ok_ex["content"])[:900])
+    saved = sorted([a for a in ART.values() if a["test"] and a["label"] != a["truth"] and len(a["sets"].get("95", [])) == 2 and a["truth"] in a["sets"]["95"]], key=lambda a: -a["pct"])[:3]   # AI chọn sai nhưng tập chuyên mục vẫn chứa đáp án đúng
+    return render_template("home.html", hero=ART[hero_ids[0]], side=cards(hero_ids[1:]), latest=cards(latest), sections=sections, keywords=KEYWORDS, ok_ex=ok_ex, bad_ex=bad_ex, saved=saved, demo_text=(ok_ex["title"] + ". " + ok_ex["desc"] + " " + ok_ex["content"])[:900])
 
 
 @app.get("/chu-de/<slug>")
@@ -362,9 +412,10 @@ def category(slug):
     name = SLUG.get(slug) or abort(404)
     all_ids = BY_TOPIC[name]
     loc = request.args.get("loc", "all")
-    ids = {"test": [i for i in all_ids if ART[i]["test"]], "sai": [i for i in all_ids if ART[i]["label"] != ART[i]["truth"]]}.get(loc, all_ids)
-    loc = loc if loc in ("test", "sai") else "all"
-    counts = {"all": len(all_ids), "test": sum(ART[i]["test"] for i in all_ids), "sai": sum(ART[i]["label"] != ART[i]["truth"] for i in all_ids)}
+    cross = sorted((i for i in ORDER if ART[i]["label"] != name and name in ART[i]["sets"].get("95", [])), key=lambda i: ART[i]["mg"].get(name, 99))   # bài AI xếp mục khác nhưng "cũng có thể thuộc" mục này; sát nút nhất lên đầu
+    ids = {"test": [i for i in all_ids if ART[i]["test"]], "sai": [i for i in all_ids if ART[i]["label"] != ART[i]["truth"]], "giao-thoa": cross}.get(loc, all_ids)
+    loc = loc if loc in ("test", "sai", "giao-thoa") else "all"
+    counts = {"all": len(all_ids), "test": sum(ART[i]["test"] for i in all_ids), "sai": sum(ART[i]["label"] != ART[i]["truth"] for i in all_ids), "gt": len(cross)}
     page = max(1, request.args.get("page", 1, type=int)); pages = max(1, math.ceil(len(ids) / PER_PAGE))
     return render_template("category.html", name=name, meta=TOPICS[name], items=cards(ids[(page - 1) * PER_PAGE: page * PER_PAGE]),
                            page=page, pages=pages, total=len(all_ids), shown=len(ids), loc=loc, counts=counts, keywords=KEYWORDS[name])
@@ -389,17 +440,54 @@ def article(aid):
 
 @app.get("/tim-kiem")
 def search():
-    qq = request.args.get("q", "").strip(); topic = request.args.get("topic", "")
-    results = []
+    """Tìm kiếm: (1) theo từ khóa (TF-IDF), (2) theo nghĩa (trộn TF-IDF + LSA), (3) nâng cao tự bật khi truy vấn có AND/OR/NOT, "cụm từ", từ*, trường:."""
+    qq = request.args.get("q", "").strip(); topic = request.args.get("topic", ""); mode = "nghia" if request.args.get("mode") == "nghia" else "tu-khoa"
+    f = {"chac": request.args.get("chac") == "1", "gt": request.args.get("gt") == "1", "nhanh": request.args.get("nhanh") == "1"}
+    results, snips, info, err, terms = [], {}, {}, None, []
+    t0 = time.time()
     if qq:
-        qv = SV.transform([clean(qq)]); sc = (SX @ qv.T).toarray().ravel()
-        low = qq.lower()
-        for n in np.argsort(-sc)[:200]:
-            a = ART[IDS[n]]
-            s = sc[n] + (0.5 if low in a["title"].lower() else 0)
-            if s > 0.02 and (not topic or a["label"] == topic): results.append((s, a))
-        results = [a for _, a in sorted(results, key=lambda x: -x[0])][:40]
-    return render_template("search.html", qq=qq, results=results, topic=topic)
+        try:
+            if search_tools.is_advanced(qq):
+                if not BOOL_READY.wait(180) or BOOL["idx"] is None:
+                    raise RuntimeError("Chỉ mục tìm kiếm nâng cao chưa sẵn sàng, hãy thử lại sau vài giây.")
+                mask, tree = BOOL["idx"].search(qq)
+                terms = search_tools.positive_terms(tree); info["parsed"] = search_tools.explain(tree); info["kind"] = "Boolean"
+                cand = np.flatnonzero(mask)
+                if terms and len(cand):
+                    qv = SV.transform([clean(" ".join(t for t, _ in terms))]); sc = (SX[cand] @ qv.T).toarray().ravel()
+                    order = [(float(x), int(j)) for x, j in zip(sc, cand)]; order.sort(key=lambda z: -z[0])
+                else:
+                    order = [(0.0, int(j)) for j in cand]
+            elif mode == "nghia":
+                if not SEM_READY.wait(180) or SEM["obj"] is None:
+                    raise RuntimeError("Chỉ mục tìm theo nghĩa chưa sẵn sàng, hãy thử lại sau vài giây.")
+                sc = SEM["obj"].scores(clean(qq)); info["kind"] = "Theo nghĩa (70% từ khóa + 30% LSA)"
+                order = [(float(sc[n]), int(n)) for n in np.argsort(-sc)[:300] if sc[n] > 0.03]
+                terms = [(w, False) for w in qq.split()]
+            else:
+                qv = SV.transform([clean(qq)]); sc = (SX @ qv.T).toarray().ravel(); low = qq.lower(); info["kind"] = "Theo từ khóa (TF-IDF)"
+                order = []
+                for n in np.argsort(-sc)[:300]:
+                    s_ = sc[n] + (0.5 if low in ART[IDS[n]]["title"].lower() else 0)
+                    if s_ > 0.02: order.append((float(s_), int(n)))
+                order.sort(key=lambda z: -z[0]); terms = [(w, False) for w in qq.split()]
+            keep = []
+            for _, n in order:
+                a = ART[IDS[n]]
+                if topic and a["label"] != topic: continue
+                if f["chac"] and a["pct"] < 95: continue
+                if f["gt"] and not a["others"]: continue
+                if f["nhanh"] and a["minutes"] > 3: continue
+                keep.append(a)
+            info["total"] = len(keep); results = keep[:40]
+            snips = {a["id"]: snippet(a, terms) for a in results}
+        except search_tools.QueryError as e:
+            err = str(e)
+        except RuntimeError as e:
+            err = str(e)
+    info["ms"] = round((time.time() - t0) * 1000)
+    params = {"q": qq or None, "topic": topic or None, "mode": "nghia" if mode == "nghia" else None, **{k: ("1" if v else None) for k, v in f.items()}}
+    return render_template("search.html", qq=qq, results=results, snips=snips, topic=topic, mode=mode, f=f, info=info, err=err, params=params)
 
 
 @app.get("/phan-loai")
@@ -654,9 +742,9 @@ def _build_qa_index():
 threading.Thread(target=_build_qa_index, daemon=True).start()
 
 
-def qa_answer(q, aid=None, ka=8, ks=3):
+def qa_answer(q, aid=None, ka=8, ks=3, aids=None):
     """Trả lời câu hỏi bằng cách (1) tìm các bài liên quan, (2) chọn các CÂU giống câu hỏi nhất trong các bài đó và dẫn nguồn.
-    Nếu aid được đưa ra thì chỉ tìm trong bài đó."""
+    Nếu aid được đưa ra thì chỉ tìm trong bài đó; nếu aids (danh sách bài, vd. bộ sưu tập của người dùng) thì chỉ tìm trong các bài đó."""
     qfull = clean(q)
     if len(qfull.split()) < 2:
         raise ValueError("Hãy nhập câu hỏi dài hơn một chút (ít nhất 2 từ).")
@@ -666,7 +754,12 @@ def qa_answer(q, aid=None, ka=8, ks=3):
     qc = " ".join(w for w in qfull.split() if w not in _STOPQ) or qfull
     qv = VEC.transform([qc])
     s = QA_W_CONTENT * (QA["AX"] @ qv.T).toarray().ravel() + QA_W_TITLE * (SX @ SV.transform([qc]).T).toarray().ravel()
-    cand = [IDX[aid]] if aid is not None else [int(j) for j in np.argsort(-s)[:ka] if s[j] > 0]
+    if aid is not None:
+        cand = [IDX[aid]]
+    elif aids:
+        cand = [j for _, j in sorted(((float(s[IDX[i]]), IDX[i]) for i in aids if i in IDX), reverse=True)[:ka] if s[j] > 0]
+    else:
+        cand = [int(j) for j in np.argsort(-s)[:ka] if s[j] > 0]
     top_s = float(s[cand[0]]) if cand else 0.0
     smax = float(s.max()) or 1.0
     rows = []
@@ -706,10 +799,23 @@ def qa_answer(q, aid=None, ka=8, ks=3):
         lab, w = vote.most_common(1)[0]
         cat = {"label": lab, "icon": TOPICS[lab][1], "share": round(100 * w / sum(vote.values()))}
     src = [ART[IDS[j]] for j in cand[:4]]
-    return {"q": q, "scope": "bài" if aid is not None else "kho", "abstain": bool(abstain), "confidence": conf, "top_score": round(top_s, 3), "ms": round((time.time() - t0) * 1000),
+    return {"q": q, "scope": "bài" if aid is not None else "bộ sưu tập" if aids else "kho", "abstain": bool(abstain), "confidence": conf, "top_score": round(top_s, 3), "ms": round((time.time() - t0) * 1000),
             "cat": cat,
             "terms": [w for w in qc.split() if len(w) > 1], "answers": ans,
             "sources": [{"id": a["id"], "title": a["title"], "label": a["label"], "icon": a["icon"], "img": a["img"], "minutes": a["minutes"]} for a in src]}
+
+
+@app.get("/bo-suu-tap")
+def library():
+    return render_template("library.html")
+
+
+@app.get("/api/articles")
+def api_articles():
+    """Thông tin rút gọn của các bài theo id (dùng cho Bộ sưu tập; danh sách id nằm trong trình duyệt của người dùng)."""
+    ids = [int(i) for i in request.args.get("ids", "").split(",") if i.isdigit() and int(i) in ART][:120]
+    keep = ("id", "title", "desc", "label", "icon", "img", "minutes", "pct", "truth", "others", "split")
+    return jsonify(items=[{k: ART[i][k] for k in keep} for i in ids])
 
 
 @app.get("/hoi-ai")
@@ -723,12 +829,57 @@ def api_ask():
     aid = d.get("aid")
     if aid is not None and (not isinstance(aid, int) or aid not in ART):
         return jsonify(error="Bài viết không tồn tại."), 400
+    aids = d.get("aids")
+    if aids is not None:
+        if not isinstance(aids, list) or len(aids) > 120 or not all(isinstance(i, int) for i in aids):
+            return jsonify(error="Danh sách bài không hợp lệ."), 400
+        aids = [i for i in aids if i in ART]
+        if not aids:
+            return jsonify(error="Bộ sưu tập đang trống."), 400
     try:
-        return jsonify(qa_answer(str(d.get("q", ""))[:300], aid))
+        return jsonify(qa_answer(str(d.get("q", ""))[:300], aid, aids=aids))
     except ValueError as e:
         return jsonify(error=str(e)), 400
     except RuntimeError as e:
         return jsonify(error=str(e)), 503
+
+
+# ---------------------------------------------------------------- Tìm kiếm nâng cao: chỉ mục Boolean theo trường + chỉ mục tìm theo nghĩa (dựng ở luồng nền)
+import search_tools
+from markupsafe import Markup, escape
+BOOL, SEM = {"idx": None}, {"obj": None}
+BOOL_READY, SEM_READY = threading.Event(), threading.Event()
+
+
+def _build_search_indexes():
+    try:
+        BOOL["idx"] = search_tools.BoolIndex([{"title": ART[i]["title"], "desc": ART[i]["desc"], "content": ART[i]["content"], "label": ART[i]["label"]} for i in IDS])
+    finally:
+        BOOL_READY.set()
+    try:
+        SEM["obj"] = search_tools.Semantic([clean(ART[i]["title"] + " " + ART[i]["desc"] + " " + ART[i]["content"]) for i in IDS])
+    finally:
+        SEM_READY.set()
+
+
+threading.Thread(target=_build_search_indexes, daemon=True).start()
+
+
+def snippet(a, terms, n=240):
+    """Câu đầu tiên chứa nhiều từ khóa nhất (tô sáng bằng <mark>); không có từ khóa thì lấy sapo."""
+    words, prefixes = set(), []
+    for t, _ in terms:
+        for w in search_tools.fold(t, star=True).split():
+            (prefixes.append(w[:-1]) if w.endswith("*") and len(w) > 2 else words.add(w.strip("*")))
+    hit = lambda tk: (lambda g: g in words or any(g.startswith(p) for p in prefixes))(search_tools.fold(tk))
+    best, best_k = a["desc"], 0
+    if words or prefixes:
+        for sent in split_sentences(a["desc"] + "\n" + a["content"])[:80]:
+            k = len({g for g in search_tools.fold(sent).split() if g in words or any(g.startswith(p) for p in prefixes)})
+            if k > best_k:
+                best, best_k = sent, k
+    best = best if len(best) <= n else best[:n].rsplit(" ", 1)[0] + "…"
+    return Markup("".join(f"<mark>{escape(tk)}</mark>" if re.match(r"\w", tk) and hit(tk) else str(escape(tk)) for tk in re.findall(r"\w+|\W+", best)))
 
 
 # ---------------------------------------------------------------- kịch bản trình bày

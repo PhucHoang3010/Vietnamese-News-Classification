@@ -1,0 +1,13 @@
+{
+ "n_queries_checked": 100,
+ "n_match": 100,
+ "n_queries_timed": 600,
+ "ms_mean": 5.318437628334323,
+ "ms_p95": 21.00308109995693,
+ "median_hits": 5,
+ "examples": [
+  "giá vàng AND (tăng OR giảm) NOT bitcoin",
+  "tieude:\"thuế\" noidung:ngân hàng",
+  "chuyenmuc:\"Thể thao\" bóng*"
+ ]
+}

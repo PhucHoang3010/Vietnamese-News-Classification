@@ -1,12 +1,43 @@
 {% extends "base.html" %}{% from "_macros.html" import card, sidebar with context %}
-{% block title %}Tìm kiếm: {{ qq }} — VnNews{% endblock %}
+{% block title %}Tìm kiếm{{ ': ' ~ qq if qq }} — VnNews{% endblock %}
+{% macro u() %}{{ url_for('search', **dict(params, **kwargs)) }}{% endmacro %}
 {% block content %}
 <div class="layout"><div>
-  <div class="sec-h"><h2>Kết quả cho “{{ qq }}”</h2><a>{{ results|length }} bài</a></div>
+  <form class="sform" action="{{ url_for('search') }}" method="get">
+    <div class="askbox"><input name="q" value="{{ qq }}" placeholder="Từ khóa, hoặc nâng cao: giá vàng AND (tăng OR giảm) NOT bitcoin" autocomplete="off" maxlength="300"><button class="btn">Tìm</button></div>
+    <div class="sopt">
+      <label><input type="radio" name="mode" value="tu-khoa" {{ 'checked' if mode != 'nghia' }}> Theo từ khóa</label>
+      <label title="Trộn 70% khớp từ khóa với 30% độ gần nghĩa (LSA): kết quả cùng chủ đề hơn"><input type="radio" name="mode" value="nghia" {{ 'checked' if mode == 'nghia' }}> Theo nghĩa</label>
+      <span class="sep"></span>
+      <label><input type="checkbox" name="chac" value="1" {{ 'checked' if f.chac }}> AI nghiêng ≥ 95%</label>
+      <label title="Bài AI thấy có thể thuộc nhiều chuyên mục (bảo đảm 95%)"><input type="checkbox" name="gt" value="1" {{ 'checked' if f.gt }}> Chỉ bài giao thoa ↔</label>
+      <label><input type="checkbox" name="nhanh" value="1" {{ 'checked' if f.nhanh }}> Đọc ≤ 3 phút</label>
+      {% if topic %}<input type="hidden" name="topic" value="{{ topic }}">{% endif %}
+    </div>
+  </form>
+  <details class="shelp" {{ 'open' if err }}><summary>Cú pháp tìm kiếm nâng cao</summary>
+    <table>
+      <tr><td><code>giá vàng AND (tăng OR giảm)</code></td><td>AND / OR / NOT viết HOA; hai từ đứng cạnh nhau hiểu là AND; dùng ngoặc đơn để nhóm</td></tr>
+      <tr><td><code>giá vàng NOT bitcoin</code> hoặc <code>-bitcoin</code></td><td>loại bài có từ đó</td></tr>
+      <tr><td><code>"thuế thu nhập"</code></td><td>cụm từ: các từ phải đứng liền nhau</td></tr>
+      <tr><td><code>bóng*</code></td><td>mọi từ bắt đầu bằng “bóng”</td></tr>
+      <tr><td><code>tieude:thuế noidung:ngân hàng</code></td><td>tìm theo trường: <code>tieude</code> (tiêu đề), <code>sapo</code>, <code>noidung</code>, <code>chuyenmuc</code> (chuyên mục AI xếp)</td></tr>
+      <tr><td><code>chuyenmuc:"Thể thao" bóng*</code></td><td>kết hợp trường, cụm từ và ký tự đại diện</td></tr>
+    </table>
+    <p class="note">Không phân biệt dấu (“gia vang” tìm được “giá vàng”). Kết quả khớp được xếp theo độ giống TF-IDF với các từ khóa.</p>
+  </details>
+  {% if err %}<div class="err">{{ err }}</div>{% endif %}
+  {% if qq and not err %}
+  {% if info.parsed %}<p class="parsed">Hiểu truy vấn là: <code>{{ info.parsed }}</code></p>{% endif %}
+  <div class="sec-h"><h2>Kết quả cho “{{ qq }}”</h2><a>{% if info.kind == 'Boolean' %}{{ info.total or 0 }} bài khớp{% if results|length < (info.total or 0) %} (hiện {{ results|length }} bài đầu){% endif %}{% else %}{{ results|length }} kết quả đầu{% endif %} · {{ info.kind }} · {{ info.ms }} ms</a></div>
   <div class="chips" style="margin-bottom:18px">
-    <a class="chip" style="{{ 'border-color:var(--brand);color:var(--brand)' if not topic }}" href="?q={{ qq|urlencode }}">Tất cả</a>
-    {% for n in NAV %}<a class="chip" style="--c:{{ n.color }};{{ 'border-color:var(--c);color:var(--c)' if topic==n.name }}" href="?q={{ qq|urlencode }}&topic={{ n.name|urlencode }}">{{ n.name }}</a>{% endfor %}</div>
-  {% if results %}<div class="grid2">{% for a in results %}{{ card(a) }}{% endfor %}</div>
-  {% else %}<div class="panel empty"><div class="big">🔎</div><b>{{ 'Không tìm thấy bài phù hợp.' if qq else 'Hãy nhập từ khóa để tìm kiếm.' }}</b><p>Thử từ khóa khác, ví dụ: <a href="?q=ngân hàng" style="color:var(--brand)">ngân hàng</a>, <a href="?q=bóng đá" style="color:var(--brand)">bóng đá</a>, <a href="?q=học sinh" style="color:var(--brand)">học sinh</a>.</p></div>{% endif %}
+    <a class="chip" style="{{ 'border-color:var(--brand);color:var(--brand)' if not topic }}" href="{{ u(topic=None) }}">Tất cả</a>
+    {% for n in NAV %}<a class="chip" style="--c:{{ n.color }};{{ 'border-color:var(--c);color:var(--c)' if topic==n.name }}" href="{{ u(topic=n.name) }}">{{ n.name }}</a>{% endfor %}</div>
+  {% if results %}<div class="grid2">{% for a in results %}<div class="sr"><button type="button" class="star" data-id="{{ a.id }}" title="Lưu vào bộ sưu tập">☆</button>{{ card(a) }}{% if snips.get(a.id) %}<p class="snip">{{ snips[a.id] }}</p>{% endif %}</div>{% endfor %}</div>
+  {% else %}<div class="panel empty"><div class="big">🔎</div><b>Không tìm thấy bài phù hợp.</b><p>Thử bớt toán tử hoặc bộ lọc, hoặc tìm theo nghĩa: <a href="?q={{ 'ngân hàng'|urlencode }}&mode=nghia" style="color:var(--brand)">ngân hàng</a>, <a href="?q={{ 'bóng đá'|urlencode }}" style="color:var(--brand)">bóng đá</a>, <a href="?q={{ 'học sinh AND (thi OR điểm)'|urlencode }}" style="color:var(--brand)">học sinh AND (thi OR điểm)</a>.</p></div>{% endif %}
+  {% elif not qq %}<div class="panel empty"><div class="big">🔎</div><b>Hãy nhập từ khóa để tìm kiếm.</b><p>Ví dụ: <a href="?q={{ 'ngân hàng'|urlencode }}" style="color:var(--brand)">ngân hàng</a>, <a href="?q={{ 'bóng đá'|urlencode }}&mode=nghia" style="color:var(--brand)">bóng đá (theo nghĩa)</a>, <a href="?q={{ 'giá vàng AND (tăng OR giảm) NOT bitcoin'|urlencode }}" style="color:var(--brand)">giá vàng AND (tăng OR giảm) NOT bitcoin</a>, <a href="?q={{ 'chuyenmuc:"Thể thao" bóng*'|urlencode }}" style="color:var(--brand)">chuyenmuc:"Thể thao" bóng*</a>.</p></div>{% endif %}
 </div>{{ sidebar() }}</div>
 {% endblock %}
+{% block scripts %}<script>
+document.querySelectorAll('.star').forEach(b=>{const id=b.dataset.id,paint=()=>{const on=Lib.has(id);b.textContent=on?'★':'☆';b.classList.toggle('on',on)};paint();b.onclick=()=>{Lib.toggle(id);paint();toast(Lib.has(id)?'Đã lưu vào bộ sưu tập':'Đã bỏ lưu')}});
+</script>{% endblock %}

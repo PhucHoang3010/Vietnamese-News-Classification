@@ -7,6 +7,7 @@
   <a class="tag" href="{{ url_for('category', slug=a.slug) }}">{{ a.icon }} {{ a.label }} · AI xếp</a>
   <h1>{{ a.title }}</h1>
   <div class="byline"><span>{{ a.minutes }} phút đọc</span></div>
+  <div class="libbar"><button type="button" class="btn ghost sm" id="libbtn">☆ Lưu vào bộ sưu tập</button><span class="libtags" id="libtags"></span></div>
   <section class="cls">
     {% if a.truth != a.label %}<div class="cls-flag bad">⚠ <b>AI khác báo gốc.</b> Báo gốc xếp bài này vào “{{ a.truth }}”. AI chọn “{{ a.label }}” ({{ a.pct }}%){% if truth_rank %}; “{{ a.truth }}” đứng thứ {{ truth_rank }} ({{ truth_pct }}%){% endif %}. Trên {{ STATS.n_test }} bài kiểm thử, AI xếp khác báo gốc ở {{ STATS.n_err }} bài ({{ (100 * STATS.n_err / STATS.n_test)|round(1) }}%).</div>
     {% else %}<div class="cls-flag ok">✓ <b>Trùng báo gốc.</b> Báo gốc cũng xếp bài này vào “{{ a.truth }}”.{% if a.split == 'train' %} (Bài này AI đã học nên không tính vào độ chính xác.){% endif %}</div>{% endif %}
@@ -15,6 +16,7 @@
       <div class="cls-res"><span class="big">{{ a.icon }}</span><div><small>Chuyên mục AI chọn</small><b>{{ a.label }}</b></div><div class="cls-pct">{{ a.pct }}<small>%</small></div></div>
       <div class="cls-bars">{% if res %}{% for t in res.top[:3] %}<div class="r"><span>{{ t.icon }} {{ t.label }}</span><div class="t"><i data-w="{{ t.pct }}"></i></div><em>{{ t.pct }}%</em></div>{% endfor %}{% endif %}</div>
     </div>
+    <div class="cs" id="cs"></div>
     <p class="cls-lean">% là mức nghiêng của AI giữa 11 chuyên mục, đã hiệu chỉnh trên tập kiểm định nên khá sát tỉ lệ đúng thực tế (lệch trung bình ≈ 3 điểm %), <b>nhưng không phải xác suất tuyệt đối</b>. Trên {{ STATS.n_test }} bài kiểm thử: AI hiện từ 95% trở lên thì đúng {{ STATS.cal_hi.acc }}% ({{ STATS.cal_hi.n }} bài); dưới 50% chỉ đúng {{ STATS.cal_lo.acc }}% ({{ STATS.cal_lo.n }} bài).</p>
     {% if why %}<div class="cls-why"><small>Từ/cụm từ đẩy AI về mục này nhiều nhất:</small>{% for w in why %}<span>{{ w }}</span>{% endfor %}</div>{% endif %}
     <div class="cls-foot">
@@ -36,6 +38,17 @@
 </div>{{ sidebar() }}</div>
 {% endblock %}
 {% block scripts %}<script>
+const libSugg={{ ([a.label] + kws[:3])|tojson }};
+function drawLib(){
+  const id={{ a.id }},on=Lib.has(id);$('#libbtn').textContent=on?'★ Đã lưu · bấm để bỏ lưu':'☆ Lưu vào bộ sưu tập';$('#libbtn').classList.toggle('on',on);
+  const box=$('#libtags');if(!on){box.innerHTML='';return}
+  const tg=Lib.tags(id);
+  box.innerHTML=tg.map(t=>`<span class="ltag">${esc(t)} <button type="button" data-d="${esc(t)}" title="Bỏ thẻ">✕</button></span>`).join('')+`<input id="ltin" placeholder="+ thẻ, bấm Enter" maxlength="30" list="ltsug"><datalist id="ltsug">${libSugg.filter(x=>!tg.includes(x)).map(x=>`<option value="${esc(x)}">`).join('')}</datalist><a class="ltgo" href="/bo-suu-tap">Mở bộ sưu tập →</a>`;
+  box.querySelectorAll('button[data-d]').forEach(b=>b.onclick=()=>{Lib.delTag(id,b.dataset.d);drawLib()});
+  $('#ltin').onkeydown=e=>{if(e.key==='Enter'){e.preventDefault();Lib.addTag(id,e.target.value);drawLib();$('#ltin').focus()}};
+}
+$('#libbtn').onclick=()=>{Lib.toggle({{ a.id }});drawLib()};drawLib();
+renderSets($('#cs'),{{ a.sets|tojson }},{{ a.label|tojson }},{note:{{ ('Bài này AI đã học nên tập được tính bằng dự đoán chéo: mô hình chấm bài này chưa từng thấy nó.' if a.split == 'train' else '')|tojson }}});
 (()=>{const aid={{ a.id }};
  const post=(u,b)=>fetch(u,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(b)}).then(async r=>{const d=await r.json();if(!r.ok)throw new Error(d.error||'Lỗi');return d});
  function hl(t,T){T=new Set(T);return t.split(/(\s+)/).map(w=>T.has(w.toLowerCase().replace(/[^\p{L}\p{N}]/gu,''))?'<mark>'+esc(w)+'</mark>':esc(w)).join('')}

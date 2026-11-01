@@ -20,15 +20,20 @@
     {% for p in per %}<tr><td>{{ TOPICS[p.name][1] }} {{ p.name }}</td><td class="num">{{ '%.2f'|format(p.p) }}</td><td class="num">{{ '%.2f'|format(p.r) }}</td>
       <td class="num"><b style="color:{{ 'var(--brand)' if p.f1>=0.9 else 'inherit' }}">{{ '%.2f'|format(p.f1) }}</b></td></tr>{% endfor %}</table></div>
 </div>
+{% if STATS.conf %}<div class="panel" id="conf" style="margin-bottom:20px"><h3 style="margin-top:0">↔ Dự đoán có bảo đảm: AI nêu tập chuyên mục thay vì ép chọn một</h3>
+  <p class="note" style="margin-top:0">AI chọn đúng {{ (STATS.acc*100)|round(1) }}% khi chỉ được nêu 1 chuyên mục. Nếu cho phép nêu thêm chuyên mục khi chưa chắc, ta được <b>bảo đảm thống kê</b> (conformal prediction): bài mới có chuyên mục đúng nằm trong tập với xác suất ít nhất bằng mức đặt ra. Dưới đây là kết quả đo lại trên {{ STATS.n_test }} bài kiểm thử.</p>
+  <table><tr><th>Mức bảo đảm</th><th class="num">Độ phủ thực tế</th><th class="num">Chuyên mục/bài</th><th class="num">Bài chỉ 1 chuyên mục</th><th class="num">Trong đó AI đúng</th><th class="num">Bài AI đoán sai được cứu</th></tr>
+  {% for k in ['90','95','99'] if STATS.conf.get(k) %}{% set c = STATS.conf[k] %}<tr><td><b>{{ k }}%</b></td><td class="num">{{ c.coverage }}%</td><td class="num">{{ c.avg_size }}</td><td class="num">{{ c.single }}%</td><td class="num">{{ c.single_acc }}%</td><td class="num">{{ c.rescued }}/{{ c.wrong }}</td></tr>{% endfor %}</table>
+  <p class="note">Hiệu chỉnh trên 4.675 bài AI chưa từng thấy (kiểm định + dự đoán chéo của bài huấn luyện), ngưỡng riêng cho từng chuyên mục. “Được cứu” = AI chọn sai nhưng chuyên mục đúng nằm trong tập. Bảo đảm là trung bình trên nhiều bài mới, không phải cho từng bài. Xem <a href="{{ url_for('category', slug='thoi-su') }}?loc=giao-thoa" style="text-decoration:underline">các bài giao thoa</a>.</p></div>{% endif %}
 <div class="panel" style="margin-bottom:20px"><h3 style="margin-top:0">Ma trận nhầm lẫn (hàng = thực tế, cột = AI dự đoán)</h3>
   <div class="cm"><table><tr><th></th>{% for c in classes %}<th>{{ c }}</th>{% endfor %}</tr>
   {% for row in cm %}{% set ri = loop.index0 %}{% set mx = row|max %}<tr><td class="lab">{{ classes[ri] }}</td>
     {% for v in row %}<td style="{% if v %}color:{{ 'var(--on-brand)' if (loop.index0==ri and v/mx>0.5) else 'inherit' }};background:color-mix(in srgb,{{ 'var(--brand)' if loop.index0==ri else '#888' }} {{ ((v/mx)*(100 if loop.index0==ri else 70))|round|int }}%,transparent){% endif %}">{{ v if v else '' }}</td>{% endfor %}</tr>{% endfor %}</table></div>
   <p class="note">Đường chéo (đen) là số bài dự đoán đúng; ô xám là các cặp hay bị nhầm, ví dụ Kinh doanh ↔ Khoa học, Thời sự ↔ Đời sống.</p></div>
 <div class="two">
-  <div class="panel"><h3 style="margin-top:0">So sánh thuật toán (tập kiểm định)</h3>
-    <table><tr><th>Mô hình</th><th class="num">Accuracy</th><th class="num">Macro-F1</th></tr>{% for b in bench %}<tr><td>{{ b.model }}</td><td class="num">{{ '%.3f'|format(b.val_acc|float) }}</td><td class="num">{{ '%.3f'|format(b.val_macro_f1|float) }}</td></tr>{% endfor %}</table>
-    <p class="note">Linear SVM cho kết quả tốt nhất nên được chọn làm mô hình chính.</p></div>
+  <div class="panel"><h3 style="margin-top:0">So sánh công bằng 6 thuật toán</h3>
+    <table><tr><th>Mô hình</th><th class="num">Macro-F1 (CV 5-fold)</th><th class="num">Huấn luyện</th></tr>{% for b in bench %}<tr><td>{{ b.model.split(' (TF-IDF')[0] }}</td><td class="num">{{ '%.3f'|format(b.cv_macro_f1_mean|float) }} ± {{ '%.3f'|format(b.cv_macro_f1_std|float) }}</td><td class="num">{{ '%.0f'|format(b.fit_sec|float) }} s</td></tr>{% endfor %}</table>
+    <p class="note">Mọi mô hình đều được chỉnh tham số bằng cùng một cách trên tập huấn luyện. Linear SVM cao nhất nhưng gần ngang Logistic Regression (kiểm định McNemar p = 0,51); chọn SVM vì nhanh hơn khoảng 4 lần và giải thích được.</p></div>
   <div class="panel"><h3 style="margin-top:0">Từ khóa đặc trưng từng chuyên mục</h3>
     {% for n in NAV %}<div style="margin-bottom:10px"><b style="color:{{ n.color }}">{{ n.icon }} {{ n.name }}</b><div class="kw" style="margin-top:4px">{% for k in keywords[n.name][:7] %}<span>{{ k }}</span>{% endfor %}</div></div>{% endfor %}</div>
 </div>
