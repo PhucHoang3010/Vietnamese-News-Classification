@@ -7,20 +7,28 @@ Chạy hoàn toàn trên CPU, không cần GPU hay mô hình ngôn ngữ lớn, 
 **Bài toán chính — phân loại**: TF-IDF + Linear SVM xếp bài vào 11 chuyên mục (Accuracy ≈ 89,3% trên 825 bài kiểm thử).
 Trang chủ có ô **phân loại trực tiếp** (dán đoạn văn bất kỳ → AI xếp chuyên mục ngay), mỗi bài báo có bảng **“AI xếp bài này vào…”** kèm mức nghiêng, top 3 chuyên mục và các từ khóa quyết định.
 
+**Điểm nhấn — AI gắn nhiều chuyên mục, có bảo đảm** (*conformal prediction*): thay vì ép mỗi bài vào đúng một chuyên mục, AI đưa ra một **tập** chuyên mục sao cho
+với bài mới, chuyên mục đúng nằm trong tập với xác suất ≥ 95% (chọn được 90 / 95 / 99%). Bài rõ ràng → 1 chuyên mục; bài mơ hồ → 2–3 chuyên mục (nhãn “↔ cũng: …”).
+Trên 825 bài kiểm thử, mức 95%: chuyên mục đúng nằm trong tập ở 94,5% bài, trung bình 1,37 chuyên mục/bài, 76% bài chỉ cần 1 chuyên mục (và 1 chuyên mục đó đúng 95,8%);
+lặp 300 lần chia ngẫu nhiên thì độ phủ trung bình 95,6%. Hiện ở trang chủ, trang bài báo, `/phan-loai`, `/giai-thich`, `/thong-ke` và tab **“Bài giao thoa”** của mỗi chuyên mục.
+Lưu ý: bảo đảm là *trung bình* trên các bài cùng phân bố với dữ liệu hiệu chỉnh (4.675 điểm “chưa thấy”), không phải cam kết cho từng bài.
+
 **Các chức năng khác (không phải phân loại):**
 | Chức năng | Kỹ thuật | Trang |
 |---|---|---|
 | **Hỏi AI về tin tức** — gõ câu hỏi, AI trích đúng câu trả lời từ các bài liên quan, luôn dẫn nguồn, biết từ chối khi không có căn cứ | Truy hồi thông tin (TF-IDF, cosine) + xếp hạng câu, chỉ trích không tự sinh | `/hoi-ai` và ô “Hỏi AI về bài này” ở mỗi bài |
+| **Tìm kiếm nâng cao** — `AND / OR / NOT`, `"cụm từ"`, `bóng*`, `-từ`, ngoặc đơn, tìm theo trường `tieude: sapo: noidung: chuyenmuc:`; không phân biệt dấu; hiển thị “Hiểu truy vấn là…” | Chỉ mục ngược nhị phân theo từng trường + bộ phân tích cú pháp; kết quả xếp theo TF-IDF | `/tim-kiem` |
+| **Tìm theo nghĩa** — kết quả cùng chủ đề hơn tìm từ khóa thuần | LSA (TF-IDF → TruncatedSVD 300 chiều) trộn 70% TF-IDF + 30% LSA | `/tim-kiem` (chọn “Theo nghĩa”) |
+| **Bộ sưu tập cá nhân** — lưu bài (☆), gắn thẻ, lọc theo thẻ, xuất JSON/CSV, hỏi AI trong các bài đã lưu, gợi ý thêm | Lưu trong trình duyệt (localStorage); chỉ số thứ tự bài được gửi lên khi hỏi/gợi ý | `/bo-suu-tap` |
 | Phân loại ngay khi gõ | Dự đoán thời gian thực | `/phan-loai` |
 | Tóm tắt tự động (kèm từ khóa, đo ROUGE) | TextRank / PageRank trên đồ thị câu | `/tom-tat` |
 | Gom sự kiện & chủ đề con | KMeans + TruncatedSVD (học không giám sát) | `/su-kien` |
 | Bản tin nhanh 60 giây | Tóm tắt hàng loạt | `/ban-tin` |
 | Gợi ý "Dành cho bạn" theo lịch sử đọc | Content-based, cosine TF-IDF | trang chủ |
-| Tìm kiếm | TF-IDF + cosine | `/tim-kiem` |
 | AI Lab — giải thích dự đoán | Phân rã mô hình tuyến tính (Explainable AI) | `/giai-thich` |
 
-Ngoài ra: trang chủ kiểu báo điện tử, 11 chuyên mục có phân trang (lọc “chỉ bài kiểm thử” / “chỉ bài AI xếp khác báo gốc”), đọc bài kèm bài liên quan,
-thống kê (ma trận nhầm lẫn, F1, phân tích lỗi), giao diện trắng đen kiểu báo giấy, chế độ sáng/tối, tốt trên điện thoại.
+Ngoài ra: trang chủ kiểu báo điện tử, 11 chuyên mục có phân trang (lọc “chỉ bài kiểm thử” / “chỉ bài AI xếp khác báo gốc” / tab “Bài giao thoa”), đọc bài kèm bài liên quan,
+thống kê (ma trận nhầm lẫn, F1, phân tích lỗi, bảng so sánh công bằng 6 mô hình, độ phủ của tập chuyên mục), giao diện trắng đen kiểu báo giấy, chế độ sáng/tối, tốt trên điện thoại.
 Ảnh minh họa đen-trắng tự tạo theo chuyên mục; muốn dùng ảnh thật chỉ cần chép `static/img/<id>.jpg` (id = số bài, xem trên URL `/bai/<id>`).
 
 ## Chạy
@@ -34,10 +42,11 @@ pip install -r requirements.txt
 python app.py                   # mở http://127.0.0.1:5000
 ```
 - Lần chạy đầu mất **1–3 phút** để nạp mô hình và dựng chỉ mục tìm kiếm. **Đừng bấm Ctrl+C** khi chưa thấy dòng “Mở trình duyệt tại http://127.0.0.1:5000”.
-- Câu hỏi đầu tiên ở trang Hỏi AI có thể chờ thêm vài giây (chỉ mục nội dung dựng ở luồng nền).
+- Câu hỏi đầu tiên ở trang Hỏi AI và lần tìm “Theo nghĩa” đầu tiên có thể chờ thêm khoảng nửa phút (chỉ mục nội dung và chỉ mục LSA dựng ở luồng nền; tìm Boolean sẵn sàng sớm hơn).
 - `python app.py --lan` cho máy khác cùng WiFi mở được website (không bắt buộc).
-- Gặp lỗi phiên bản scikit-learn khi nạp mô hình: chạy `python train.py` rồi `python build_cache.py` để tạo lại `model.joblib` và dự đoán sẵn.
+- Gặp lỗi phiên bản scikit-learn khi nạp mô hình: chạy `python train.py` rồi `python build_cache.py` để tạo lại `model.joblib`, dự đoán sẵn và ngưỡng của tập chuyên mục.
 - Không biết lỗi ở đâu: `python kiem_tra_moi_truong.py` (in phiên bản Python, thời gian nạp từng thư viện, thử nạp mô hình).
+- Kiểm thử tự động (15 bài kiểm tra: độ phủ conformal, cú pháp tìm kiếm AND/OR/NOT, cụm từ, ký tự đại diện, trường, bỏ dấu, báo lỗi cú pháp): `python -m unittest discover -s tests -v`
 
 Hướng dẫn chi tiết từng bước và cách xử lý lỗi: `HUONG-DAN-CHAY.txt`. Slide và kịch bản thuyết trình (không demo, chia 5 người): thư mục `trinh-bay/`.
 Mọi chức năng chạy cục bộ, **không cần Internet hay micro**. (Phông chữ lấy từ Google Fonts nếu có mạng, nếu không tự dùng phông dự phòng.)
@@ -45,11 +54,13 @@ Mọi chức năng chạy cục bộ, **không cần Internet hay micro**. (Phô
 ## Huấn luyện lại / báo cáo
 ```bash
 python train.py          # huấn luyện, sinh outputs/ và model.joblib
-python build_cache.py    # dự đoán sẵn cho toàn bộ bài -> data/predictions.json
+python build_cache.py    # dự đoán sẵn cho toàn bộ bài + hiệu chỉnh conformal -> data/predictions.json, data/conformal.json
 python predict.py "Bộ Giáo dục công bố điểm chuẩn đại học"
 python eval_summary.py   # đo ROUGE của tóm tắt -> outputs/summary_eval.json
 python make_report.py    # sinh BAO_CAO_DO_AN.docx
 ```
+`build_cache.py` chấm điểm các bài huấn luyện bằng *cross-fitting* 5 lần (mỗi bài được chấm bởi mô hình chưa thấy nó) để có đủ điểm “chưa thấy” cho hiệu chỉnh;
+kết quả lưu ở `data/oof_train.npz` nên các lần chạy sau nhanh. Mã của phương pháp: `conformal.py`; công cụ tìm kiếm: `search_tools.py`.
 
 ## Thí nghiệm (thư mục `experiments/`, kết quả trong `outputs/experiments/`)
 Các thí nghiệm dùng chung một cách chia dữ liệu (70/15/15, `random_state=42`); **tập kiểm thử chỉ dùng để báo cáo cuối**, mọi lựa chọn đều làm trên tập huấn luyện (cross-validation).
@@ -61,11 +72,20 @@ Các thí nghiệm dùng chung một cách chia dữ liệu (70/15/15, `random_s
 | `exp4_learning_curve.py` | Đường cong học (thêm dữ liệu có giúp không?) |
 | `exp5_calibration.py` | Hiệu chỉnh độ tin cậy, biểu đồ rủi ro–độ phủ (từ chối bài kém chắc chắn) |
 | `exp6_errors.py` | Phân tích lỗi: cặp chuyên mục hay nhầm, từ gây nhầm, nghi vấn nhãn |
+| `exp7_explain.py` | Độ trung thực của AI Lab: giữ / xóa các từ AI cho là quan trọng thì dự đoán đổi thế nào |
 | `exp8_qa.py` | Đánh giá “Hỏi AI”: tìm lại đúng bài (R@1/5/10, MRR), chọn trọng số, ngưỡng tin cậy và ngưỡng từ chối |
+| `exp9_conformal.py` | **AI gắn nhiều chuyên mục có bảo đảm**: so top-k cố định, LAC, APS ngẫu nhiên, khoảng cách điểm SVM (chung / theo chuyên mục) ở mức 90/95/99%; lặp 300 lần chia ngẫu nhiên; kiểm tra điểm cross-fitting có thay được điểm “chưa thấy” không |
+| `exp10_search.py` | **Tìm kiếm**: bộ tìm Boolean có đúng không (100/100 truy vấn ngẫu nhiên khớp cách duyệt tuần tự; trung bình ≈ 5 ms/truy vấn); LSA có hơn TF-IDF không (tìm lại đúng bài, độ thuần chủ đề P@10) |
 
 Chạy lại: `python experiments/exp2_ablation.py` (mỗi script độc lập; `bash experiments/run_rest.sh exp2_ablation exp3_stability ...` chạy lần lượt). Cần thêm `pip install pyvi` để chạy phần tách từ.
 
 ## Kết quả (tập kiểm thử 825 bài chưa dùng khi huấn luyện)
 Accuracy ≈ 89,3% · Macro-F1 ≈ 89,3%
+
+Tập chuyên mục có bảo đảm (mức 95%): độ phủ 94,5% · trung bình 1,37 chuyên mục/bài · 76% bài chỉ 1 chuyên mục. Mức 90%: 92,1% / 1,16; mức 99%: 99,3% / 2,53.
+(Mức 90% gần bằng độ chính xác của việc chọn 1 chuyên mục nên trang web mặc định hiển thị mức 95%.)
+
+Tìm theo nghĩa (LSA trộn 70/30) so với TF-IDF thuần, nửa dữ liệu dùng để đánh giá: độ thuần chủ đề P@10 64,3% so với 60,7% (+3,7 điểm); tìm lại đúng một bài gần như không đổi (R@1 tiêu đề → bài 78,3% so với 77,4%).
+Vì vậy “Theo nghĩa” là lựa chọn để *khám phá cùng chủ đề*, không phải để tìm đúng một bài cụ thể.
 
 Báo cáo đầy đủ: `BAO_CAO_DO_AN.docx` (điền tên/MSSV ở trang đầu).

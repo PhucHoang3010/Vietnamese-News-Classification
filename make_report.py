@@ -27,6 +27,8 @@ abl = rcsv("ablation_results.csv").set_index("bien_the"); lc = rcsv("learning_cu
 ec = rjson("error_confidence.json"); pairs = rcsv("error_pairs.csv"); bylen = rcsv("error_by_length.csv"); conf_err = rcsv("errors_confident.csv"); e88 = rcsv("errors_88.csv")
 fa = rjson("explain_faithfulness.json"); fcsv = rcsv("explain_faithfulness.csv")
 qr = rcsv("qa_retrieval.csv"); qc = rcsv("qa_confidence.csv"); qa = rjson("qa_abstain.json"); T_cal = rjson("calibration_T.json")["T"]
+cres = rcsv("conformal_results.csv"); crep = rcsv("conformal_repeat.csv"); coof = rcsv("conformal_oof_to_unseen.csv"); cprod = rjson("conformal_prod.json"); cval = rcsv("conformal_val_only.csv")
+sem = rcsv("search_semantic.csv"); boolt = rjson("search_bool_tests.json")
 
 d = Document(); d.styles["Normal"].font.name = "Times New Roman"; d.styles["Normal"].font.size = Pt(13)
 
@@ -77,7 +79,7 @@ H("1. Giới thiệu")
 P("Mỗi ngày các trang báo điện tử đăng hàng nghìn bài viết. Việc gán chủ đề (giáo dục, sức khỏe, thể thao, pháp luật...) thủ công tốn nhiều thời gian. "
   "Đề tài xây dựng hệ thống học máy tự động phân loại bài báo tiếng Việt vào 11 chủ đề dựa trên nội dung văn bản.")
 P("Mục tiêu: (1) xây dựng pipeline tiền xử lý – trích xuất đặc trưng – huấn luyện; (2) so sánh công bằng một số thuật toán học máy cổ điển (mỗi mô hình đều được chỉnh tham số bằng cùng một quy trình); "
-  "(3) đánh giá bằng Accuracy, Precision, Recall, F1 kèm khoảng tin cậy, kiểm định thống kê, độ ổn định khi chia lại dữ liệu và ablation; (4) giải thích được vì sao mô hình chọn chủ đề và biết độ tin cậy của dự đoán; "
+  "(3) đánh giá bằng Accuracy, Precision, Recall, F1 kèm khoảng tin cậy, kiểm định thống kê, độ ổn định khi chia lại dữ liệu và ablation; (4) giải thích được vì sao mô hình chọn chủ đề, biết độ tin cậy của dự đoán và nêu được tập chuyên mục có bảo đảm thống kê khi bài mơ hồ; "
   "(5) cung cấp chương trình chạy được trên máy cấu hình thấp (CPU, không cần GPU hay mô hình ngôn ngữ lớn) và đóng gói thành website tin tức.")
 
 # ------------------------------------------------------------------ 2
@@ -197,6 +199,49 @@ P("Dự đoán có chọn lọc: nếu AI chỉ tự quyết những bài nó ch
 rt = pd.DataFrame({"Tỉ lệ bài AI tự quyết": [pc(x, 0) for x in rc.coverage], "Số bài": rc.n.astype(str), "Accuracy trên phần tự quyết": [pc(x, 1) for x in rc.accuracy]})
 TABLE(rt)
 
+H("4.7 Dự đoán có bảo đảm: AI nêu tập chuyên mục (conformal prediction)", 2)
+P("Mục 5 sẽ cho thấy nhiều lỗi là bài nằm giữa hai chuyên mục. Thay vì ép AI chọn đúng một chuyên mục, chúng em cho AI nêu một TẬP chuyên mục sao cho với bài mới, chuyên mục đúng nằm trong tập với xác suất ít nhất 1 − α "
+  "(conformal prediction; Vovk và cs., 2005; Angelopoulos và Bates, 2021). Bài dễ cho tập 1 chuyên mục, bài mơ hồ cho 2–3 chuyên mục. Cách làm:")
+B(["Điểm lệch của một bài với đáp án y là khoảng cách giữa điểm SVM cao nhất và điểm SVM của y (bằng 0 nếu AI chọn đúng y).",
+   "Ngưỡng tính riêng cho từng chuyên mục (Mondrian conformal) từ phân vị ⌈(n+1)(1−α)⌉/n của điểm lệch trên các bài có đáp án đó, nên chuyên mục khó như Thời sự cũng được bảo đảm.",
+   "Tập dự đoán gồm các chuyên mục có điểm SVM cách điểm cao nhất không quá ngưỡng của chuyên mục đó; luôn chứa chuyên mục điểm cao nhất, không cần huấn luyện lại.",
+   "Hiệu chỉnh trên 4.675 bài AI chưa từng thấy: 825 bài kiểm định và 3.850 bài huấn luyện chấm bằng dự đoán chéo 5-fold (mỗi bài được chấm bởi mô hình không học bài đó); đo trên 825 bài kiểm thử."])
+meth = ["Top-1 (không có tập)", "Top-2 cố định", "Top-3 cố định", "LAC xác suất (chung)", "LAC xác suất (theo chuyên mục)", "APS ngẫu nhiên (chung)", "Khoảng cách điểm SVM (chung)", "Khoảng cách điểm SVM (theo chuyên mục)"]
+t5 = cres[cres.alpha.round(2) == 0.05].set_index("method").loc[meth].reset_index()
+P("So sánh các cách tạo tập ở mức bảo đảm 95% (độ phủ mục tiêu 0,95), trên 825 bài kiểm thử:")
+TABLE(pd.DataFrame({"Phương pháp": t5.method, "Độ phủ": [pc(x) for x in t5.coverage], "Chuyên mục/bài": [vn(x, 2) for x in t5.avg_size], "Bài chỉ 1 mục": [pc(x, 0) for x in t5.singleton_share],
+                    "AI đúng khi chỉ 1 mục": [pc(x) if x == x else "—" for x in t5.singleton_acc], "Chuyên mục kém nhất": [pc(x) for x in t5.worst_class_coverage]}))
+ccur = rcsv("conformal_curve.csv"); ccur = ccur[ccur.method == "Khoảng cách điểm SVM (theo chuyên mục)"]
+def _size_at(cov):
+    return float(ccur[ccur.coverage >= cov].avg_size.min())
+P(f"Hai cách top-2 và top-3 cố định đạt độ phủ {pc(t5.set_index('method').loc['Top-2 cố định', 'coverage'])} và {pc(t5.set_index('method').loc['Top-3 cố định', 'coverage'])} nhưng luôn nêu 2 hoặc 3 chuyên mục. Các phương pháp conformal điều chỉnh kích thước tập theo từng bài (đa số chỉ 1 chuyên mục): "
+  f"đạt cùng độ phủ thì tập trung bình chỉ {vn(_size_at(t5.set_index('method').loc['Top-2 cố định', 'coverage']), 2)} chuyên mục (so với 2,00) và {vn(_size_at(t5.set_index('method').loc['Top-3 cố định', 'coverage']), 2)} chuyên mục (so với 3,00; Hình 9, ô phải trên). "
+  "APS ngẫu nhiên cho tập lớn hơn (độ phủ 97,3%, trung bình 1,96 chuyên mục) vì phụ thuộc xác suất softmax. Điểm lệch bằng khoảng cách điểm SVM cho kết quả tương đương LAC trên xác suất nhưng không cần chọn hệ số nhiệt độ, nên được chọn. "
+  "Ngưỡng riêng cho từng chuyên mục cần thêm khoảng 0,15 chuyên mục mỗi bài so với ngưỡng chung nhưng nâng độ phủ của chuyên mục kém nhất rõ rệt (xem dưới).")
+pr_ = cprod
+rows7 = []
+for a, lab in (("0.1", "90%"), ("0.05", "95%"), ("0.01", "99%")):
+    c = pr_[a]; rows7.append([lab, pc(c["coverage"]), vn(c["avg_size"], 2), pc(c["singleton_share"], 0), pc(c["singleton_acc"]), f"{c['wrong_rescued']}/{c['n_top1_wrong']}"])
+P("Kết quả của phương pháp được dùng trên website (ngưỡng riêng từng chuyên mục) ở ba mức bảo đảm:")
+TABLE(pd.DataFrame(rows7, columns=["Mức bảo đảm", "Độ phủ thực tế", "Chuyên mục/bài", "Bài chỉ 1 mục", "AI đúng khi chỉ 1 mục", "Bài AI đoán sai được cứu"]))
+c95 = pr_["0.05"]; a95 = crep[(crep.alpha.round(2) == 0.05)].set_index("method")
+mg, mo = a95.loc["Khoảng cách điểm SVM (chung)"], a95.loc["Khoảng cách điểm SVM (theo chuyên mục)"]
+P(f"Ở mức 95%, độ phủ thực tế là {pc(c95['coverage'])}; {pc(c95['singleton_share'], 0)} số bài chỉ cần 1 chuyên mục và khi đó AI đúng {pc(c95['singleton_acc'])} (so với {pc(m['test_accuracy'])} khi buộc chọn 1 cho mọi bài); "
+  f"{pc(c95['multi_share'], 0)} số bài mơ hồ được nêu từ 2 chuyên mục, trong đó chuyên mục AI chọn đầu tiên chỉ đúng {pc(c95['multi_acc_top1'], 0)} nhưng cả tập chứa đáp án đúng ở {pc(c95['multi_covered'], 0)} bài. "
+  f"Tập 95% “cứu” được {c95['wrong_rescued']} trong {c95['n_top1_wrong']} bài mà AI chọn sai. Mức 90% gần như trùng với độ chính xác của top-1 ({pc(m['test_accuracy'])}) nên chỉ cần thêm rất ít chuyên mục; giá trị rõ nhất ở mức 95% và 99%.")
+P("Độ phủ có thật sự đạt mục tiêu không? Chúng em lặp 300 lần chia ngẫu nhiên 50/50 trên toàn bộ 5.500 điểm chưa từng thấy (hiệu chỉnh trên một nửa, đo trên nửa còn lại):")
+rr = crep[crep.method.isin(["Khoảng cách điểm SVM (chung)", "Khoảng cách điểm SVM (theo chuyên mục)"])].sort_values(["alpha", "method"], ascending=[False, True])
+TABLE(pd.DataFrame({"Mức bảo đảm": [f"{round((1 - a) * 100)}%" for a in rr.alpha], "Cách đặt ngưỡng": ["chung" if "chung" in x else "riêng từng chuyên mục" for x in rr.method],
+                    "Độ phủ trung bình ± độ lệch chuẩn": [f"{pc(a, 1)} ± {vn(b * 100, 1)}" for a, b in zip(rr.cov_mean, rr.cov_std)], "Chuyên mục/bài": [vn(x, 2) for x in rr.size_mean],
+                    "Chuyên mục kém nhất (trung bình)": [pc(x) for x in rr.worst_class_mean]}))
+P(f"Độ phủ trung bình bám sát mục tiêu (95% → {pc(mg.cov_mean)} với ngưỡng chung, {pc(mo.cov_mean)} với ngưỡng riêng). Điểm đáng chú ý: với ngưỡng chung, chuyên mục kém nhất chỉ được phủ {pc(mg.worst_class_mean)}; ngưỡng riêng nâng lên {pc(mo.worst_class_mean)}. "
+  "Phép thử thứ hai kiểm tra việc trộn hai nguồn điểm khi hiệu chỉnh: nếu chỉ dùng dự đoán chéo của 3.850 bài huấn luyện để hiệu chỉnh rồi đo trên 1.650 bài kiểm định + kiểm thử, độ phủ vẫn là "
+  + ", ".join(f"{pc(coof[(coof.alpha.round(2) == a) & (coof.method == 'Khoảng cách điểm SVM (theo chuyên mục)')].coverage.iloc[0])} (mục tiêu {round((1 - a) * 100)}%)" for a in (0.1, 0.05, 0.01))
+  + ". Nếu chỉ hiệu chỉnh bằng 825 bài kiểm định thì mức 99% không làm được (mỗi chuyên mục chỉ có khoảng 75 bài nên ngưỡng buộc phải nêu cả 11 chuyên mục), đó là lý do chúng em dùng thêm dự đoán chéo.")
+IMG("conformal.png", "Hình 9. Dự đoán có bảo đảm (hiệu chỉnh trên 4.675 bài chưa từng thấy, đo trên 825 bài kiểm thử)", 15, E)
+P("Lưu ý khi diễn giải: (1) bảo đảm là trung bình trên nhiều bài mới và giả định bài mới cùng phân phối với dữ liệu hiệu chỉnh, không bảo đảm cho từng bài và không bảo đảm với bài của báo khác; "
+  "(2) bài thuộc tập huấn luyện được chấm bằng dự đoán chéo nên tập chuyên mục của chúng phản ánh sự mơ hồ thật chứ không phải việc mô hình đã học thuộc; (3) ngưỡng riêng cho chuyên mục khó (Thời sự) khiến chuyên mục này xuất hiện trong tập của nhiều bài thuộc mục khác.")
+
 # ------------------------------------------------------------------ 5
 H("5. Phân tích lỗi")
 n_ts = int(((e88.truth == "Thời sự") | (e88.pred == "Thời sự")).sum())
@@ -266,7 +311,7 @@ P(f"Kết quả: chỉ giữ 5 từ mà AI chỉ ra (khoảng {vn(g5['token_shar
   f"Ngược lại, xóa đúng 5 từ đó làm {vn(x5['rate'] * 100, 1)}% bài đổi chuyên mục (khoảng tin cậy 95%: {vn(x5['lo'] * 100, 1)}–{vn(x5['hi'] * 100, 1)}%), so với {fcell('xoa', 5, 'Ngẫu nhiên (theo loại từ)')}–{fcell('xoa', 5, 'TF-IDF lớn nhất')} khi xóa 5 từ chọn theo cách khác. "
   "Như vậy các từ được tô đậm thật sự mang quyết định của mô hình. Tuy nhiên quyết định dựa vào nhiều từ chứ không vài từ “then chốt”: phải xóa 20 từ mới làm gần một nửa số bài đổi chuyên mục "
   f"({vn(fa['ms'] and fcsv[(fcsv.che_do == 'xoa') & (fcsv.m == 20) & (fcsv.phuong_phap == names[0])].ty_le_doi_du_doan.iloc[0] * 100, 1)}%). Đây là kết quả trên 825 bài kiểm thử, không phải một ví dụ minh họa.")
-IMG("explain_faithfulness.png", "Hình 9. Độ trung thực của lời giải thích (825 bài kiểm thử)", 15, E)
+IMG("explain_faithfulness.png", "Hình 10. Độ trung thực của lời giải thích (825 bài kiểm thử)", 15, E)
 H("6.5 Hỏi AI về tin tức (hỏi đáp có dẫn nguồn)", 2)
 P("Chức năng cho người đọc gõ một câu hỏi và nhận câu trả lời trích từ các bài báo, luôn kèm bài gốc và chuyên mục do AI phân loại; ô “Hỏi AI về bài này” trên từng bài chỉ tìm trong bài đó. "
   "Hệ thống không dùng mô hình sinh văn bản nên không tự bịa nội dung; hạn chế là chỉ trả lời được điều có sẵn trong kho 5.500 bài. Cách làm:")
@@ -288,7 +333,25 @@ th10 = [x for x in qa["thresholds"] if abs(x["nguong"] - 0.10) < 1e-9][0]
 P(f"Khả năng từ chối: đối chiếu 5.500 truy vấn thật với 5.500 truy vấn ngẫu nhiên (5 từ bất kỳ trong vốn từ), điểm của bài cao nhất tách hai nhóm với AUC = {vn(qa['auc_thuc_vs_ngau_nhien'], 3)}. "
   f"Với ngưỡng 0,10 đang dùng, hệ thống từ chối nhầm {pc(th10['tu_choi_nham_truy_van_that'])} truy vấn thật và vẫn trả lời nhầm {pc(th10['tra_loi_nham_truy_van_ngau_nhien'])} truy vấn ngẫu nhiên. "
   "Lưu ý: đây là phép thử tìm lại bài bằng tiêu đề, chưa phải đánh giá chất lượng câu trả lời với câu hỏi thật của người dùng; câu được trích có thể chưa đúng ý, vì vậy giao diện luôn dẫn nguồn để người đọc kiểm tra.")
-H("6.6 Phân loại thời gian thực và chạy cục bộ", 2)
+H("6.6 Tìm kiếm nâng cao và tìm theo nghĩa", 2)
+P("Trang tìm kiếm có ba chế độ: (1) theo từ khóa (TF-IDF); (2) nâng cao, tự bật khi truy vấn có toán tử Boolean AND / OR / NOT, cụm từ trong ngoặc kép, ký tự đại diện (bóng*), ngoặc đơn hoặc trường (tieude:, sapo:, noidung:, chuyenmuc:); "
+  "(3) theo nghĩa (LSA). Mọi so khớp không phân biệt dấu tiếng Việt. Giao diện hiển thị cách hiểu truy vấn (ví dụ “giá VÀ vàng VÀ (tăng HOẶC giảm) VÀ KHÔNG bitcoin”), tô sáng từ khóa trong câu trích và có bộ lọc (chuyên mục, AI nghiêng ≥ 95%, bài giao thoa, đọc ≤ 3 phút).")
+P(f"Bộ tìm Boolean dùng chỉ mục ngược nhị phân theo từng trường. Để kiểm tra tính đúng, chúng em sinh truy vấn ngẫu nhiên (AND/OR/NOT, cụm từ, tiền tố, trường) và so với một cách duyệt tuần tự độc lập: {boolt['n_match']}/{boolt['n_queries_checked']} truy vấn cho đúng cùng tập bài; "
+  f"thời gian trả lời trung bình {vn(boolt['ms_mean'], 1)} ms (phân vị 95%: {vn(boolt['ms_p95'], 0)} ms) trên 5.500 bài. Kiểm thử đơn vị nằm ở tests/test_features.py.")
+P("Tìm theo nghĩa dùng LSA: TF-IDF (từ đơn, 30.000 đặc trưng) rồi TruncatedSVD 300 chiều. Chúng em so với TF-IDF thường trên ba phép thử (tham số chọn trên một nửa số bài, báo cáo trên nửa còn lại): tìm lại bài từ tiêu đề, tìm lại bài từ sapo, và độ thuần chủ đề "
+  "(lấy tiêu đề làm truy vấn, 10 bài gần nhất có cùng chuyên mục thật không).")
+sm = sem.set_index("method").loc[["TF-IDF", "LSA k=300", "Trộn k=300, 70% TF-IDF"]]
+TABLE(pd.DataFrame({"Cách xếp hạng": ["TF-IDF thường", "LSA 300 chiều", "Trộn 70% TF-IDF + 30% LSA"], "Tiêu đề → bài: đúng ở vị trí 1": [pc(x) for x in sm["tiêu đề → bài | eval | R@1"]],
+                    "Tiêu đề → bài: MRR": [vn(x, 3) for x in sm["tiêu đề → bài | eval | MRR"]], "Sapo → bài: đúng ở vị trí 1": [pc(x) for x in sm["sapo → bài | eval | R@1"]],
+                    "Độ thuần chủ đề P@10": [pc(x) for x in sm["độ thuần chủ đề P@10 | eval"]]}))
+dP = (sm.loc["Trộn k=300, 70% TF-IDF", "độ thuần chủ đề P@10 | eval"] - sm.loc["TF-IDF", "độ thuần chủ đề P@10 | eval"]) * 100
+dR = (sm.loc["Trộn k=300, 70% TF-IDF", "tiêu đề → bài | eval | R@1"] - sm.loc["TF-IDF", "tiêu đề → bài | eval | R@1"]) * 100
+P(f"LSA một mình kém hẳn TF-IDF khi cần tìm đúng một bài cụ thể (khớp từ khóa chính xác quan trọng hơn) nhưng cho các bài lân cận cùng chủ đề hơn. Bản trộn 70/30 giữ nguyên khả năng tìm đúng bài (vị trí 1 thay đổi {vn(dR, 1)} điểm, không đáng kể) và tăng độ thuần chủ đề {vn(dP, 1)} điểm; "
+  "vì vậy website cung cấp “Theo nghĩa” như một lựa chọn bên cạnh tìm theo từ khóa chứ không thay thế. Đây là phép đo gián tiếp (chưa có người dùng đánh giá độ liên quan).")
+H("6.7 Bộ sưu tập cá nhân", 2)
+P("Người đọc lưu bài, gắn thẻ riêng, xem thành phần chuyên mục của những bài đã lưu, xuất danh sách ra JSON/CSV và hỏi AI chỉ trong các bài đã lưu (chức năng Hỏi AI giới hạn trên danh sách bài). Danh sách lưu trong trình duyệt (localStorage), không lưu trên máy chủ; "
+  "trang cũng gợi ý thêm bài giống với bộ sưu tập bằng hệ gợi ý dựa trên nội dung ở mục 6.3.")
+H("6.8 Phân loại thời gian thực và chạy cục bộ", 2)
 B(["Phân loại khi gõ: kết quả cập nhật theo thời gian thực sau mỗi lần ngừng gõ, không cần nhấn nút; trang chủ có ô dán văn bản và xem ngay chuyên mục AI chọn.",
    "Toàn bộ chức năng chạy cục bộ, không cần Internet hay thiết bị ngoại vi, nên ổn định khi trình bày; thêm tùy chọn python app.py --lan để máy khác cùng WiFi mở được."])
 
@@ -298,6 +361,8 @@ B([f"Tách từ tiếng Việt: đã thử pyvi, Macro-F1 chỉ tăng {vn(abl.lo
    "Chưa thử mô hình ngôn ngữ lớn/PhoBERT vì mục tiêu chạy trên CPU; k-NN và MLP nhỏ đã thử nhưng không vượt Linear SVM.",
    "Dữ liệu chỉ 5.500 bài: đường cong học chưa phẳng nên thêm dữ liệu sẽ giúp; ranh giới nhãn mờ (mục 5) khiến khó vượt xa mức hiện tại nếu không làm sạch nhãn.",
    f"Phần trăm hiển thị đã hiệu chỉnh nhiệt độ (ECE {pc(c1.ECE)}) nhưng chưa phải xác suất tuyệt đối; chưa kiểm tra trên tin từ nguồn báo khác (ngoài miền dữ liệu).",
+   "Bảo đảm của tập chuyên mục là trung bình và chỉ áp dụng cho bài cùng phân phối với dữ liệu hiệu chỉnh (cùng nguồn báo); ngưỡng riêng cho Thời sự rộng nên chuyên mục này xuất hiện trong tập của nhiều bài thuộc mục khác.",
+   "Tìm theo nghĩa (LSA) chưa được người dùng đánh giá, chỉ đo gián tiếp; bộ sưu tập cá nhân lưu trong trình duyệt nên không đồng bộ giữa các thiết bị.",
    "Hỏi AI chỉ trích câu có sẵn, không tổng hợp nhiều nguồn và chưa được đánh giá bằng câu hỏi của người dùng thật; chỉ trả lời được nội dung trong kho 5.500 bài (tĩnh, không cập nhật tin mới).",
    "Hướng phát triển: thu tin mới qua RSS để kiểm tra ngoài dữ liệu hiện có; gán lại nhãn cho các bài nghi sai; thử PhoBERT khi có GPU; thêm chấm điểm câu trả lời bằng người đọc."])
 
@@ -305,7 +370,7 @@ B([f"Tách từ tiếng Việt: đã thử pyvi, Macro-F1 chỉ tăng {vn(abl.lo
 H("8. Hướng dẫn chạy")
 P("Windows: bấm đúp CHAY.bat. Hoặc:\npython -m venv .venv\n.venv\\Scripts\\activate     (Linux/macOS: source .venv/bin/activate)\npip install -r requirements.txt\npython app.py          # mở http://127.0.0.1:5000 (lần đầu 1–3 phút, đừng bấm Ctrl+C)\n"
   "python train.py        # (tùy chọn) huấn luyện lại + sinh biểu đồ\npython build_cache.py  # dự đoán sẵn cho 5.500 bài\npython predict.py \"nội dung bài báo\"\npython make_report.py  # sinh lại báo cáo\n"
-  "python experiments/exp2_ablation.py   # chạy lại từng thí nghiệm (exp1 … exp8; cần pip install pyvi cho phần tách từ)")
+  "python experiments/exp2_ablation.py   # chạy lại từng thí nghiệm (exp1 … exp10; cần pip install pyvi cho phần tách từ)\npython -m unittest discover -s tests -v   # kiểm thử tự động (conformal, tìm kiếm Boolean)")
 P("Nếu gặp lỗi khi chạy, chạy python kiem_tra_moi_truong.py để xem phiên bản Python, thời gian nạp từng thư viện và thử nạp mô hình.")
 
 # ------------------------------------------------------------------ 9
@@ -314,13 +379,18 @@ P(f"Hệ thống TF-IDF + Linear SVM đạt Accuracy {pc(m['test_accuracy'])} v�
   f"ổn định khi chia lại dữ liệu ({vn(sv_.split_acc_mean * 100, 1)}% ± {vn(sv_.split_acc_std * 100, 1)}), huấn luyện khoảng 10 giây trên CPU. "
   "Khi chỉnh tham số công bằng cho mọi mô hình, Linear SVM và Logistic Regression ngang nhau về mặt thống kê; ablation cho thấy nội dung bài báo, cặp từ và log-tf là các yếu tố quan trọng còn tách từ không cải thiện đáng kể. "
   f"Chúng em còn hiệu chỉnh độ tin cậy (ECE từ {pc(c0.ECE)} xuống {pc(c1.ECE)}), kiểm chứng rằng lời giải thích của AI Lab phản ánh đúng quyết định của mô hình trên 825 bài, "
-  "và bổ sung chức năng Hỏi AI trả lời có dẫn nguồn. Toàn bộ chạy trên CPU, không cần tài nguyên tính toán lớn.")
+  f"và bổ sung chức năng Hỏi AI trả lời có dẫn nguồn. Điểm đột phá là dự đoán có bảo đảm: với mức 95%, AI nêu trung bình {vn(cprod['0.05']['avg_size'], 2)} chuyên mục mỗi bài và đáp án đúng nằm trong tập ở {pc(cprod['0.05']['coverage'])} bài kiểm thử (so với {pc(m['test_accuracy'])} khi chỉ được chọn một), "
+  "kèm tìm kiếm nâng cao (Boolean, theo trường, theo nghĩa) và bộ sưu tập cá nhân. Toàn bộ chạy trên CPU, không cần tài nguyên tính toán lớn.")
 H("Tài liệu tham khảo")
 B(["Pedregosa et al., Scikit-learn: Machine Learning in Python, JMLR 12, 2011.", "Manning, Raghavan, Schütze. Introduction to Information Retrieval, Cambridge UP, 2008.",
    "Joachims, T. Text categorization with Support Vector Machines, ECML 1998.",
    "Dietterich, T. G. Approximate Statistical Tests for Comparing Supervised Classification Learning Algorithms, Neural Computation 10(7), 1998.",
    "Guo, C., Pleiss, G., Sun, Y., Weinberger, K. Q. On Calibration of Modern Neural Networks, ICML 2017.",
    "DeYoung, J. et al. ERASER: A Benchmark to Evaluate Rationalized NLP Models, ACL 2020.",
-   "Mihalcea, R., Tarau, P. TextRank: Bringing Order into Texts, EMNLP 2004."])
+   "Mihalcea, R., Tarau, P. TextRank: Bringing Order into Texts, EMNLP 2004.",
+   "Vovk, V., Gammerman, A., Shafer, G. Algorithmic Learning in a Random World, Springer, 2005.",
+   "Angelopoulos, A. N., Bates, S. A Gentle Introduction to Conformal Prediction and Distribution-Free Uncertainty Quantification, 2021.",
+   "Romano, Y., Sesia, M., Candès, E. Classification with Valid and Adaptive Coverage, NeurIPS 2020.",
+   "Deerwester, S. et al. Indexing by Latent Semantic Analysis, JASIS 41(6), 1990."])
 d.save(Path(__file__).parent / "BAO_CAO_DO_AN.docx")
 print("Đã sinh BAO_CAO_DO_AN.docx")
