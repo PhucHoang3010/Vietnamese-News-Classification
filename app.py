@@ -423,18 +423,49 @@ def clusters():
 
 
 # ---------------------------------------------------------------- trang
+
+
+def sample_text(a, limit=520):
+    """Đoạn văn mẫu cho ô phân loại ở trang chủ: tiêu đề + sapo + vài câu đầu của bài, cắt ở cuối câu cho khỏi cụt."""
+    t = a["title"].strip().rstrip(".") + ". " + a["desc"].strip()
+    for sent in split_sentences(a["content"]):
+        if sent in t:
+            continue
+        if len(t) + len(sent) + 1 > limit:
+            break
+        t += " " + sent
+    return t
+
+
+_EASY = []
+
+
+def pick_easy():
+    """Bài mẫu điền sẵn ở trang chủ: bài kiểm tra Thể thao, AI xếp đúng và rất chắc chắn (chỉ 1 chuyên mục), để ai nhìn cũng hiểu ngay."""
+    if _EASY:
+        return _EASY[0]
+    for i in BY_TOPIC["Thể thao"]:
+        a = ART[i]
+        if a["test"] and a["label"] == a["truth"] and a["pct"] >= 99:
+            r = analyze(sample_text(a))                                  # đúng đoạn văn sẽ hiện ở ô nhập
+            if r and r["label"] == a["truth"] and (not r.get("sets") or len(r["sets"]["95"]) == 1):
+                _EASY.append(a); return a
+    _EASY.append(None)
+    return None
+
+
 _DEMO = []
 
 
 def pick_demo():
-    """Bài mẫu cho ô phân loại ở trang chủ: bài kiểm thử AI xếp đúng, mơ hồ giữa 2 chuyên mục (để thấy ngay tập chuyên mục có bảo đảm)."""
+    """Bài khó cho nút “🤔 Bài khó”: AI xếp đúng nhưng phân vân giữa 2 chuyên mục (để thấy ngay danh sách “có thể thuộc”)."""
     if _DEMO:
         return _DEMO[0]
     if CONF:
         for i in ORDER:
             a = ART[i]
             if a["test"] and a["label"] == a["truth"] and len(a["sets"].get("95", [])) == 2 and a["pct"] < 97:
-                r = analyze((a["title"] + ". " + a["desc"] + " " + a["content"])[:900])          # đúng đoạn văn sẽ hiện ở ô nhập
+                r = analyze(sample_text(a))
                 if r and r["label"] == a["truth"] and r["sets"] and len(r["sets"]["95"]) == 2:
                     _DEMO.append(a); return a
     _DEMO.append(None)
@@ -448,11 +479,10 @@ def home():
     hero_ids = [first_test(t) for t in ("Thời sự", "Thể thao", "Kinh doanh", "Khoa học", "Sức khỏe")]
     latest = [i for i in ORDER if i not in hero_ids][:8]
     sections = [(t, cards(feat[t][1:5])) for t in ("Thời sự", "Kinh doanh", "Thể thao", "Giáo dục", "Sức khỏe", "Khoa học")]
-    ok_ex = pick_demo() or next(ART[i] for i in feat["Thế giới"] if ART[i]["test"] and ART[i]["label"] == ART[i]["truth"])
-    wrong = sorted([a for a in ART.values() if a["test"] and a["label"] != a["truth"]], key=lambda a: a["pct"])
-    bad_ex = wrong[len(wrong) // 2]                                                           # một bài AI sai điển hình (độ nghiêng trung vị)
-    saved = sorted([a for a in ART.values() if a["test"] and a["label"] != a["truth"] and len(a["sets"].get("95", [])) == 2 and a["truth"] in a["sets"]["95"]], key=lambda a: -a["pct"])[:3]   # AI chọn sai nhưng tập chuyên mục vẫn chứa đáp án đúng
-    return render_template("home.html", hero=ART[hero_ids[0]], side=cards(hero_ids[1:]), latest=cards(latest), sections=sections, keywords=KEYWORDS, ok_ex=ok_ex, bad_ex=bad_ex, saved=saved, demo_text=(ok_ex["title"] + ". " + ok_ex["desc"] + " " + ok_ex["content"])[:900])
+    ok_ex = pick_easy() or next(ART[i] for i in feat["Thế giới"] if ART[i]["test"] and ART[i]["label"] == ART[i]["truth"])
+    hard_ex = pick_demo() or ok_ex
+    return render_template("home.html", hero=ART[hero_ids[0]], side=cards(hero_ids[1:]), latest=cards(latest), sections=sections,
+                           ok_ex=ok_ex, hard_ex=hard_ex, demo_text=sample_text(ok_ex), hard_text=sample_text(hard_ex))
 
 
 @app.get("/chu-de/<slug>")

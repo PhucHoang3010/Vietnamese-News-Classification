@@ -14,7 +14,7 @@
 <header class="site"><div class="hw">
   <a class="logo" href="{{ url_for('home') }}" aria-label="VnNews, trang chủ"><span class="lg"><em>Vn</em>News</span><small>trang tin điện tử · AI phân loại</small></a>
   <div class="hd-r">
-    <a class="aichip" href="{{ url_for('stats') }}" title="Độ chính xác của AI trên các bài nó chưa từng thấy"><span class="ic">🤖</span><span><b>AI xếp đúng {{ (STATS.acc*100)|round(1) }}%</b><small>trên {{ STATS.n_test }} bài kiểm thử</small></span></a>
+    <a class="aichip" href="{{ url_for('stats') }}" title="Độ chính xác của AI trên các bài nó chưa từng thấy"><span class="ic">🤖</span><span><b>AI xếp đúng {{ (STATS.acc*100)|round(1) }}%</b><small>trên {{ STATS.n_test }} bài AI chưa từng thấy</small></span></a>
     <a class="hbtn" href="{{ url_for('library') }}" title="Bộ sưu tập của tôi" aria-label="Bộ sưu tập của tôi">📚<span class="libcount"></span></a>
     <button class="hbtn" id="theme" type="button" title="Sáng / tối" aria-label="Đổi giao diện sáng hoặc tối">🌙</button>
   </div>
@@ -22,19 +22,19 @@
 <nav class="bar" aria-label="Menu chính"><div class="bw">
   <div class="navtabs">
   <a class="tab {{ 'on' if request.endpoint=='home' }}" href="{{ url_for('home') }}">Trang chủ</a>
-  <span class="tabdd"><button type="button" class="tab {{ 'on' if request.endpoint=='category' }}" id="ddbtn" aria-expanded="false" aria-controls="ddpanel">Chủ đề <i>▾</i></button>
+  <span class="tabdd"><button type="button" class="tab {{ 'on' if request.endpoint=='category' }}" id="ddbtn" aria-expanded="false" aria-controls="ddpanel">Chuyên mục <i>▾</i></button>
     <div class="dd" id="ddpanel" hidden>{% for n in NAV %}<a href="{{ url_for('category', slug=n.slug) }}" style="--c:{{ n.color }}" class="{{ 'on' if request.view_args and request.view_args.get('slug')==n.slug }}"><span>{{ n.icon }}</span>{{ n.name }}<small>{{ STATS.counts[n.name] }}</small></a>{% endfor %}</div></span>
-  <a class="tab {{ 'on' if request.endpoint=='ask_page' }}" href="{{ url_for('ask_page') }}">Hỏi AI</a>
-  <a class="tab {{ 'on' if request.endpoint in ('tools','summarize_page','events','digest','classify_page','lab') }}" href="{{ url_for('tools') }}">Công cụ</a>
-  <a class="tab {{ 'on' if request.endpoint=='stats' }}" href="{{ url_for('stats') }}">Thống kê</a>
+  <a class="tab {{ 'on' if request.endpoint=='classify_page' }}" href="{{ url_for('classify_page') }}">Thử phân loại</a>
+  <a class="tab {{ 'on' if request.endpoint=='stats' }}" href="{{ url_for('stats') }}">Độ chính xác</a>
+  <a class="tab {{ 'on' if request.endpoint in ('tools','ask_page','summarize_page','events','digest','lab','library') }}" href="{{ url_for('tools') }}">Công cụ AI</a>
   </div>
   <form class="bsearch" action="{{ url_for('search') }}" role="search"><input name="q" value="{{ q }}" placeholder="Nhập nội dung tìm kiếm" autocomplete="off" aria-label="Tìm kiếm bài báo"><button aria-label="Tìm"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button></form>
   <button type="button" class="burger" id="burger" aria-label="Mở menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
 </div>
 <div class="menu" id="menu" hidden><div class="mw">
   <div><h5>Chuyên mục (do AI xếp)</h5>{% for n in NAV %}<a href="{{ url_for('category', slug=n.slug) }}"><span>{{ n.icon }}</span>{{ n.name }}</a>{% endfor %}</div>
-  <div><h5>Công cụ AI</h5><a href="{{ url_for('classify_page') }}">🏷️ Phân loại bài báo</a><a href="{{ url_for('ask_page') }}">💬 Hỏi AI về tin tức</a><a href="{{ url_for('summarize_page') }}">📝 Tóm tắt tự động</a><a href="{{ url_for('events') }}">🧩 Sự kiện &amp; chủ đề con</a><a href="{{ url_for('digest') }}">⚡ Bản tin 60 giây</a><a href="{{ url_for('lab') }}">🔬 AI Lab — giải thích</a><a href="{{ url_for('tools') }}">✦ Tất cả công cụ</a></div>
-  <div><h5>Của tôi &amp; đồ án</h5><a href="{{ url_for('library') }}">📚 Bộ sưu tập<span class="libcount"></span></a><a href="{{ url_for('stats') }}">📊 Thống kê mô hình</a><a href="{{ url_for('about') }}">ℹ️ Giới thiệu đồ án</a><a href="{{ url_for('guide') }}">🎤 Kịch bản trình bày</a><button type="button" class="mtheme" id="theme2">🌙 Đổi giao diện sáng / tối</button></div>
+  <div><h5>Phân loại &amp; kết quả</h5><a href="{{ url_for('classify_page') }}">🏷️ Thử phân loại một bài</a><a href="{{ url_for('stats') }}">📊 Độ chính xác của máy</a><a href="{{ url_for('lab') }}">🔬 AI giải thích vì sao chọn mục này</a><a href="{{ url_for('about') }}">ℹ️ Giới thiệu đồ án</a><a href="{{ url_for('guide') }}">🎤 Kịch bản trình bày</a></div>
+  <div><h5>Công cụ khác</h5><a href="{{ url_for('ask_page') }}">💬 Hỏi AI về tin tức</a><a href="{{ url_for('summarize_page') }}">📝 Tóm tắt tự động</a><a href="{{ url_for('events') }}">🧩 Sự kiện &amp; chủ đề con</a><a href="{{ url_for('digest') }}">⚡ Bản tin 60 giây</a><a href="{{ url_for('library') }}">📚 Bộ sưu tập của tôi<span class="libcount"></span></a><a href="{{ url_for('tools') }}">✦ Tất cả công cụ</a><button type="button" class="mtheme" id="theme2">🌙 Đổi giao diện sáng / tối</button></div>
 </div></div>
 </nav>
 <div class="band"><div class="bandw">{% block band %}{% endblock %}</div></div>
@@ -42,9 +42,8 @@
 <footer><div class="fw">
   <div><h5>VnNews</h5>Trang tin tức mô phỏng với hệ thống học máy phân loại chủ đề tiếng Việt (TF-IDF + Linear SVM). Dữ liệu gồm {{ '{:,}'.format(STATS.n).replace(',', '.') }} bài báo, đồ án môn Học máy.</div>
   <div><h5>Chuyên mục</h5>{% for n in NAV[:6] %}<a href="{{ url_for('category', slug=n.slug) }}">{{ n.name }}</a>{% endfor %}</div>
-  <div><h5>Công cụ AI</h5><a href="{{ url_for('ask_page') }}">Hỏi AI về tin tức</a><a href="{{ url_for('tools') }}">Tất cả công cụ</a><a href="{{ url_for('guide') }}">Kịch bản trình bày</a><a href="{{ url_for('summarize_page') }}">Tóm tắt tự động</a><a href="{{ url_for('events') }}">Sự kiện & chủ đề con</a><a href="{{ url_for('lab') }}">AI Lab — giải thích</a><a href="{{ url_for('classify_page') }}">Phân loại bài báo</a><a href="{{ url_for('stats') }}">Thống kê mô hình</a><a href="{{ url_for('about') }}">Giới thiệu đồ án</a></div>
+  <div><h5>Trang chính</h5><a href="{{ url_for('classify_page') }}">Thử phân loại</a><a href="{{ url_for('stats') }}">Độ chính xác của máy</a><a href="{{ url_for('tools') }}">Công cụ AI</a><a href="{{ url_for('about') }}">Giới thiệu đồ án</a><a href="{{ url_for('guide') }}">Kịch bản trình bày</a></div>
 </div></footer>
-{% if request.endpoint != 'ask_page' %}<a class="fab" href="{{ url_for('ask_page') }}" title="Hỏi AI về tin tức">💬 Hỏi AI</a>{% endif %}
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
@@ -83,10 +82,19 @@ function renderSets(el,sets,main,opt){
   const draw=()=>{
     const L=sets[k]||[],oth=L.filter(c=>c!==main),st=CF[k]||{};
     const chips=L.map(c=>`<a class="cs-chip${c===main?' main':''}" href="/chu-de/${TOP[c][0]}">${TOP[c][1]} ${esc(c)}${c===main?'<small>AI chọn</small>':''}</a>`).join('');
-    const verdict=oth.length?`AI chưa chắc: bài này có thể thuộc ${L.length} chuyên mục.`:'Ở mức bảo đảm này AI chỉ cần nêu 1 chuyên mục.';
-    el.innerHTML=`<div class="cs-h"><b>↔ Chuyên mục có thể thuộc</b><span class="cs-tg">${['90','95','99'].map(x=>`<button type="button" data-k="${x}" class="${x===k?'on':''}">${x}%</button>`).join('')}</span></div>
-      <div class="cs-set">${chips}</div>
-      <p class="cs-note">${verdict} Mức bảo đảm ${k}%: với bài AI chưa từng thấy, tập này chứa chuyên mục đúng ở ít nhất khoảng ${k}% bài${st.coverage?` (đo trên bài kiểm thử: ${vnum(st.coverage)}%, trung bình ${vnum(st.avg_size)} chuyên mục/bài)`:''}. Đây là bảo đảm trung bình trên nhiều bài, không phải cho từng bài.${opt.note?' '+esc(opt.note):''}</p>`;
+    const tg=`<span class="cs-tg">${['90','95','99'].map(x=>`<button type="button" data-k="${x}" class="${x===k?'on':''}">${x}%</button>`).join('')}</span>`;
+    const cover=st.coverage?` (đo trên bài kiểm tra: ${vnum(st.coverage)}%, trung bình ${vnum(st.avg_size)} chuyên mục/bài)`:'';
+    if(opt.compact){
+      const open=el.querySelector('details')&&el.querySelector('details').open?' open':'';
+      el.innerHTML=`<div class="cs-line"><b>${oth.length?'AI chưa chắc, bài này cũng có thể thuộc:':'AI khá chắc, chỉ có 1 chuyên mục phù hợp:'}</b><span class="cs-set">${chips}</span></div>
+        <details class="cs-det"${open}><summary>Giải thích</summary><div class="cs-h"><span>Mức bảo đảm</span>${tg}</div>
+        <p class="cs-note">Với mức ${k}%: nếu AI nêu danh sách chuyên mục như trên cho những bài mới (cùng loại với dữ liệu), thì khoảng ${k}% số bài sẽ có chuyên mục đúng nằm trong danh sách${cover}. Đây là bảo đảm trung bình trên nhiều bài, không phải cho từng bài.${opt.note?' '+esc(opt.note):''}</p></details>`;
+    }else{
+      const verdict=oth.length?`AI chưa chắc: bài này có thể thuộc ${L.length} chuyên mục.`:'Ở mức bảo đảm này AI chỉ cần nêu 1 chuyên mục.';
+      el.innerHTML=`<div class="cs-h"><b>↔ Chuyên mục có thể thuộc</b>${tg}</div>
+        <div class="cs-set">${chips}</div>
+        <p class="cs-note">${verdict} Mức bảo đảm ${k}%: với bài AI chưa từng thấy, tập này chứa chuyên mục đúng ở ít nhất khoảng ${k}% bài${cover}. Đây là bảo đảm trung bình trên nhiều bài, không phải cho từng bài.${opt.note?' '+esc(opt.note):''}</p>`;
+    }
     el.querySelectorAll('.cs-tg button').forEach(b=>b.onclick=()=>{k=b.dataset.k;draw()});
   };
   draw();

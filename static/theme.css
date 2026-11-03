@@ -160,6 +160,41 @@ th{border-bottom:2px solid var(--line)}
 a.tool:hover{background:var(--brand);color:var(--on-brand)}
 .steps li::before,.gstep .num{border-radius:50%}
 
+/* ===== 7b. Làm gọn: ô phân loại, thẻ AI ở trang bài, ba bước, mục xổ ra ===== */
+.stp{display:inline-grid;place-items:center;flex:none;width:22px;height:22px;border-radius:50%;background:#fff;color:#0a3d6e;font:800 13px/1 var(--sans);margin-right:6px}
+.cl-row .btn .stp{background:#0a3d6e;color:#fff}.cl-r .stp{background:var(--brand);color:var(--on-brand)}
+.cl-lab{display:flex;align-items:center;font-size:13.5px;margin:14px 0 6px;opacity:.95}
+.cl-l .sub{font-size:15px;line-height:1.55;margin-bottom:6px}.cl-l .sub b{color:#fff}
+.cl-cap{display:flex;align-items:center;font-size:13.5px;font-weight:700;color:var(--muted)}
+.cl-top .ic{font-size:40px}.cl-top strong{font-size:32px;line-height:1.1}.cl-top .pc{margin-left:auto;text-align:right;line-height:1.05}.cl-top .pc em{display:block;font:600 12px var(--sans);color:var(--muted)}
+.cl-sub{font-size:13px;color:var(--muted);margin-top:2px}
+.cl-truth{font-size:13.5px}.cl-truth .ok{color:#17803f;font-weight:700}.cl-truth .bad{color:#c0392b;font-weight:700}.cl-truth em{color:var(--muted);font-style:normal}
+[data-theme=dark] .cl-truth .ok{color:#5ad28a}[data-theme=dark] .cl-truth .bad{color:#ff8a80}
+.cl-r .cs{margin:2px 0 0;padding:10px 12px}.cl-lean{margin:0}
+.cs-line{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}.cs-line b{font-size:13.5px}.cs-set{display:flex;flex-wrap:wrap;gap:6px}
+.cs-set .cs-chip{padding:3px 11px;font-size:14px}
+.cs-det{margin-top:8px}.cs-det summary{cursor:pointer;font-size:13px;font-weight:700;opacity:.85;list-style:none;width:fit-content}.cs-det summary::-webkit-details-marker{display:none}
+.cs-det summary::before{content:"ⓘ ";}.cs-det[open] summary{margin-bottom:8px}
+.cs-det .cs-h{margin-bottom:8px}.cs-det .cs-h span:first-child{font-size:13px;font-weight:700}
+.cls-res{margin-bottom:12px}.cls-res small{font-size:12.5px;opacity:.9;text-transform:none;letter-spacing:0}
+.cls-pct{text-align:right;line-height:1.05}.cls-pct em{display:block;font:600 12px var(--sans);opacity:.85}
+.cls .cls-flag{margin:0 0 12px}.cls-flag.ok{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.35)}
+.cls .cs{margin:0}
+.cls-more{margin-top:14px;border-top:1px solid rgba(255,255,255,.25);padding-top:12px}
+.cls-more summary{cursor:pointer;list-style:none;display:inline-flex;align-items:center;gap:8px;padding:7px 16px;border:1px solid rgba(255,255,255,.75);border-radius:999px;font-weight:700;font-size:14px}
+.cls-more summary::-webkit-details-marker{display:none}.cls-more summary::after{content:"▾"}.cls-more[open] summary::after{content:"▴"}
+.cls-more summary:hover{background:rgba(255,255,255,.14)}
+.cls-sub{font-size:13px;opacity:.85;margin:14px 0 2px}
+.how{padding:16px 22px 18px;margin-bottom:26px}.how h2{font-size:19px;margin:0 0 12px;border:0;padding:0}
+.how-steps.s3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.how-steps.s3 .hs{flex-direction:row;align-items:flex-start;gap:12px;background:var(--alt)}.how-steps.s3 .hs .n{flex:none;width:30px;height:30px;font-size:15px}
+.how-steps.s3 .hs b{display:block;font-size:17px}.how-steps.s3 .hs small{font-size:14px}.how-steps.s3 .hs small a{color:var(--brand);font-weight:700}
+@media(max-width:900px){.how-steps.s3{grid-template-columns:1fr}}
+.bigstat{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}.bigstat b{font:800 40px/1 var(--sans);color:var(--brand)}.bigstat span{color:var(--muted);font-size:14.5px}
+.sec-adv{margin:36px 0 14px;font-size:19px;color:var(--muted);border-top:1px dashed var(--rule);padding-top:20px}
+.grid-h{grid-column:1/-1;margin:10px 0 0;font-size:19px;padding-left:12px;border-left:4px solid var(--brand)}.grid-h:first-child{margin-top:0}
+.sec-h .sh-note{font-size:13px}
+
 /* ===== 8. Bình luận ===== */
 .cmts{margin-top:40px}.cmts .sec-h h2 small{font:600 15px var(--sans);color:var(--muted)}
 .cm-sort{margin-left:auto;display:flex;border:1px solid var(--rule);border-radius:999px;overflow:hidden}

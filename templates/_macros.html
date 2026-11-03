@@ -1,8 +1,9 @@
 {% macro cmeta(a) %}<span>{{ a.minutes }} phút đọc</span>{% set n = ccount(a.id) %}{% if n %}<span class="cm-n" title="{{ n }} bình luận">💬 {{ n }}</span>{% endif %}{% endmacro %}
-{% macro card(a, cat=True) %}
+{# Thẻ tin: ảnh, nhãn do AI xếp, tiêu đề, mô tả. cat=False khi cả trang cùng một chuyên mục (khi đó nhãn ghi độ tự tin). alt=True để hiện thêm "cũng có thể thuộc". #}
+{% macro card(a, cat=True, alt=False) %}
 <a class="card" href="{{ url_for('article', aid=a.id) }}" style="--c:{{ a.color }}">
   <div class="thumb"><img src="{{ a.img }}" alt="" loading="lazy"></div>
-  <div class="tags"><span class="tag aib">🤖 AI xếp:{% if cat %} {{ a.icon }} {{ a.label }} ·{% endif %} nghiêng {{ a.pct }}%</span>{% if a.truth != a.label %}<span class="tag diff">⚠ Báo gốc: {{ a.truth }}</span>{% endif %}{% if a.others %}<span class="tag xs" title="AI thấy bài này cũng có thể thuộc các chuyên mục sau (bảo đảm 95%)">↔ cũng: {% for o in a.others[:2] %}{{ TOPICS[o][1] }} {{ o }}{{ ', ' if not loop.last }}{% endfor %}</span>{% endif %}</div>
+  <div class="tags"><span class="tag aib" title="AI đọc bài rồi xếp vào chuyên mục này (độ tự tin {{ a.pct }}%)">{% if cat %}🤖 AI xếp: {{ a.icon }} {{ a.label }}{% else %}🤖 AI tự tin {{ a.pct }}%{% endif %}</span>{% if a.truth != a.label %}<span class="tag diff" title="Báo gốc xếp bài này vào “{{ a.truth }}”, AI xếp khác">⚠ Báo gốc: {{ a.truth }}</span>{% endif %}{% if alt and a.others %}<span class="tag xs" title="AI thấy bài này cũng có thể thuộc các chuyên mục sau">↔ cũng: {% for o in a.others[:2] %}{{ TOPICS[o][1] }} {{ o }}{{ ', ' if not loop.last }}{% endfor %}</span>{% endif %}</div>
   <h3>{{ a.title }}</h3><p>{{ a.desc }}</p>
   <div class="meta">{{ cmeta(a) }}</div>
 </a>
@@ -15,13 +16,11 @@
 {% macro heat(v, mx) %}{% set k = (v / mx) if mx else 0 %}background:color-mix(in srgb,var(--brand) {{ (k*100)|round|int }}%,transparent);color:{{ '#fff' if k>0.55 else 'inherit' }}{% endmacro %}
 {% macro sidebar() %}
 <aside>
-  <div class="box promo"><h3>Công cụ AI</h3><p>Phân loại, tóm tắt tự động, gom sự kiện, gợi ý bài đọc — thử ngay với bài báo của bạn.</p><a class="btn" href="{{ url_for('summarize_page') }}">Tóm tắt bài →</a> <a class="btn ghost" style="margin-top:8px" href="{{ url_for('tools') }}">✦ Tất cả công cụ</a></div>
-  {% set lc = latest_comments(4) %}{% if lc %}<div class="box"><h3>Ý kiến bạn đọc</h3>{% for c in lc %}<a class="cmt-mini" href="{{ url_for('article', aid=c.aid) }}#binh-luan"><b>{{ c.name }}</b><small>{{ c.ts|ago }}</small><p>{{ c.body[:110] }}{{ '…' if c.body|length > 110 }}</p><em>{{ c.title }}</em></a>{% endfor %}</div>{% endif %}
   <div class="box"><h3>Chuyên mục (do AI xếp)</h3><ul class="list">
     {% for n in NAV %}<li><a href="{{ url_for('category', slug=n.slug) }}"><span>{{ n.icon }}</span> {{ n.name }}<b>{{ STATS.counts[n.name] }}</b></a></li>{% endfor %}</ul></div>
-  <div class="box"><h3>Độ chính xác AI</h3>
-    <div class="row2" style="grid-template-columns:90px 1fr 52px"><span>Accuracy</span><div class="track"><i data-w="{{ (STATS.acc*100)|round(1) }}"></i></div><em>{{ (STATS.acc*100)|round(1) }}%</em></div>
-    <div class="row2" style="grid-template-columns:90px 1fr 52px"><span>Macro-F1</span><div class="track"><i data-w="{{ (STATS.f1*100)|round(1) }}"></i></div><em>{{ (STATS.f1*100)|round(1) }}%</em></div>
-    <p class="note">Đo trên {{ STATS.n_test }} bài kiểm thử chưa dùng khi huấn luyện. <a href="{{ url_for('stats') }}" style="color:var(--brand)">Xem chi tiết</a></p></div>
+  <div class="box"><h3>AI giỏi cỡ nào?</h3>
+    <div class="bigstat"><b>{{ (STATS.acc*100)|round(1) }}%</b><span>bài AI xếp đúng chuyên mục</span></div>
+    <p class="note">Đo trên {{ STATS.n_test }} bài AI chưa từng thấy khi học. <a href="{{ url_for('stats') }}" style="color:var(--brand);font-weight:600">Xem chi tiết →</a></p></div>
+  {% set lc = latest_comments(4) %}{% if lc %}<div class="box"><h3>Ý kiến bạn đọc</h3>{% for c in lc %}<a class="cmt-mini" href="{{ url_for('article', aid=c.aid) }}#binh-luan"><b>{{ c.name }}</b><small>{{ c.ts|ago }}</small><p>{{ c.body[:110] }}{{ '…' if c.body|length > 110 }}</p><em>{{ c.title }}</em></a>{% endfor %}</div>{% endif %}
 </aside>
 {% endmacro %}

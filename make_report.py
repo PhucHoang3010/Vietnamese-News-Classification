@@ -186,7 +186,7 @@ P(f"Macro-F1 tăng từ {pc(lc.val_f1.iloc[0])} (192 bài) lên {pc(lc.val_f1.il
   "Độ chính xác trên tập huấn luyện luôn 100% nên khoảng cách huấn luyện – kiểm định là phương sai (thiếu dữ liệu), gợi ý rằng thêm dữ liệu sẽ còn giúp nhưng lợi ích giảm dần.")
 
 H("4.6 Hiệu chỉnh độ tin cậy và dự đoán có chọn lọc", 2)
-P("Website hiển thị “mức nghiêng” (%) của AI cho từng chuyên mục, tính bằng softmax(T × điểm SVM). Một độ tin cậy hữu ích khi 90% nghĩa là khoảng 90% những lần như vậy đúng. "
+P("Website hiển thị “độ tự tin” (%) của AI cho từng chuyên mục (trong báo cáo gọi là mức nghiêng), tính bằng softmax(T × điểm SVM). Một độ tin cậy hữu ích khi 90% nghĩa là khoảng 90% những lần như vậy đúng. "
   "Chúng em đo sai lệch hiệu chỉnh ECE (chia 10 nhóm độ tin cậy), Brier và NLL trên tập kiểm thử; hệ số T được chọn trên tập kiểm định (temperature scaling).")
 ct = pd.DataFrame({"Cách tính": cal.method, "Độ tin cậy trung bình": [pc(x, 1) for x in cal.mean_conf], "ECE": [pc(x, 1) for x in cal.ECE], "Brier": [vn(x, 3) for x in cal.brier], "NLL": [vn(x, 3) for x in cal.nll]})
 TABLE(ct)
@@ -361,8 +361,8 @@ P("Mỗi bài báo có khu bình luận quen thuộc ở các trang tin: đăng 
   "Hệ thống giới hạn độ dài (1.000 ký tự), tốc độ (cách nhau 5 giây; tối đa 20 bình luận mỗi giờ cho mỗi trình duyệt và 60 cho mỗi địa chỉ IP), từ chối bình luận trùng, và luôn thoát ký tự HTML khi hiển thị nên nội dung người dùng không chèn được mã. "
   "Phần này được kiểm thử bằng 25 bài kiểm tra đơn vị (tests/test_comments.py) và một kịch bản trình duyệt tự động (tests/e2e/comments_e2e.js: đăng, trả lời, thích, xóa, tải lại trang, trình duyệt thứ hai, chuỗi chứa HTML).")
 H("6.10 Giao diện", 2)
-P("Giao diện theo bố cục báo điện tử hiện đại: đầu trang trắng, thanh menu chuyển màu xanh ngọc sang xanh dương (Trang chủ, Chủ đề, Hỏi AI, Công cụ, Thống kê, ô tìm kiếm và nút menu), nền xanh với cột nội dung trắng ở giữa, cụm tin nổi bật ba cột (tiêu đề, ảnh, danh sách) và thẻ tin có nhãn chuyên mục do AI xếp kèm mức nghiêng. "
-  "Ảnh minh họa được tự vẽ bằng SVG, mỗi chuyên mục một bảng màu. Giao diện có chế độ sáng/tối và dùng được trên điện thoại; toàn bộ phần màu nằm trong static/theme.css (nạp sau style.css).")
+P("Giao diện theo bố cục báo điện tử hiện đại: đầu trang trắng, thanh menu chuyển màu xanh ngọc sang xanh dương (Trang chủ, Chuyên mục, Thử phân loại, Độ chính xác, Công cụ AI, ô tìm kiếm và nút menu), nền xanh với cột nội dung trắng ở giữa, cụm tin nổi bật ba cột (tiêu đề, ảnh, danh sách) và thẻ tin có nhãn chuyên mục do AI xếp kèm mức nghiêng. "
+  "Ảnh minh họa được tự vẽ bằng SVG, mỗi chuyên mục một bảng màu. Để người xem hiểu ngay, trang chủ chỉ giữ ba việc (thử phân loại theo ba bước, giải thích ba bước AI làm việc, tin theo chuyên mục); thẻ tin chỉ có một nhãn “AI xếp”; kết quả chi tiết (các chuyên mục AI cân nhắc, từ khóa, mức bảo đảm) thu vào mục “Xem AI phân tích chi tiết”; các công cụ phụ gom vào mục “Công cụ AI”. Giao diện có chế độ sáng/tối và dùng được trên điện thoại; toàn bộ phần màu nằm trong static/theme.css (nạp sau style.css).")
 
 # ------------------------------------------------------------------ 7
 H("7. Hạn chế và hướng phát triển")

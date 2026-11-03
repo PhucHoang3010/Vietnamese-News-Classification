@@ -5,12 +5,12 @@ Chạy hoàn toàn trên CPU, không cần GPU hay mô hình ngôn ngữ lớn, 
 
 ## Chức năng
 **Bài toán chính — phân loại**: TF-IDF + Linear SVM xếp bài vào 11 chuyên mục (Accuracy ≈ 89,3% trên 825 bài kiểm thử).
-Trang chủ có ô **phân loại trực tiếp** (dán đoạn văn bất kỳ → AI xếp chuyên mục ngay), mỗi bài báo có bảng **“AI xếp bài này vào…”** kèm mức nghiêng, top 3 chuyên mục và các từ khóa quyết định.
+Trang chủ có ô **phân loại trực tiếp** (dán đoạn văn bất kỳ → AI xếp chuyên mục ngay), mỗi bài báo có bảng **“AI xếp bài này vào…”** kèm độ tự tin (website gọi phần trăm này là “độ tự tin”), top 3 chuyên mục và các từ khóa quyết định.
 
 **Điểm nhấn — AI gắn nhiều chuyên mục, có bảo đảm** (*conformal prediction*): thay vì ép mỗi bài vào đúng một chuyên mục, AI đưa ra một **tập** chuyên mục sao cho
 với bài mới, chuyên mục đúng nằm trong tập với xác suất ≥ 95% (chọn được 90 / 95 / 99%). Bài rõ ràng → 1 chuyên mục; bài mơ hồ → 2–3 chuyên mục (nhãn “↔ cũng: …”).
 Trên 825 bài kiểm thử, mức 95%: chuyên mục đúng nằm trong tập ở 94,5% bài, trung bình 1,37 chuyên mục/bài, 76% bài chỉ cần 1 chuyên mục (và 1 chuyên mục đó đúng 95,8%);
-lặp 300 lần chia ngẫu nhiên thì độ phủ trung bình 95,6%. Hiện ở trang chủ, trang bài báo, `/phan-loai`, `/giai-thich`, `/thong-ke` và tab **“Bài giao thoa”** của mỗi chuyên mục.
+lặp 300 lần chia ngẫu nhiên thì độ phủ trung bình 95,6%. Hiện ở trang chủ, trang bài báo, `/phan-loai`, `/giai-thich`, `/thong-ke` và tab **“Bài có thể thuộc nhiều mục”** của mỗi chuyên mục.
 Lưu ý: bảo đảm là *trung bình* trên các bài cùng phân bố với dữ liệu hiệu chỉnh (4.675 điểm “chưa thấy”), không phải cam kết cho từng bài.
 
 **Các chức năng khác (không phải phân loại):**
@@ -28,8 +28,8 @@ Lưu ý: bảo đảm là *trung bình* trên các bài cùng phân bố với d
 | Gợi ý "Dành cho bạn" theo lịch sử đọc | Content-based, cosine TF-IDF | trang chủ |
 | AI Lab — giải thích dự đoán | Phân rã mô hình tuyến tính (Explainable AI) | `/giai-thich` |
 
-Ngoài ra: trang chủ kiểu báo điện tử, 11 chuyên mục có phân trang (lọc “chỉ bài kiểm thử” / “chỉ bài AI xếp khác báo gốc” / tab “Bài giao thoa”), đọc bài kèm bài liên quan,
-thống kê (ma trận nhầm lẫn, F1, phân tích lỗi, bảng so sánh công bằng 6 mô hình, độ phủ của tập chuyên mục), giao diện kiểu báo điện tử hiện đại (đầu trang trắng, thanh menu xanh ngọc → xanh dương, nền xanh với cột trắng, cụm tin 3 cột; phần màu nằm trong `static/theme.css`), chế độ sáng/tối, tốt trên điện thoại.
+Ngoài ra: trang chủ kiểu báo điện tử, 11 chuyên mục có phân trang (lọc “bài AI chưa từng thấy” / “AI xếp khác báo gốc” / “bài có thể thuộc nhiều mục”), đọc bài kèm bài liên quan,
+thống kê (ma trận nhầm lẫn, F1, phân tích lỗi, bảng so sánh công bằng 6 mô hình, độ phủ của tập chuyên mục), giao diện kiểu báo điện tử hiện đại, **đã làm gọn cho dễ hiểu**: trang chủ chỉ có ba việc (thử phân loại theo 3 bước ①②③, giải thích “AI làm thế nào” trong 3 dòng, tin theo chuyên mục); thanh menu chỉ có 5 mục (Trang chủ · Chuyên mục · Thử phân loại · Độ chính xác · Công cụ AI); chi tiết nâng cao nằm trong mục “Xem AI phân tích chi tiết” hoặc trang riêng; phần màu nằm trong `static/theme.css`, chế độ sáng/tối, tốt trên điện thoại.
 Ảnh minh họa tự vẽ bằng SVG, mỗi chuyên mục một bảng màu; muốn dùng ảnh thật chỉ cần chép `static/img/<id>.jpg` (id = số bài, xem trên URL `/bai/<id>`).
 
 ## Chạy

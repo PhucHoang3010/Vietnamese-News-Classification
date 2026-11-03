@@ -9,8 +9,8 @@
       <label><input type="radio" name="mode" value="tu-khoa" {{ 'checked' if mode != 'nghia' }}> Theo từ khóa</label>
       <label title="Trộn 70% khớp từ khóa với 30% độ gần nghĩa (LSA): kết quả cùng chủ đề hơn"><input type="radio" name="mode" value="nghia" {{ 'checked' if mode == 'nghia' }}> Theo nghĩa</label>
       <span class="sep"></span>
-      <label><input type="checkbox" name="chac" value="1" {{ 'checked' if f.chac }}> AI nghiêng ≥ 95%</label>
-      <label title="Bài AI thấy có thể thuộc nhiều chuyên mục (bảo đảm 95%)"><input type="checkbox" name="gt" value="1" {{ 'checked' if f.gt }}> Chỉ bài giao thoa ↔</label>
+      <label><input type="checkbox" name="chac" value="1" {{ 'checked' if f.chac }}> Chỉ bài AI tự tin ≥ 95%</label>
+      <label title="Bài AI thấy có thể thuộc nhiều chuyên mục"><input type="checkbox" name="gt" value="1" {{ 'checked' if f.gt }}> Chỉ bài có thể thuộc nhiều mục ↔</label>
       <label><input type="checkbox" name="nhanh" value="1" {{ 'checked' if f.nhanh }}> Đọc ≤ 3 phút</label>
       {% if topic %}<input type="hidden" name="topic" value="{{ topic }}">{% endif %}
     </div>
