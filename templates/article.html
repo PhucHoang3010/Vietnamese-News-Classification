@@ -6,7 +6,7 @@
 <article class="art">
   <a class="tag" href="{{ url_for('category', slug=a.slug) }}">{{ a.icon }} {{ a.label }} · AI xếp</a>
   <h1>{{ a.title }}</h1>
-  <div class="byline"><span>{{ a.minutes }} phút đọc</span></div>
+  <div class="byline"><span>{{ a.minutes }} phút đọc</span><a href="#binh-luan" id="cm-link">💬 {{ ccount(a.id) }} bình luận</a></div>
   <div class="libbar"><button type="button" class="btn ghost sm" id="libbtn">☆ Lưu vào bộ sưu tập</button><span class="libtags" id="libtags"></span></div>
   <section class="cls">
     {% if a.truth != a.label %}<div class="cls-flag bad">⚠ <b>AI khác báo gốc.</b> Báo gốc xếp bài này vào “{{ a.truth }}”. AI chọn “{{ a.label }}” ({{ a.pct }}%){% if truth_rank %}; “{{ a.truth }}” đứng thứ {{ truth_rank }} ({{ truth_pct }}%){% endif %}. Trên {{ STATS.n_test }} bài kiểm thử, AI xếp khác báo gốc ở {{ STATS.n_err }} bài ({{ (100 * STATS.n_err / STATS.n_test)|round(1) }}%).</div>
@@ -34,10 +34,26 @@
   <figure class="fig" style="margin-left:0;margin-right:0"><div class="thumb"><img src="{{ a.img }}" alt=""></div><div class="figcap">Ảnh minh họa theo chuyên mục “{{ a.label }}”.</div></figure>
   <div class="body" style="margin-top:20px">{% for p in a.content|paras %}<p>{{ p }}</p>{% endfor %}</div>
 </article>
+<section class="cmts" id="binh-luan" data-aid="{{ a.id }}" aria-labelledby="cm-h">
+  <div class="sec-h"><h2 id="cm-h">Bình luận <small id="cm-n"></small></h2>
+    <div class="cm-sort" role="group" aria-label="Sắp xếp bình luận"><button type="button" data-s="moi" class="on">Mới nhất</button><button type="button" data-s="thich">Nhiều lượt thích</button></div></div>
+  <form id="cm-form" class="cm-form" autocomplete="off">
+    <span class="cm-av" aria-hidden="true">✍</span>
+    <div class="cm-fields">
+      <textarea id="cm-body" rows="3" maxlength="1000" placeholder="Chia sẻ ý kiến của bạn về bài viết… (Ctrl+Enter để gửi)" aria-label="Nội dung bình luận" required></textarea>
+      <div class="cm-row"><input id="cm-name" maxlength="30" placeholder="Tên hiển thị (không bắt buộc)" aria-label="Tên hiển thị"><span class="cm-cnt" id="cm-cnt">0/1000</span><button class="btn">Gửi bình luận</button></div>
+      <div class="err" id="cm-err" hidden></div>
+    </div>
+  </form>
+  <div id="cm-list" aria-live="polite"><p class="cm-empty">Đang tải bình luận…</p></div>
+  <div class="cm-more"><button type="button" class="btn ghost" id="cm-more" hidden>Xem thêm bình luận</button></div>
+  <p class="note">Bình luận được lưu trên máy chủ của website này (không cần tài khoản), ai mở website cũng xem được. Bạn xóa được bình luận do chính mình viết trên trình duyệt này. Website không kiểm duyệt nội dung, vì vậy đừng nhập thông tin cá nhân.</p>
+</section>
 <section class="blk" style="margin-top:30px"><div class="sec-h"><h2>Bài viết liên quan</h2></div><div class="grid2">{% for r in related %}{{ card(r) }}{% endfor %}</div></section>
 </div>{{ sidebar() }}</div>
 {% endblock %}
-{% block scripts %}<script>
+{% block scripts %}<script src="{{ url_for('static', filename='comments.js') }}" defer></script>
+<script>
 const libSugg={{ ([a.label] + kws[:3])|tojson }};
 function drawLib(){
   const id={{ a.id }},on=Lib.has(id);$('#libbtn').textContent=on?'★ Đã lưu · bấm để bỏ lưu':'☆ Lưu vào bộ sưu tập';$('#libbtn').classList.toggle('on',on);

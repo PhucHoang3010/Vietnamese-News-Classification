@@ -19,6 +19,7 @@ Lưu ý: bảo đảm là *trung bình* trên các bài cùng phân bố với d
 | **Hỏi AI về tin tức** — gõ câu hỏi, AI trích đúng câu trả lời từ các bài liên quan, luôn dẫn nguồn, biết từ chối khi không có căn cứ | Truy hồi thông tin (TF-IDF, cosine) + xếp hạng câu, chỉ trích không tự sinh | `/hoi-ai` và ô “Hỏi AI về bài này” ở mỗi bài |
 | **Tìm kiếm nâng cao** — `AND / OR / NOT`, `"cụm từ"`, `bóng*`, `-từ`, ngoặc đơn, tìm theo trường `tieude: sapo: noidung: chuyenmuc:`; không phân biệt dấu; hiển thị “Hiểu truy vấn là…” | Chỉ mục ngược nhị phân theo từng trường + bộ phân tích cú pháp; kết quả xếp theo TF-IDF | `/tim-kiem` |
 | **Tìm theo nghĩa** — kết quả cùng chủ đề hơn tìm từ khóa thuần | LSA (TF-IDF → TruncatedSVD 300 chiều) trộn 70% TF-IDF + 30% LSA | `/tim-kiem` (chọn “Theo nghĩa”) |
+| **Bình luận của bạn đọc** — đăng, trả lời, thích, sắp xếp mới nhất / nhiều thích, xóa bình luận của mình; số bình luận hiện trên thẻ bài; khối “Ý kiến bạn đọc” ở thanh bên | SQLite (`data/comments.db`), không cần tài khoản; giới hạn độ dài/tốc độ, chống trùng, thoát HTML (xem `comments.py`) | cuối mỗi trang bài |
 | **Bộ sưu tập cá nhân** — lưu bài (☆), gắn thẻ, lọc theo thẻ, xuất JSON/CSV, hỏi AI trong các bài đã lưu, gợi ý thêm | Lưu trong trình duyệt (localStorage); chỉ số thứ tự bài được gửi lên khi hỏi/gợi ý | `/bo-suu-tap` |
 | Phân loại ngay khi gõ | Dự đoán thời gian thực | `/phan-loai` |
 | Tóm tắt tự động (kèm từ khóa, đo ROUGE) | TextRank / PageRank trên đồ thị câu | `/tom-tat` |
@@ -28,8 +29,8 @@ Lưu ý: bảo đảm là *trung bình* trên các bài cùng phân bố với d
 | AI Lab — giải thích dự đoán | Phân rã mô hình tuyến tính (Explainable AI) | `/giai-thich` |
 
 Ngoài ra: trang chủ kiểu báo điện tử, 11 chuyên mục có phân trang (lọc “chỉ bài kiểm thử” / “chỉ bài AI xếp khác báo gốc” / tab “Bài giao thoa”), đọc bài kèm bài liên quan,
-thống kê (ma trận nhầm lẫn, F1, phân tích lỗi, bảng so sánh công bằng 6 mô hình, độ phủ của tập chuyên mục), giao diện trắng đen kiểu báo giấy, chế độ sáng/tối, tốt trên điện thoại.
-Ảnh minh họa đen-trắng tự tạo theo chuyên mục; muốn dùng ảnh thật chỉ cần chép `static/img/<id>.jpg` (id = số bài, xem trên URL `/bai/<id>`).
+thống kê (ma trận nhầm lẫn, F1, phân tích lỗi, bảng so sánh công bằng 6 mô hình, độ phủ của tập chuyên mục), giao diện kiểu báo điện tử hiện đại (đầu trang trắng, thanh menu xanh ngọc → xanh dương, nền xanh với cột trắng, cụm tin 3 cột; phần màu nằm trong `static/theme.css`), chế độ sáng/tối, tốt trên điện thoại.
+Ảnh minh họa tự vẽ bằng SVG, mỗi chuyên mục một bảng màu; muốn dùng ảnh thật chỉ cần chép `static/img/<id>.jpg` (id = số bài, xem trên URL `/bai/<id>`).
 
 ## Chạy
 **Windows (dễ nhất):** bấm đúp `CHAY.bat` (tự tạo môi trường `.venv`, cài thư viện, chạy website).
@@ -46,7 +47,8 @@ python app.py                   # mở http://127.0.0.1:5000
 - `python app.py --lan` cho máy khác cùng WiFi mở được website (không bắt buộc).
 - Gặp lỗi phiên bản scikit-learn khi nạp mô hình: chạy `python train.py` rồi `python build_cache.py` để tạo lại `model.joblib`, dự đoán sẵn và ngưỡng của tập chuyên mục.
 - Không biết lỗi ở đâu: `python kiem_tra_moi_truong.py` (in phiên bản Python, thời gian nạp từng thư viện, thử nạp mô hình).
-- Kiểm thử tự động (15 bài kiểm tra: độ phủ conformal, cú pháp tìm kiếm AND/OR/NOT, cụm từ, ký tự đại diện, trường, bỏ dấu, báo lỗi cú pháp): `python -m unittest discover -s tests -v`
+- Kiểm thử tự động (40 bài: độ phủ conformal, cú pháp tìm kiếm AND/OR/NOT, cụm từ, ký tự đại diện, trường, bỏ dấu, báo lỗi cú pháp, bình luận: đăng/trả lời/thích/xóa, giới hạn tốc độ, API): `python -m unittest discover -s tests -v`. Kiểm thử giao diện bằng trình duyệt (cần Node.js + Playwright): xem đầu các tệp trong `tests/e2e/`.
+- **Bình luận** nằm trong `data/comments.db` (SQLite, không đưa lên git; mỗi máy có bộ riêng). Muốn xóa hết bình luận: xóa tệp này (tắt website trước cho chắc). Muốn dùng tệp khác: đặt biến môi trường `VNNEWS_COMMENTS_DB=<đường dẫn>` trước khi chạy `python app.py`. Website không có tài khoản và không kiểm duyệt nội dung bình luận.
 
 Hướng dẫn chi tiết từng bước và cách xử lý lỗi: `HUONG-DAN-CHAY.txt`. Slide và kịch bản thuyết trình (không demo, chia 5 người): thư mục `trinh-bay/`.
 Mọi chức năng chạy cục bộ, **không cần Internet hay micro**. (Phông chữ lấy từ Google Fonts nếu có mạng, nếu không tự dùng phông dự phòng.)

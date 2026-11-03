@@ -355,6 +355,15 @@ H("6.8 Phân loại thời gian thực và chạy cục bộ", 2)
 B(["Phân loại khi gõ: kết quả cập nhật theo thời gian thực sau mỗi lần ngừng gõ, không cần nhấn nút; trang chủ có ô dán văn bản và xem ngay chuyên mục AI chọn.",
    "Toàn bộ chức năng chạy cục bộ, không cần Internet hay thiết bị ngoại vi, nên ổn định khi trình bày; thêm tùy chọn python app.py --lan để máy khác cùng WiFi mở được."])
 
+H("6.9 Bình luận của bạn đọc", 2)
+P("Mỗi bài báo có khu bình luận quen thuộc ở các trang tin: đăng bình luận, trả lời (một cấp), bấm Thích, sắp xếp theo mới nhất hoặc nhiều lượt thích, xóa bình luận do chính mình viết; số bình luận hiện trên thẻ bài và khối “Ý kiến bạn đọc” ở thanh bên. "
+  "Bình luận lưu trong SQLite (data/comments.db) và không cần tài khoản: mỗi trình duyệt tự sinh một mã ngẫu nhiên, máy chủ chỉ giữ bản băm SHA-256 của mã đó để biết bình luận nào là của mình và ai đã thích. "
+  "Hệ thống giới hạn độ dài (1.000 ký tự), tốc độ (cách nhau 5 giây; tối đa 20 bình luận mỗi giờ cho mỗi trình duyệt và 60 cho mỗi địa chỉ IP), từ chối bình luận trùng, và luôn thoát ký tự HTML khi hiển thị nên nội dung người dùng không chèn được mã. "
+  "Phần này được kiểm thử bằng 25 bài kiểm tra đơn vị (tests/test_comments.py) và một kịch bản trình duyệt tự động (tests/e2e/comments_e2e.js: đăng, trả lời, thích, xóa, tải lại trang, trình duyệt thứ hai, chuỗi chứa HTML).")
+H("6.10 Giao diện", 2)
+P("Giao diện theo bố cục báo điện tử hiện đại: đầu trang trắng, thanh menu chuyển màu xanh ngọc sang xanh dương (Trang chủ, Chủ đề, Hỏi AI, Công cụ, Thống kê, ô tìm kiếm và nút menu), nền xanh với cột nội dung trắng ở giữa, cụm tin nổi bật ba cột (tiêu đề, ảnh, danh sách) và thẻ tin có nhãn chuyên mục do AI xếp kèm mức nghiêng. "
+  "Ảnh minh họa được tự vẽ bằng SVG, mỗi chuyên mục một bảng màu. Giao diện có chế độ sáng/tối và dùng được trên điện thoại; toàn bộ phần màu nằm trong static/theme.css (nạp sau style.css).")
+
 # ------------------------------------------------------------------ 7
 H("7. Hạn chế và hướng phát triển")
 B([f"Tách từ tiếng Việt: đã thử pyvi, Macro-F1 chỉ tăng {vn(abl.loc['Tách từ (pyvi) + 1–2 gram', 'delta_vs_base'] * 100, 2)} điểm (p = {vn(abl.loc['Tách từ (pyvi) + 1–2 gram', 'paired_t_p'], 2)}, chưa có ý nghĩa) nên không dùng; chưa thử underthesea/VnCoreNLP.",
@@ -363,6 +372,7 @@ B([f"Tách từ tiếng Việt: đã thử pyvi, Macro-F1 chỉ tăng {vn(abl.lo
    f"Phần trăm hiển thị đã hiệu chỉnh nhiệt độ (ECE {pc(c1.ECE)}) nhưng chưa phải xác suất tuyệt đối; chưa kiểm tra trên tin từ nguồn báo khác (ngoài miền dữ liệu).",
    "Bảo đảm của tập chuyên mục là trung bình và chỉ áp dụng cho bài cùng phân phối với dữ liệu hiệu chỉnh (cùng nguồn báo); ngưỡng riêng cho Thời sự rộng nên chuyên mục này xuất hiện trong tập của nhiều bài thuộc mục khác.",
    "Tìm theo nghĩa (LSA) chưa được người dùng đánh giá, chỉ đo gián tiếp; bộ sưu tập cá nhân lưu trong trình duyệt nên không đồng bộ giữa các thiết bị.",
+   "Bình luận không có tài khoản và không kiểm duyệt nội dung (chỉ giới hạn độ dài, tốc độ, chống trùng; người dùng chỉ xóa được bình luận của chính mình trên trình duyệt đó): phù hợp để trình diễn cục bộ, chưa đủ cho một website công khai.",
    "Hỏi AI chỉ trích câu có sẵn, không tổng hợp nhiều nguồn và chưa được đánh giá bằng câu hỏi của người dùng thật; chỉ trả lời được nội dung trong kho 5.500 bài (tĩnh, không cập nhật tin mới).",
    "Hướng phát triển: thu tin mới qua RSS để kiểm tra ngoài dữ liệu hiện có; gán lại nhãn cho các bài nghi sai; thử PhoBERT khi có GPU; thêm chấm điểm câu trả lời bằng người đọc."])
 
@@ -370,7 +380,7 @@ B([f"Tách từ tiếng Việt: đã thử pyvi, Macro-F1 chỉ tăng {vn(abl.lo
 H("8. Hướng dẫn chạy")
 P("Windows: bấm đúp CHAY.bat. Hoặc:\npython -m venv .venv\n.venv\\Scripts\\activate     (Linux/macOS: source .venv/bin/activate)\npip install -r requirements.txt\npython app.py          # mở http://127.0.0.1:5000 (lần đầu 1–3 phút, đừng bấm Ctrl+C)\n"
   "python train.py        # (tùy chọn) huấn luyện lại + sinh biểu đồ\npython build_cache.py  # dự đoán sẵn cho 5.500 bài\npython predict.py \"nội dung bài báo\"\npython make_report.py  # sinh lại báo cáo\n"
-  "python experiments/exp2_ablation.py   # chạy lại từng thí nghiệm (exp1 … exp10; cần pip install pyvi cho phần tách từ)\npython -m unittest discover -s tests -v   # kiểm thử tự động (conformal, tìm kiếm Boolean)")
+  "python experiments/exp2_ablation.py   # chạy lại từng thí nghiệm (exp1 … exp10; cần pip install pyvi cho phần tách từ)\npython -m unittest discover -s tests -v   # kiểm thử tự động (conformal, tìm kiếm Boolean, bình luận)")
 P("Nếu gặp lỗi khi chạy, chạy python kiem_tra_moi_truong.py để xem phiên bản Python, thời gian nạp từng thư viện và thử nạp mô hình.")
 
 # ------------------------------------------------------------------ 9
@@ -380,7 +390,7 @@ P(f"Hệ thống TF-IDF + Linear SVM đạt Accuracy {pc(m['test_accuracy'])} v�
   "Khi chỉnh tham số công bằng cho mọi mô hình, Linear SVM và Logistic Regression ngang nhau về mặt thống kê; ablation cho thấy nội dung bài báo, cặp từ và log-tf là các yếu tố quan trọng còn tách từ không cải thiện đáng kể. "
   f"Chúng em còn hiệu chỉnh độ tin cậy (ECE từ {pc(c0.ECE)} xuống {pc(c1.ECE)}), kiểm chứng rằng lời giải thích của AI Lab phản ánh đúng quyết định của mô hình trên 825 bài, "
   f"và bổ sung chức năng Hỏi AI trả lời có dẫn nguồn. Điểm đột phá là dự đoán có bảo đảm: với mức 95%, AI nêu trung bình {vn(cprod['0.05']['avg_size'], 2)} chuyên mục mỗi bài và đáp án đúng nằm trong tập ở {pc(cprod['0.05']['coverage'])} bài kiểm thử (so với {pc(m['test_accuracy'])} khi chỉ được chọn một), "
-  "kèm tìm kiếm nâng cao (Boolean, theo trường, theo nghĩa) và bộ sưu tập cá nhân. Toàn bộ chạy trên CPU, không cần tài nguyên tính toán lớn.")
+  "kèm tìm kiếm nâng cao (Boolean, theo trường, theo nghĩa), bộ sưu tập cá nhân và bình luận của bạn đọc. Toàn bộ chạy trên CPU, không cần tài nguyên tính toán lớn.")
 H("Tài liệu tham khảo")
 B(["Pedregosa et al., Scikit-learn: Machine Learning in Python, JMLR 12, 2011.", "Manning, Raghavan, Schütze. Introduction to Information Retrieval, Cambridge UP, 2008.",
    "Joachims, T. Text categorization with Support Vector Machines, ECML 1998.",

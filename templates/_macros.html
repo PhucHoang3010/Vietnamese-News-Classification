@@ -1,9 +1,10 @@
+{% macro cmeta(a) %}<span>{{ a.minutes }} phút đọc</span>{% set n = ccount(a.id) %}{% if n %}<span class="cm-n" title="{{ n }} bình luận">💬 {{ n }}</span>{% endif %}{% endmacro %}
 {% macro card(a, cat=True) %}
 <a class="card" href="{{ url_for('article', aid=a.id) }}" style="--c:{{ a.color }}">
   <div class="thumb"><img src="{{ a.img }}" alt="" loading="lazy"></div>
-  <span class="tag aib">🤖 AI xếp:{% if cat %} {{ a.icon }} {{ a.label }} ·{% endif %} nghiêng {{ a.pct }}%</span>{% if a.truth != a.label %}<span class="tag diff">⚠ Báo gốc: {{ a.truth }}</span>{% endif %}{% if a.others %}<span class="tag xs" title="AI thấy bài này cũng có thể thuộc các chuyên mục sau (bảo đảm 95%)">↔ cũng: {% for o in a.others[:2] %}{{ TOPICS[o][1] }} {{ o }}{{ ', ' if not loop.last }}{% endfor %}</span>{% endif %}
+  <div class="tags"><span class="tag aib">🤖 AI xếp:{% if cat %} {{ a.icon }} {{ a.label }} ·{% endif %} nghiêng {{ a.pct }}%</span>{% if a.truth != a.label %}<span class="tag diff">⚠ Báo gốc: {{ a.truth }}</span>{% endif %}{% if a.others %}<span class="tag xs" title="AI thấy bài này cũng có thể thuộc các chuyên mục sau (bảo đảm 95%)">↔ cũng: {% for o in a.others[:2] %}{{ TOPICS[o][1] }} {{ o }}{{ ', ' if not loop.last }}{% endfor %}</span>{% endif %}</div>
   <h3>{{ a.title }}</h3><p>{{ a.desc }}</p>
-  <div class="meta"><span>{{ a.minutes }} phút đọc</span></div>
+  <div class="meta">{{ cmeta(a) }}</div>
 </a>
 {% endmacro %}
 {% macro mini(a) %}
@@ -15,6 +16,7 @@
 {% macro sidebar() %}
 <aside>
   <div class="box promo"><h3>Công cụ AI</h3><p>Phân loại, tóm tắt tự động, gom sự kiện, gợi ý bài đọc — thử ngay với bài báo của bạn.</p><a class="btn" href="{{ url_for('summarize_page') }}">Tóm tắt bài →</a> <a class="btn ghost" style="margin-top:8px" href="{{ url_for('tools') }}">✦ Tất cả công cụ</a></div>
+  {% set lc = latest_comments(4) %}{% if lc %}<div class="box"><h3>Ý kiến bạn đọc</h3>{% for c in lc %}<a class="cmt-mini" href="{{ url_for('article', aid=c.aid) }}#binh-luan"><b>{{ c.name }}</b><small>{{ c.ts|ago }}</small><p>{{ c.body[:110] }}{{ '…' if c.body|length > 110 }}</p><em>{{ c.title }}</em></a>{% endfor %}</div>{% endif %}
   <div class="box"><h3>Chuyên mục (do AI xếp)</h3><ul class="list">
     {% for n in NAV %}<li><a href="{{ url_for('category', slug=n.slug) }}"><span>{{ n.icon }}</span> {{ n.name }}<b>{{ STATS.counts[n.name] }}</b></a></li>{% endfor %}</ul></div>
   <div class="box"><h3>Độ chính xác AI</h3>

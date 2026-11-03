@@ -27,6 +27,7 @@ CÁCH GÕ TAY
        /hoi-ai        Hỏi AI về tin tức (trích câu trả lời có dẫn nguồn; mỗi bài cũng có ô "Hỏi AI về bài này")
        /tim-kiem      Tìm kiếm: từ khóa, NÂNG CAO (AND/OR/NOT...) hoặc "Theo nghĩa" (xem mục 5 bên dưới)
        /bo-suu-tap    Bộ sưu tập của tôi: bài đã lưu (bấm ☆), thẻ, xuất JSON/CSV, hỏi AI trong các bài đã lưu
+       /bai/<số>      Trang bài báo: AI xếp chuyên mục, tóm tắt, Hỏi AI về bài này, BÌNH LUẬN ở cuối bài
        /giai-thich    AI Lab: AI giải thích vì sao chọn chuyên mục
        /thong-ke      Thống kê mô hình, ma trận nhầm lẫn, phân tích lỗi, độ phủ của "tập chuyên mục có bảo đảm"
        /chu-de/the-thao   Từng chuyên mục, ví dụ the-thao, kinh-doanh, phap-luat (có tab "Bài giao thoa": bài AI thấy có thể thuộc chuyên mục này)
@@ -51,6 +52,12 @@ CÁCH GÕ TAY
      c) BỘ SƯU TẬP: bấm ☆ ở bài báo hoặc kết quả tìm kiếm. Danh sách nằm trong TRÌNH DUYỆT (đổi trình duyệt/máy là mất;
         dùng nút "⬇ JSON / CSV" để sao lưu).
 
+     d) BÌNH LUẬN (cuối mỗi trang bài): gõ nội dung, bấm "Gửi bình luận" (Ctrl+Enter cũng được). Có thể trả lời, bấm Thích, đổi cách sắp xếp
+        (Mới nhất / Nhiều lượt thích) và xóa bình luận do CHÍNH MÌNH viết (nhận ra mình bằng mã lưu trong trình duyệt, đổi trình duyệt thì không xóa được).
+        Bình luận lưu trong data/comments.db trên máy chạy website; ai mở website cũng thấy. Gửi liên tiếp sẽ bị chờ vài giây (chống spam).
+        Muốn xóa hết bình luận để trình bày cho sạch: xóa tệp data/comments.db (tắt website trước cho chắc).
+        Website không có tài khoản và không kiểm duyệt, nên đừng nhập thông tin cá nhân.
+
 NẾU GẶP LỖI
   - Báo lỗi phiên bản scikit-learn khi nạp model.joblib:
        python train.py          (huấn luyện lại, mất vài phút, tạo lại model.joblib)
@@ -59,11 +66,12 @@ NẾU GẶP LỖI
   - Không biết lỗi ở đâu:   python kiem_tra_moi_truong.py   (in phiên bản Python, thời gian nạp từng thư viện, thử nạp mô hình)
   - Lỡ bấm Ctrl+C khi đang nạp: chạy lại python app.py rồi chờ.
   - Báo cổng 5000 đang bận: đóng cửa sổ đang chạy website cũ rồi chạy lại.
-  - Sửa mã/mẫu giao diện xong mà trang không đổi: tắt website (Ctrl+C) rồi chạy lại python app.py (bản chạy thường không tự nạp lại).
+  - Sửa mã/mẫu giao diện xong mà trang không đổi: tắt website (Ctrl+C) rồi chạy lại python app.py (bản chạy thường không tự nạp lại; đặt VNNEWS_DEV=1 trước khi chạy thì mẫu HTML tự nạp lại).
+  - Báo "Chưa ghi được bình luận trên máy này": thư mục data/ đang chỉ-đọc (vd. chạy ngay trong tệp zip chưa giải nén). Giải nén ra thư mục thường rồi chạy lại.
   - Tìm "Theo nghĩa" báo chưa sẵn sàng: chờ thêm vài chục giây sau khi mở website rồi thử lại.
 
 CÁC LỆNH KHÁC
-  python -m unittest discover -s tests -v                         chạy 15 bài kiểm tra tự động (conformal + tìm kiếm); phải báo OK
+  python -m unittest discover -s tests -v                         chạy 40 bài kiểm tra tự động (conformal, tìm kiếm, bình luận); phải báo OK
   python predict.py "Bộ Giáo dục công bố điểm chuẩn đại học"     phân loại một đoạn văn trong Terminal
   python eval_summary.py                                          đo ROUGE của tóm tắt
   python make_report.py                                           tạo lại BAO_CAO_DO_AN.docx

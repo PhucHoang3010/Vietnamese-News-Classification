@@ -1,5 +1,5 @@
-{% extends "base.html" %}{% from "_macros.html" import card, mini, sidebar with context %}
-{% block content %}
+{% extends "base.html" %}{% from "_macros.html" import card, mini, cmeta, sidebar with context %}
+{% block band %}
 <section class="clshero">
   <div class="cl-l">
     <span class="kick">🤖 Bài toán của đồ án</span>
@@ -10,6 +10,20 @@
     <div class="cl-chips" id="hsamples"></div>
   </div>
   <div class="cl-r" id="hres"><div class="cl-empty">Đang phân loại…</div></div>
+</section>
+{% endblock %}
+{% block content %}
+<section class="top3" aria-label="Tin nổi bật">
+  <a class="t3-main" href="{{ url_for('article', aid=hero.id) }}" style="--c:{{ hero.color }}">
+    <span class="chipcat">{{ hero.icon }} {{ hero.label }}</span>
+    <h1>{{ hero.title }}</h1>
+    <div class="t3-meta"><span class="tag aib">🤖 AI nghiêng {{ hero.pct }}%</span>{{ cmeta(hero) }}</div>
+    <p>{{ hero.desc[:260] }}{{ '…' if hero.desc|length>260 }}</p>
+  </a>
+  <a class="t3-img" href="{{ url_for('article', aid=hero.id) }}" tabindex="-1" aria-hidden="true"><div class="thumb"><img src="{{ hero.img }}" alt=""></div></a>
+  <div class="t3-list">{% for a in side %}
+    <a class="t3-item" href="{{ url_for('article', aid=a.id) }}" style="--c:{{ a.color }}"><h3>{{ a.title }}</h3><div class="t3-meta"><span class="chipcat sm">{{ a.icon }} {{ a.label }}</span><span class="tag aib">AI {{ a.pct }}%</span>{{ cmeta(a) }}</div></a>{% endfor %}
+  </div>
 </section>
 <section class="how" id="how">
   <h2 class="serif">VnNews hoạt động thế nào?</h2>
@@ -26,12 +40,6 @@
 {% if saved and STATS.conf.get('95') %}<section class="gtsec"><div class="sec-h"><h2>↔ Khi AI không ép chọn một chuyên mục</h2><a href="{{ url_for('stats') }}#conf">Xem số liệu →</a></div>
   <p class="note" style="margin-top:0">Buộc chọn 1 mục thì AI đúng {{ (STATS.acc*100)|round(1) }}%. Cho AI nêu thêm chuyên mục khi chưa chắc thì <b>{{ STATS.conf['95'].coverage }}%</b> bài có chuyên mục đúng nằm trong tập (trung bình {{ STATS.conf['95'].avg_size }} chuyên mục/bài; {{ STATS.conf['95'].single }}% bài chỉ cần 1). Ví dụ 3 bài AI chọn khác báo gốc nhưng tập chuyên mục vẫn chứa đáp án đúng:</p>
   <div class="grid3">{% for a in saved %}{{ card(a) }}{% endfor %}</div></section>{% endif %}
-<h2 class="serif newshead">Kho tin: {{ STATS.n|vn }} bài do AI xếp chuyên mục</h2>
-<div class="hero">
-  <a class="hero-main" href="{{ url_for('article', aid=hero.id) }}" style="--c:{{ hero.color }}"><img class="bg" src="{{ hero.img }}" alt="">
-    <div class="in"><span class="tag aib">🤖 AI xếp vào {{ hero.icon }} {{ hero.label }} · nghiêng {{ hero.pct }}%</span><h1>{{ hero.title }}</h1><p>{{ hero.desc[:220] }}{{ '…' if hero.desc|length>220 }}</p></div></a>
-  <div class="hero-side">{% for a in side %}{{ mini(a) }}{% endfor %}</div>
-</div>
 <section class="askban"><div class="ab-l"><span class="big">💬</span><div><b class="serif">Hỏi AI về tin tức</b><small>Gõ một câu hỏi: AI tìm trong {{ STATS.n|vn }} bài và trích câu trả lời, luôn dẫn nguồn.</small></div></div>
   <form action="{{ url_for('ask_page') }}" method="get" class="ab-f"><input name="q" placeholder="Ví dụ: Giá vàng trong nước biến động thế nào?" autocomplete="off" maxlength="300"><button class="btn">Hỏi AI</button></form>
   <div class="ab-ex">{% for e in ['Giá vàng trong nước biến động thế nào?', 'Mitsubishi Destinator ra mắt ở Việt Nam khi nào?', 'Thông tư 29 về dạy thêm có hiệu lực khi nào?'] %}<a href="{{ url_for('ask_page', q=e) }}">{{ e }}</a>{% endfor %}</div></section>
@@ -43,7 +51,7 @@
 </div>
 <section class="blk" id="foryou" hidden><div class="sec-h"><h2>Dành cho bạn</h2><a id="prof"></a></div><div class="foryou-grid" id="foryou-grid"></div></section>
 <div class="layout"><div>
-  <section class="blk"><div class="sec-h"><h2>Tin mới nhất</h2></div><div class="grid2">{% for a in latest[:4] %}{{ card(a) }}{% endfor %}</div></section>
+  <section class="blk"><div class="sec-h"><h2>Tin mới nhất</h2><span class="sh-note">Kho tin: {{ STATS.n|vn }} bài do AI xếp chuyên mục</span></div><div class="grid2">{% for a in latest[:4] %}{{ card(a) }}{% endfor %}</div></section>
   {% for name, items in sections %}{% set m = TOPICS[name] %}
   <section class="blk" style="--c:{{ m[2] }}"><div class="sec-h"><h2>{{ m[1] }} {{ name }}</h2><a href="{{ url_for('category', slug=m[0]) }}">Xem tất cả →</a></div>
     <div class="sect">{{ card(items[0]) }}<div class="stack">{% for a in items[1:4] %}{{ mini(a) }}{% endfor %}</div></div></section>

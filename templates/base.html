@@ -5,39 +5,62 @@
 <title>{% block title %}VnNews — Tin tức được AI phân loại{% endblock %}</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📰%3C/text%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700&family=Playfair+Display:wght@600;700;800&display=swap&subset=vietnamese">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;600;700;800&display=swap&subset=vietnamese">
 <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='theme.css') }}">
 <script>try{document.documentElement.dataset.theme=localStorage.getItem('theme')||'light'}catch(e){}</script>
 </head>
 <body>
-<div class="topbar"><div class="wrap"><span>Mọi bài viết được AI tự động phân loại vào 11 chuyên mục</span>
-  <div class="r"><a href="{{ url_for('classify_page') }}">Phân loại</a><a href="{{ url_for('ask_page') }}">Hỏi AI</a><a href="{{ url_for('library') }}">📚 Bộ sưu tập<span class="libcount"></span></a><a href="{{ url_for('summarize_page') }}">Tóm tắt</a><a href="{{ url_for('events') }}">Sự kiện</a><a href="{{ url_for('digest') }}">Bản tin 60s</a><a href="{{ url_for('stats') }}">Thống kê</a><a href="{{ url_for('about') }}">Giới thiệu</a></div></div></div>
-<header class="main"><div class="wrap head">
-  <a class="logo" href="{{ url_for('home') }}">VnNews<small>Tin tức · AI phân loại</small></a>
-  <form class="search" action="{{ url_for('search') }}"><input name="q" value="{{ q }}" placeholder="Tìm kiếm bài báo, chủ đề..." autocomplete="off"><button>Tìm</button></form>
-  <a class="btn" href="{{ url_for('ask_page') }}">💬 Hỏi AI</a>
-  <button class="icon" id="theme" title="Sáng / tối">🌙</button>
+<header class="site"><div class="hw">
+  <a class="logo" href="{{ url_for('home') }}" aria-label="VnNews, trang chủ"><span class="lg"><em>Vn</em>News</span><small>trang tin điện tử · AI phân loại</small></a>
+  <div class="hd-r">
+    <a class="aichip" href="{{ url_for('stats') }}" title="Độ chính xác của AI trên các bài nó chưa từng thấy"><span class="ic">🤖</span><span><b>AI xếp đúng {{ (STATS.acc*100)|round(1) }}%</b><small>trên {{ STATS.n_test }} bài kiểm thử</small></span></a>
+    <a class="hbtn" href="{{ url_for('library') }}" title="Bộ sưu tập của tôi" aria-label="Bộ sưu tập của tôi">📚<span class="libcount"></span></a>
+    <button class="hbtn" id="theme" type="button" title="Sáng / tối" aria-label="Đổi giao diện sáng hoặc tối">🌙</button>
+  </div>
 </div></header>
-<nav class="cats"><div class="wrap">
-  <a class="home {{ 'on' if request.endpoint=='home' }}" href="{{ url_for('home') }}">Trang chủ</a>
-  {% for n in NAV %}<a style="--c:{{ n.color }}" class="{{ 'on' if request.view_args and request.view_args.get('slug')==n.slug }}" href="{{ url_for('category', slug=n.slug) }}">{{ n.name }}</a>{% endfor %}
-  <a class="lab" href="{{ url_for('ask_page') }}">💬 Hỏi AI</a>
-</div></nav>
-<main><div class="wrap">{% block content %}{% endblock %}</div></main>
-<footer><div class="wrap">
+<nav class="bar" aria-label="Menu chính"><div class="bw">
+  <div class="navtabs">
+  <a class="tab {{ 'on' if request.endpoint=='home' }}" href="{{ url_for('home') }}">Trang chủ</a>
+  <span class="tabdd"><button type="button" class="tab {{ 'on' if request.endpoint=='category' }}" id="ddbtn" aria-expanded="false" aria-controls="ddpanel">Chủ đề <i>▾</i></button>
+    <div class="dd" id="ddpanel" hidden>{% for n in NAV %}<a href="{{ url_for('category', slug=n.slug) }}" style="--c:{{ n.color }}" class="{{ 'on' if request.view_args and request.view_args.get('slug')==n.slug }}"><span>{{ n.icon }}</span>{{ n.name }}<small>{{ STATS.counts[n.name] }}</small></a>{% endfor %}</div></span>
+  <a class="tab {{ 'on' if request.endpoint=='ask_page' }}" href="{{ url_for('ask_page') }}">Hỏi AI</a>
+  <a class="tab {{ 'on' if request.endpoint in ('tools','summarize_page','events','digest','classify_page','lab') }}" href="{{ url_for('tools') }}">Công cụ</a>
+  <a class="tab {{ 'on' if request.endpoint=='stats' }}" href="{{ url_for('stats') }}">Thống kê</a>
+  </div>
+  <form class="bsearch" action="{{ url_for('search') }}" role="search"><input name="q" value="{{ q }}" placeholder="Nhập nội dung tìm kiếm" autocomplete="off" aria-label="Tìm kiếm bài báo"><button aria-label="Tìm"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m15.5 15.5 5 5"/></svg></button></form>
+  <button type="button" class="burger" id="burger" aria-label="Mở menu" aria-expanded="false" aria-controls="menu"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+</div>
+<div class="menu" id="menu" hidden><div class="mw">
+  <div><h5>Chuyên mục (do AI xếp)</h5>{% for n in NAV %}<a href="{{ url_for('category', slug=n.slug) }}"><span>{{ n.icon }}</span>{{ n.name }}</a>{% endfor %}</div>
+  <div><h5>Công cụ AI</h5><a href="{{ url_for('classify_page') }}">🏷️ Phân loại bài báo</a><a href="{{ url_for('ask_page') }}">💬 Hỏi AI về tin tức</a><a href="{{ url_for('summarize_page') }}">📝 Tóm tắt tự động</a><a href="{{ url_for('events') }}">🧩 Sự kiện &amp; chủ đề con</a><a href="{{ url_for('digest') }}">⚡ Bản tin 60 giây</a><a href="{{ url_for('lab') }}">🔬 AI Lab — giải thích</a><a href="{{ url_for('tools') }}">✦ Tất cả công cụ</a></div>
+  <div><h5>Của tôi &amp; đồ án</h5><a href="{{ url_for('library') }}">📚 Bộ sưu tập<span class="libcount"></span></a><a href="{{ url_for('stats') }}">📊 Thống kê mô hình</a><a href="{{ url_for('about') }}">ℹ️ Giới thiệu đồ án</a><a href="{{ url_for('guide') }}">🎤 Kịch bản trình bày</a><button type="button" class="mtheme" id="theme2">🌙 Đổi giao diện sáng / tối</button></div>
+</div></div>
+</nav>
+<div class="band"><div class="bandw">{% block band %}{% endblock %}</div></div>
+<main class="col"><div class="wrap">{% block content %}{% endblock %}</div></main>
+<footer><div class="fw">
   <div><h5>VnNews</h5>Trang tin tức mô phỏng với hệ thống học máy phân loại chủ đề tiếng Việt (TF-IDF + Linear SVM). Dữ liệu gồm {{ '{:,}'.format(STATS.n).replace(',', '.') }} bài báo, đồ án môn Học máy.</div>
   <div><h5>Chuyên mục</h5>{% for n in NAV[:6] %}<a href="{{ url_for('category', slug=n.slug) }}">{{ n.name }}</a>{% endfor %}</div>
   <div><h5>Công cụ AI</h5><a href="{{ url_for('ask_page') }}">Hỏi AI về tin tức</a><a href="{{ url_for('tools') }}">Tất cả công cụ</a><a href="{{ url_for('guide') }}">Kịch bản trình bày</a><a href="{{ url_for('summarize_page') }}">Tóm tắt tự động</a><a href="{{ url_for('events') }}">Sự kiện & chủ đề con</a><a href="{{ url_for('lab') }}">AI Lab — giải thích</a><a href="{{ url_for('classify_page') }}">Phân loại bài báo</a><a href="{{ url_for('stats') }}">Thống kê mô hình</a><a href="{{ url_for('about') }}">Giới thiệu đồ án</a></div>
 </div></footer>
 {% if request.endpoint != 'ask_page' %}<a class="fab" href="{{ url_for('ask_page') }}" title="Hỏi AI về tin tức">💬 Hỏi AI</a>{% endif %}
-<div class="toast" id="toast"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
 const $=s=>document.querySelector(s),esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-function setTheme(t){document.documentElement.dataset.theme=t;$('#theme').textContent=t==='dark'?'☀️':'🌙';try{localStorage.setItem('theme',t)}catch(e){}}
-setTheme(document.documentElement.dataset.theme);$('#theme').onclick=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+function setTheme(t){document.documentElement.dataset.theme=t;const ic=t==='dark'?'☀️':'🌙';$('#theme').textContent=ic;const m=$('#theme2');if(m)m.textContent=ic+' Đổi giao diện sáng / tối';try{localStorage.setItem('theme',t)}catch(e){}}
+const flipTheme=()=>setTheme(document.documentElement.dataset.theme==='dark'?'light':'dark');
+setTheme(document.documentElement.dataset.theme);$('#theme').onclick=flipTheme;$('#theme2').onclick=flipTheme;
 const toast=m=>{const t=$('#toast');t.textContent=m;t.classList.add('on');setTimeout(()=>t.classList.remove('on'),1800)};
 window.addEventListener('load',()=>document.querySelectorAll('i[data-w]').forEach(i=>i.style.width=i.dataset.w+'%'));
-const a=document.querySelector('nav.cats a.on');a&&a.scrollIntoView({inline:'center',block:'nearest'});
+/* Menu: danh sách "Chủ đề" và nút ☰ (đóng khi bấm ra ngoài hoặc nhấn Esc) */
+(()=>{const dd=$('#ddbtn'),ddp=$('#ddpanel'),bg=$('#burger'),mn=$('#menu');
+ const shut=()=>{ddp.hidden=mn.hidden=true;dd.setAttribute('aria-expanded','false');bg.setAttribute('aria-expanded','false')};
+ const flip=(btn,box)=>{const open=box.hidden;shut();box.hidden=!open;btn.setAttribute('aria-expanded',String(open))};
+ dd.onclick=e=>{e.stopPropagation();matchMedia('(max-width:900px)').matches?flip(bg,mn):flip(dd,ddp)};bg.onclick=e=>{e.stopPropagation();flip(bg,mn)};
+ document.addEventListener('click',e=>{if(!e.target.closest('.dd,.menu'))shut()});
+ document.addEventListener('keydown',e=>{if(e.key==='Escape')shut()});
+ const on=document.querySelector('.tab.on');on&&on.scrollIntoView({inline:'center',block:'nearest'});})();
 /* Bộ sưu tập cá nhân: lưu trong trình duyệt (localStorage), không gửi lên máy chủ */
 const Lib={
   load(){try{return JSON.parse(localStorage.getItem('vn_lib'))||{}}catch(e){return {}}},

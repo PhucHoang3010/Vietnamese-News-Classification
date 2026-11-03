@@ -1,5 +1,5 @@
 """Website tin tức VnNews — AI tự động phân loại chủ đề.   python app.py   →  http://127.0.0.1:5000"""
-import csv, ipaddress, json, math, random, re, socket, unicodedata
+import csv, ipaddress, json, math, os, random, re, socket, sqlite3, unicodedata
 import time
 _T0 = time.time()
 print("VnNews đang khởi động… Lần đầu (nhất là trên Windows) có thể mất 1–3 phút vì đang nạp thư viện. Vui lòng KHÔNG bấm Ctrl+C.", flush=True)
@@ -33,12 +33,12 @@ except Exception:
     CONF = None
 TEMP = 4.3          # hệ số nhiệt độ của softmax(TEMP × điểm SVM), chọn trên tập kiểm định (experiments/exp5_calibration.py): sai lệch hiệu chỉnh ECE trên tập kiểm thử giảm từ 7,6% xuống 3,2%
 
-TOPICS = {  # tên: (slug, icon, màu)
-    "Thời sự": ("thoi-su", "📰", "#111111"), "Thế giới": ("the-gioi", "🌍", "#111111"),
-    "Kinh doanh": ("kinh-doanh", "💼", "#111111"), "Pháp luật": ("phap-luat", "⚖️", "#111111"),
-    "Giáo dục": ("giao-duc", "🎓", "#111111"), "Sức khỏe": ("suc-khoe", "🩺", "#111111"),
-    "Khoa học": ("khoa-hoc", "🔬", "#111111"), "Đời sống": ("doi-song", "🏡", "#111111"),
-    "Giải trí": ("giai-tri", "🎬", "#111111"), "Thể thao": ("the-thao", "⚽", "#111111"), "Xe": ("xe", "🚗", "#111111"),
+TOPICS = {  # tên: (slug, icon, màu nhấn)
+    "Thời sự": ("thoi-su", "📰", "#0a74c0"), "Thế giới": ("the-gioi", "🌍", "#0a7f84"),
+    "Kinh doanh": ("kinh-doanh", "💼", "#17803f"), "Pháp luật": ("phap-luat", "⚖️", "#6a42c2"),
+    "Giáo dục": ("giao-duc", "🎓", "#a85800"), "Sức khỏe": ("suc-khoe", "🩺", "#d1344a"),
+    "Khoa học": ("khoa-hoc", "🔬", "#2b50d6"), "Đời sống": ("doi-song", "🏡", "#8f6200"),
+    "Giải trí": ("giai-tri", "🎬", "#b8267f"), "Thể thao": ("the-thao", "⚽", "#347a12"), "Xe": ("xe", "🚗", "#4b5b6b"),
 }
 SLUG = {v[0]: k for k, v in TOPICS.items()}
 SAMPLES = {
@@ -157,6 +157,8 @@ except Exception:
     BENCH = []
 
 app = Flask(__name__)
+if os.environ.get("VNNEWS_DEV"):                     # khi sửa giao diện: nạp lại mẫu HTML mà không cần khởi động lại (chỉ dùng lúc phát triển)
+    app.config["TEMPLATES_AUTO_RELOAD"] = True
 
 
 @app.template_filter("vn")
@@ -168,7 +170,7 @@ IMG_DIR = ROOT / "static" / "img"
 NAV = [{"name": k, "slug": v[0], "icon": v[1], "color": v[2]} for k, v in TOPICS.items()]
 
 
-# ---------------------------------------------------------------- ảnh minh họa (SVG đen-trắng, tạo theo chủ đề + id bài)
+# ---------------------------------------------------------------- ảnh minh họa (SVG có màu theo chuyên mục, tạo theo chủ đề + id bài)
 def _motif(label, r):
     """Hình minh họa đường nét cho từng chuyên mục, vẽ quanh tâm (320,200)."""
     K = 'stroke="#111" stroke-width="7" stroke-linejoin="round" stroke-linecap="round"'
@@ -204,25 +206,32 @@ def _motif(label, r):
     return f'<rect x="170" y="85" width="300" height="240" fill="#fff" {K}/><rect x="200" y="108" width="240" height="46" fill="#111"/><rect x="200" y="166" width="108" height="8" fill="#111"/>{lines}'
 
 
+# bảng màu ảnh minh họa theo chuyên mục: (nền sáng, nền đậm hơn, màu nét vẽ)
+ART_PAL = {"Thời sự": ("#e8f2fd", "#b3d5f5", "#0b3a6e"), "Thế giới": ("#e0f5f4", "#a9ddda", "#0a4a4d"), "Kinh doanh": ("#e4f6ea", "#b0e0bf", "#12532a"),
+           "Pháp luật": ("#eee9fb", "#cdc0f0", "#37226f"), "Giáo dục": ("#fdf0e0", "#f7cf9d", "#6f3a00"), "Sức khỏe": ("#fde8ea", "#f5b9c1", "#74121f"),
+           "Khoa học": ("#e6ebfd", "#b8c6f6", "#1a2c7d"), "Đời sống": ("#fff5da", "#f9e08f", "#5f4300"), "Giải trí": ("#fce7f4", "#f1b5da", "#701350"),
+           "Thể thao": ("#eaf8dc", "#c3e69a", "#29530b"), "Xe": ("#e8ecf0", "#c0cad5", "#24303d")}
+
+
 def art_svg(label, seed):
     r = random.Random(seed)
-    g1, g2 = r.choice([("#ececec", "#ffffff"), ("#dedede", "#f6f6f6"), ("#f2f2f2", "#d8d8d8"), ("#e6e6e6", "#fafafa")])
+    top, bot, ink = ART_PAL.get(label, ART_PAL["Thời sự"])
     kind = r.randrange(4)
     if kind == 0:
-        pat = "".join(f'<circle cx="{x}" cy="{y}" r="{2.2 + (x + y) % 3}" fill="#111" opacity=".18"/>' for x in range(14, 640, 28) for y in range(14, 400, 28))
+        pat = "".join(f'<circle cx="{x}" cy="{y}" r="{2.2 + (x + y) % 3}" fill="{ink}" opacity=".16"/>' for x in range(14, 640, 28) for y in range(14, 400, 28))
     elif kind == 1:
-        pat = "".join(f'<line x1="{x}" y1="0" x2="{x - 200}" y2="400" stroke="#111" stroke-width="2" opacity=".12"/>' for x in range(0, 900, 26))
+        pat = "".join(f'<line x1="{x}" y1="0" x2="{x - 200}" y2="400" stroke="{ink}" stroke-width="2" opacity=".11"/>' for x in range(0, 900, 26))
     elif kind == 2:
-        pat = "".join(f'<line x1="{x}" y1="0" x2="{x}" y2="400" stroke="#111" opacity=".1"/>' for x in range(0, 640, 32)) + "".join(f'<line x1="0" y1="{y}" x2="640" y2="{y}" stroke="#111" opacity=".1"/>' for y in range(0, 400, 32))
+        pat = "".join(f'<line x1="{x}" y1="0" x2="{x}" y2="400" stroke="{ink}" opacity=".09"/>' for x in range(0, 640, 32)) + "".join(f'<line x1="0" y1="{y}" x2="640" y2="{y}" stroke="{ink}" opacity=".09"/>' for y in range(0, 400, 32))
     else:
-        pat = "".join(f'<circle cx="{r.randint(0, 640)}" cy="{r.randint(0, 400)}" r="{r.randint(30, 120)}" fill="none" stroke="#111" stroke-width="2" opacity=".14"/>' for _ in range(9))
+        pat = "".join(f'<circle cx="{r.randint(0, 640)}" cy="{r.randint(0, 400)}" r="{r.randint(30, 120)}" fill="none" stroke="{ink}" stroke-width="2" opacity=".13"/>' for _ in range(9))
     dx, dy, rot, sc = r.randint(-26, 26), r.randint(-14, 14), r.randint(-6, 6), r.choice([0.92, 1.0, 1.08])
-    blob = f'<circle cx="{r.randint(100, 540)}" cy="{r.randint(60, 340)}" r="{r.randint(110, 170)}" fill="#111" opacity=".07"/>'
+    blob = f'<circle cx="{r.randint(100, 540)}" cy="{r.randint(60, 340)}" r="{r.randint(110, 170)}" fill="{ink}" opacity=".07"/>'
+    motif = _motif(label, r).replace("#111", ink)
     return (f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 400" preserveAspectRatio="xMidYMid slice">'
-            f'<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{g1}"/><stop offset="1" stop-color="{g2}"/></linearGradient></defs>'
+            f'<defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="{top}"/><stop offset="1" stop-color="{bot}"/></linearGradient></defs>'
             f'<rect width="640" height="400" fill="url(#g)"/>{pat}{blob}'
-            f'<g transform="translate({dx} {dy}) rotate({rot} 320 200) translate(320 200) scale({sc}) translate(-320 -200)">{_motif(label, r)}</g>'
-            f'<rect x="1.5" y="1.5" width="637" height="397" fill="none" stroke="#111" stroke-width="3"/></svg>')
+            f'<g transform="translate({dx} {dy}) rotate({rot} 320 200) translate(320 200) scale({sc}) translate(-320 -200)">{motif}</g></svg>')
 
 
 @app.get("/img/<int:aid>.svg")
@@ -247,6 +256,45 @@ for _a in ART.values():
 @app.context_processor
 def inject():
     return {"NAV": NAV, "TOPICS": TOPICS, "STATS": STATS, "q": request.args.get("q", "")}
+
+
+# ---------------------------------------------------------------- bình luận của bạn đọc (comments.py)
+import comments
+try:
+    CMT = comments.CommentStore(os.environ.get("VNNEWS_COMMENTS_DB") or ROOT / "data" / "comments.db")
+except (OSError, sqlite3.Error) as _e:       # thư mục chỉ đọc...: website vẫn chạy, chỉ riêng phần bình luận báo lỗi
+    print(f"  ! Không mở được kho bình luận: {_e}", flush=True)
+    CMT = None
+app.register_blueprint(comments.make_blueprint(CMT, lambda aid: aid in ART))
+
+
+def _safe(fn, default):
+    """Lỗi ở kho bình luận không được làm hỏng trang bài báo, trang chủ...: gặp lỗi thì coi như chưa có bình luận."""
+    def run(*a, **k):
+        try:
+            return fn(*a, **k)
+        except (OSError, sqlite3.Error):
+            return default
+    return run
+
+
+app.jinja_env.globals["ccount"] = _safe(lambda aid: CMT.count(aid) if CMT else 0, 0)
+app.jinja_env.globals["latest_comments"] = _safe(lambda n=4: [{**c, "title": ART[c["aid"]]["title"]} for c in (CMT.latest(n) if CMT else []) if c["aid"] in ART], [])
+
+
+@app.template_filter("ago")
+def _ago(ts):
+    """Thời điểm đăng dạng 'vừa xong', '5 phút trước', '3 giờ trước', '2 ngày trước', hoặc ngày tháng nếu đã lâu."""
+    d = int(time.time()) - int(ts)
+    if d < 60:
+        return "vừa xong"
+    if d < 3600:
+        return f"{d // 60} phút trước"
+    if d < 86400:
+        return f"{d // 3600} giờ trước"
+    if d < 7 * 86400:
+        return f"{d // 86400} ngày trước"
+    return time.strftime("%d/%m/%Y", time.localtime(int(ts)))
 
 
 @app.template_filter("paras")
