@@ -5,3 +5,7 @@ node_modules/
 data/arena.jsonl
 data/arena-*.bak
 experiments/cache/
+data/comments.db
+data/comments.db-journal
+data/comments.db-wal
+data/comments.db-shm
