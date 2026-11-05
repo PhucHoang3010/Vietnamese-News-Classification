@@ -8,6 +8,8 @@ Cách dùng (cần pdftotext của poppler):
   2) xuất BAO_CAO_DO_AN.docx ra PDF (Word: Lưu thành PDF; hoặc LibreOffice)
   3) python experiments/tinh_so_trang_muc_luc.py BAO_CAO_DO_AN.pdf
   4) python make_report.py                         sinh lại, lần này mục lục đã có số trang
+Các trang bìa (bìa chính, bìa phụ, danh sách nhóm) không đánh số; số trang bắt đầu từ 1 ở trang "Tóm tắt" (đề mục đầu tiên), nên số trang
+ghi vào mục lục là số in ở chân trang chứ không phải thứ tự trang trong tệp PDF.
 Số trang tính theo PDF, có thể lệch vài trang so với Word nếu phông chữ khác nhau; khi đó hãy cập nhật trường trong Word.
 """
 import json
@@ -33,7 +35,7 @@ def is_toc_line(ln):
     return "....." in ln
 
 
-out, cur = {}, 0
+out, cur, first = {}, 0, None
 for h in heads:
     key = re.sub(r"\s+", " ", h).strip()
     found = None
@@ -44,7 +46,9 @@ for h in heads:
     if found is None:
         print("không tìm thấy đề mục:", h)
         continue
-    out[h] = found + 1
+    if first is None:
+        first = found                     # trang của đề mục đầu tiên = trang số 1 (các trang bìa phía trước không có số)
+    out[h] = found - first + 1
     cur = found
 (ROOT / "outputs" / "toc_pages.json").write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
 print(f"đã ghi {len(out)}/{len(heads)} đề mục vào outputs/toc_pages.json; tổng {len(pages)} trang")

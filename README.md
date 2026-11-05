@@ -59,11 +59,11 @@ python train.py          # huấn luyện, sinh outputs/ và model.joblib
 python build_cache.py    # dự đoán sẵn cho toàn bộ bài + hiệu chỉnh conformal -> data/predictions.json, data/conformal.json
 python predict.py "Bộ Giáo dục công bố điểm chuẩn đại học"
 python eval_summary.py   # đo ROUGE của tóm tắt -> outputs/summary_eval.json
-python make_report.py    # sinh BAO_CAO_DO_AN.docx (A4, có bìa, tóm tắt, mục lục, cơ sở lý thuyết, ảnh website, phân công, phụ lục)
+python make_report.py    # sinh BAO_CAO_DO_AN.docx (khổ giấy và bìa theo mẫu của Khoa CNTT, tóm tắt, mục lục, cơ sở lý thuyết, ảnh website, phân công, phụ lục)
 ```
 Báo cáo dùng thêm hai loại ảnh tạo sẵn: sơ đồ hệ thống (`python experiments/ve_so_do_he_thong.py` → `outputs/he_thong.png`) và ảnh màn hình website
 (`node tests/e2e/chup_man_hinh.js outputs/man_hinh`, cần Node.js + Playwright, chạy khi website đang chạy với kho bình luận tạm). Số trang trong mục lục lấy từ
-`outputs/toc_pages.json` (tạo bằng `python experiments/tinh_so_trang_muc_luc.py BAO_CAO_DO_AN.pdf` sau khi xuất báo cáo ra PDF); trong Word có thể bấm chuột phải vào mục lục → Cập nhật trường.
+`outputs/toc_pages.json` (tạo bằng `python experiments/tinh_so_trang_muc_luc.py BAO_CAO_DO_AN.pdf` sau khi xuất báo cáo ra PDF); trong Word có thể bấm chuột phải vào mục lục → Cập nhật trường. Ba trang bìa (bìa chính, bìa phụ, danh sách nhóm kèm ô chữ ký cán bộ chấm thi) không có số trang; số trang bắt đầu từ 1 ở trang Tóm tắt. Logo ở `outputs/bia_logo.jpeg`.
 `build_cache.py` chấm điểm các bài huấn luyện bằng *cross-fitting* 5 lần (mỗi bài được chấm bởi mô hình chưa thấy nó) để có đủ điểm “chưa thấy” cho hiệu chỉnh;
 kết quả lưu ở `data/oof_train.npz` nên các lần chạy sau nhanh. Mã của phương pháp: `conformal.py`; công cụ tìm kiếm: `search_tools.py`.
 
@@ -93,4 +93,4 @@ Tập chuyên mục có bảo đảm (mức 95%): độ phủ 94,5% · trung bì
 Tìm theo nghĩa (LSA trộn 70/30) so với TF-IDF thuần, nửa dữ liệu dùng để đánh giá: độ thuần chủ đề P@10 64,3% so với 60,7% (+3,7 điểm); tìm lại đúng một bài gần như không đổi (R@1 tiêu đề → bài 78,3% so với 77,4%).
 Vì vậy “Theo nghĩa” là lựa chọn để *khám phá cùng chủ đề*, không phải để tìm đúng một bài cụ thể.
 
-Báo cáo đầy đủ: `BAO_CAO_DO_AN.docx`. **Nhóm cần điền** (các chỗ tô vàng và ô trống): trường/khoa, giảng viên, lớp, họ tên + MSSV ở trang bìa; nguồn dữ liệu ở mục 2.1; kiểm tra bảng phân công ở mục 10.
+Báo cáo đầy đủ: `BAO_CAO_DO_AN.docx`. **Nhóm cần điền** (các chỗ tô vàng và ô trống): giảng viên hướng dẫn, nhóm số, MSSV, lớp ở bìa chính và bìa phụ, họ tên + MSSV + lớp ở trang danh sách nhóm (điền xong thì bỏ tô vàng); nguồn dữ liệu ở mục 2.1; kiểm tra bảng phân công ở mục 10.

@@ -3,7 +3,7 @@ import json
 from pathlib import Path
 import pandas as pd
 from docx import Document
-from docx.shared import Cm, Pt
+from docx.shared import Cm, Pt, Twips
 from docx.enum.text import WD_ALIGN_PARAGRAPH
 
 O = Path(__file__).parent / "outputs"
@@ -37,7 +37,8 @@ import sys
 import unittest
 
 from docx.enum.style import WD_STYLE_TYPE
-from docx.enum.table import WD_TABLE_ALIGNMENT
+from docx.enum.section import WD_SECTION
+from docx.enum.table import WD_ALIGN_VERTICAL, WD_ROW_HEIGHT_RULE, WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_BREAK, WD_COLOR_INDEX, WD_TAB_ALIGNMENT, WD_TAB_LEADER
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
@@ -45,16 +46,19 @@ from docx.shared import RGBColor
 
 ROOT = Path(__file__).parent
 FONT = "Times New Roman"
-TEXT_W = 16.0                                            # bề rộng vùng chữ (cm) trên khổ A4 với lề 3 / 2 cm
+TEXT_W = 16.5                                            # bề rộng vùng chữ (cm): khổ Letter 21,59 cm trừ lề trái 3 cm và lề phải 2 cm = 16,59 cm
 CENTER, LEFT, JUSTIFY = WD_ALIGN_PARAGRAPH.CENTER, WD_ALIGN_PARAGRAPH.LEFT, WD_ALIGN_PARAGRAPH.JUSTIFY
 
 d = Document()
-_sec = d.sections[0]
-_sec.page_width, _sec.page_height = Cm(21), Cm(29.7)    # A4
-_sec.left_margin, _sec.right_margin, _sec.top_margin, _sec.bottom_margin = Cm(3), Cm(2), Cm(2.5), Cm(2.5)
-_sec.different_first_page_header_footer = True           # trang bìa không có đầu trang / số trang
-_sec.first_page_header.is_linked_to_previous = False       # tạo sẵn đầu/chân trang riêng (để trống) cho trang bìa; thiếu thì một số phần mềm vẫn hiện số trang
-_sec.first_page_footer.is_linked_to_previous = False
+_sec = d.sections[0]                                     # khổ giấy và lề theo đúng tệp mẫu của khoa: Letter, lề trên / dưới / phải 2 cm, lề trái 3 cm
+_sec.page_width, _sec.page_height = Twips(12240), Twips(15840)
+_sec.left_margin, _sec.right_margin, _sec.top_margin, _sec.bottom_margin = Twips(1701), Twips(1134), Twips(1134), Twips(1134)
+_sec.header_distance = _sec.footer_distance = Twips(709)
+for _cs in d.settings.element.iter(qn("w:compatSetting")):  # chế độ tương thích Word 2013 trở lên như tệp mẫu (không hiện "Compatibility Mode")
+    if _cs.get(qn("w:name")) == "compatibilityMode":
+        _cs.set(qn("w:val"), "15")
+d.core_properties.title = "Báo cáo Học máy: Phân loại tin tức tiếng Việt"
+d.core_properties.author = d.core_properties.comments = ""
 
 
 def _style_font(st, size, bold=None, italic=None, name=FONT):
@@ -111,11 +115,6 @@ def _fld(par, instr, cached="1"):
     mk("begin")
     r = par.add_run(); it = OxmlElement("w:instrText"); it.set(qn("xml:space"), "preserve"); it.text = instr; r._r.append(it)
     mk("separate"); par.add_run(cached); mk("end")
-
-
-_fp = _sec.footer.paragraphs[0]; _fp.alignment = CENTER; _fld(_fp, "PAGE")
-_hp = _sec.header.paragraphs[0]; _hp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
-_hr = _hp.add_run("Đồ án môn Học máy — Phân loại tin tức tiếng Việt"); _hr.italic = True; _hr.font.size = Pt(10.5)
 
 
 def vn(x, k=1):
@@ -248,33 +247,168 @@ c0, c1 = cal.iloc[0], cal.iloc[1]
 DATA = pd.read_csv(ROOT / "data" / "news_dataset.csv", encoding="utf-8").fillna("")
 _w = DATA.text.str.split().str.len()
 
-# ================================================================== trang bìa
-_center("TRƯỜNG ĐẠI HỌC ……………………………………", 14, True)
-_center("KHOA ……………………………………", 13, True, after=48)
-_center("ĐỒ ÁN MÔN HỌC MÁY", 22, True, after=10)
-_center("PHÂN LOẠI TIN TỨC TIẾNG VIỆT", 24, True, after=10)
-_center("TF-IDF + Linear SVM, kèm hiệu chỉnh độ tự tin, giải thích, dự đoán có bảo đảm và website tin tức VnNews", 14, italic=True, after=42)
-PH([("Giảng viên hướng dẫn: ", False), ("……………………………", True)], CENTER)
-PH([("Lớp: ", False), ("………………", True), ("      Học kỳ / năm học: ", False), ("………………", True)], CENTER).paragraph_format.space_after = Pt(18)
-_center("Nhóm thực hiện", 13, True, after=6)
-_tc = d.add_table(rows=1, cols=4); _tc.style = "Table Grid"; _tc.alignment = WD_TABLE_ALIGNMENT.CENTER
-for _i, _c in enumerate(["STT", "Họ và tên", "MSSV", "Vai trò"]):
-    _tc.rows[0].cells[_i].text = _c
-for _i, _role in enumerate(["Nhóm trưởng", "Thành viên", "Thành viên", "Thành viên", "Thành viên"], 1):
-    _cells = _tc.add_row().cells
-    for _j, _v in enumerate([str(_i), "", "", _role]):
-        _cells[_j].text = _v
-for _ri, _row in enumerate(_tc.rows):
-    for _j, (_c, _wd) in enumerate(zip(_row.cells, (1.4, 6.6, 3.2, 3.6))):
-        _c.width = Cm(_wd)
-        for _p in _c.paragraphs:
-            _p.alignment = CENTER if _j != 1 else LEFT
-            _p.paragraph_format.space_before = _p.paragraph_format.space_after = Pt(3)
-            for _r in _p.runs:
-                _r.font.size = Pt(12); _r.bold = (_ri == 0)
-_center("", after=40)
-_center(f"Tháng {datetime.date.today().month} năm {datetime.date.today().year}", 13, italic=True)
-d.add_page_break()
+# ================================================================== trang bìa theo mẫu của khoa
+# Gồm bìa chính, bìa phụ, trang danh sách nhóm kèm ô chữ ký của cán bộ chấm thi (đúng bố cục tệp mẫu của Khoa Công nghệ thông tin).
+# Chỗ tô vàng là chỗ nhóm cần tự điền (giống tệp mẫu); điền xong thì bỏ tô vàng: Home -> Text Highlight Color -> No Color.
+_NOW = datetime.date.today()
+_THANG = f"tháng {_NOW.month:02d}/{_NOW.year}"
+_FRAME_W, _FRAME_IND = 10835, -815                       # khung viền kép rộng 19,1 cm, nhô ra ngoài lề trái 1,4 cm như mẫu
+_LOGO = O / "bia_logo.jpeg"
+_HOLE = WD_COLOR_INDEX.YELLOW
+_AFTER_PBDR = ("w:shd", "w:tabs", "w:suppressAutoHyphens", "w:kinsoku", "w:wordWrap", "w:overflowPunct", "w:topLinePunct", "w:autoSpaceDE", "w:autoSpaceDN", "w:bidi",
+               "w:adjustRightInd", "w:snapToGrid", "w:spacing", "w:ind", "w:contextualSpacing", "w:mirrorIndents", "w:suppressOverlap", "w:jc", "w:textDirection",
+               "w:textAlignment", "w:textboxTightWrap", "w:outlineLvl", "w:divId", "w:cnfStyle", "w:rPr", "w:sectPr", "w:pPrChange")
+
+
+def _el(tag, **attrs):
+    e = OxmlElement(tag)
+    for k, v in attrs.items():
+        e.set(qn("w:" + k), str(v))
+    return e
+
+
+class _CellText:
+    """Viết lần lượt các đoạn vào một ô; định dạng đặt rõ từng đoạn để không phụ thuộc kiểu Normal của báo cáo."""
+
+    def __init__(self, cell):
+        self.cell, self.n = cell, 0
+
+    def par(self, parts, size, bold=True, italic=False, align=CENTER, before=0, after=8, line=1.0, left=None):
+        p = self.cell.paragraphs[0] if self.n == 0 else self.cell.add_paragraph()
+        self.n += 1
+        if isinstance(parts, str):
+            parts = [(parts, False)]
+        p.alignment = align
+        f = p.paragraph_format
+        f.space_before, f.space_after, f.line_spacing = Pt(before), Pt(after), line
+        if left is not None:
+            f.left_indent = Cm(left)
+        for txt, hole in parts:
+            r = p.add_run(txt)
+            r.font.size, r.bold, r.italic = Pt(size), bold, italic
+            if hole:
+                r.font.highlight_color = _HOLE
+        return p
+
+
+def _frame(heights_cm):
+    """Khung viền kép của một trang bìa: bảng một cột, mỗi phần tử của heights_cm là chiều cao (tối thiểu) của một hàng."""
+    t = d.add_table(rows=len(heights_cm), cols=1)
+    pr = t._tbl.tblPr
+    for ch in list(pr):
+        pr.remove(ch)
+    pr.append(_el("w:tblW", w=_FRAME_W, type="dxa"))
+    pr.append(_el("w:tblInd", w=_FRAME_IND, type="dxa"))
+    bd = _el("w:tblBorders")
+    for side in ("top", "left", "bottom", "right"):
+        bd.append(_el("w:" + side, val="thinThickSmallGap", sz=24, space=0, color="auto"))
+    for side in ("insideH", "insideV"):
+        bd.append(_el("w:" + side, val="nil"))
+    pr.append(bd)
+    pr.append(_el("w:tblLayout", type="fixed"))
+    pr.append(_el("w:tblLook", val="0000", firstRow=0, lastRow=0, firstColumn=0, lastColumn=0, noHBand=0, noVBand=0))
+    t.columns[0].width = Twips(_FRAME_W)
+    for row, h in zip(t.rows, heights_cm):
+        row.height, row.height_rule = Cm(h), WD_ROW_HEIGHT_RULE.AT_LEAST
+        row._tr.get_or_add_trPr().append(_el("w:cantSplit"))
+        row.cells[0].width = Twips(_FRAME_W)
+    return t
+
+
+def _bottom_border():
+    b = _el("w:pBdr")
+    b.append(_el("w:bottom", val="single", sz=6, space=1, color="auto"))
+    return b
+
+
+def _cover_page(city):
+    t = _frame([21.4, 2.0])                               # hàng 1: nội dung; hàng 2: dòng địa điểm, thời gian ở sát đáy khung (tổng 23,4 cm < 23,94 cm vùng chữ)
+    c = _CellText(t.rows[0].cells[0])
+    c.par("HỌC VIỆN HÀNG KHÔNG VIỆT NAM", 18)
+    c.par("KHOA CÔNG NGHỆ THÔNG TIN", 14, after=0)
+    ln = c.par("", 3, after=6, line=Pt(5))                # đường kẻ ngắn dưới tên khoa: viền dưới của một đoạn rỗng thụt vào hai bên
+    ln.paragraph_format.left_indent = ln.paragraph_format.right_indent = Cm(6.5)
+    ln._p.get_or_add_pPr().insert_element_before(_bottom_border(), *_AFTER_PBDR)
+    lg = c.par("", 12, before=13, after=0)          # Word và LibreOffice lấy khoảng cách lớn hơn giữa "sau" của đoạn trên và "trước" của đoạn dưới, không cộng dồn
+    if _LOGO.exists():
+        lg.add_run().add_picture(str(_LOGO), width=Cm(4.55))
+    else:
+        print("thiếu logo, bỏ qua:", _LOGO)
+    c.par("BÁO CÁO", 24, before=14)
+    c.par("HỌC MÁY", 20)                                  # tên học phần
+    c.par("PHÂN LOẠI TIN TỨC TIẾNG VIỆT", 18, after=0)     # tên đề tài
+    info = dict(size=14, align=LEFT, left=1.36, line=2.0)
+    c.par([("Giảng viên hướng dẫn:", False), ("…" * 23 + "..", True)], before=79, **info)
+    c.par([("Sinh viên/ Nhóm sinh viên thực hiện: Nhóm ", False), ("xx", True), ("…" * 13, False)], **info)
+    c.par([("Mã số sinh viên:", False), ("…" * 26 + ".", True)], **info)
+    c.par([("Lớp: ", False), ("0101000xxxxx", True), ("…" * 25, False)], **info)
+    row2 = t.rows[1].cells[0]
+    row2.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+    _CellText(row2).par(f"{city}, {_THANG}", 14, after=0)
+
+
+def _tiny(break_before):
+    """Đoạn cao 1 pt đặt giữa hai bảng; page_break_before đẩy bảng phía sau sang trang mới mà không để lại dòng trống."""
+    p = d.add_paragraph()
+    f = p.paragraph_format
+    f.space_before = f.space_after = Pt(0)
+    f.line_spacing = Pt(1)
+    f.page_break_before = break_before
+    return p
+
+
+def _grid(rows, widths_tw, ind_tw):
+    """Bảng có kẻ ô, rộng tổng widths_tw (đơn vị twip), thụt ind_tw so với lề trái như tệp mẫu."""
+    t = d.add_table(rows=rows, cols=len(widths_tw))
+    t.style = "Table Grid"
+    t.autofit = False
+    pr = t._tbl.tblPr
+    pr.find(qn("w:tblW")).set(qn("w:w"), str(sum(widths_tw)))
+    pr.find(qn("w:tblW")).set(qn("w:type"), "dxa")
+    pr.insert_element_before(_el("w:tblInd", w=ind_tw, type="dxa"), "w:tblBorders", "w:shd", "w:tblLayout", "w:tblCellMar", "w:tblLook", "w:tblCaption", "w:tblDescription")
+    for i, wd in enumerate(widths_tw):
+        t.columns[i].width = Twips(wd)
+        for row in t.rows:
+            row.cells[i].width = Twips(wd)
+    for row in t.rows:
+        row._tr.get_or_add_trPr().append(_el("w:cantSplit"))
+    return t
+
+
+_cover_page("TP. Hồ Chí Minh")                            # bìa chính
+_tiny(True)
+_cover_page("Thành phố Hồ Chí Minh")                      # bìa phụ
+
+_ds = d.add_paragraph()                                   # trang 3: danh sách nhóm và ô chữ ký của cán bộ chấm thi
+_ds.paragraph_format.page_break_before = True
+_ds.paragraph_format.line_spacing, _ds.paragraph_format.space_before, _ds.paragraph_format.space_after = 1.5, Pt(0), Pt(8)
+_ds.alignment = LEFT
+_dr = _ds.add_run("Danh sách Nhóm:"); _dr.bold = True; _dr.font.size = Pt(14)
+_gt = _grid(6, [876, 3104, 1906, 2194, 2410], -714)
+for _j, _h in enumerate(["STT", "Họ và tên", "MSSV", "Lớp", "Ghi chú"]):
+    _CellText(_gt.rows[0].cells[_j]).par(_h, 14, after=0)
+for _i in range(1, 6):
+    _gt.rows[_i].height, _gt.rows[_i].height_rule = Twips(567), WD_ROW_HEIGHT_RULE.AT_LEAST
+    for _j, (_v, _hole) in enumerate([(str(_i), False), ("…", True), ("…", True), ("…", True), ("Nhóm trưởng" if _i == 1 else "", False)]):
+        _gt.rows[_i].cells[_j].vertical_alignment = WD_ALIGN_VERTICAL.CENTER
+        _CellText(_gt.rows[_i].cells[_j]).par([(_v, _hole)], 14, bold=False, after=0)
+_sp = d.add_paragraph(); _sp.paragraph_format.space_after = Pt(6); _sp.paragraph_format.line_spacing = 1.0
+_cb = _grid(2, [5329, 5329], -714)
+for _i, _row in enumerate(_cb.rows):
+    _row.height, _row.height_rule = Twips(3402), WD_ROW_HEIGHT_RULE.AT_LEAST
+    for _cell, _who in zip(_row.cells, (["Cán bộ chấm thi 1", "Cán bộ chấm thi 2"], ["Cán bộ chấm thi phúc khảo 1", "Cán bộ chấm thi phúc khảo 2"])[_i]):
+        _ct = _CellText(_cell)
+        _ct.par(_who, 14, after=0)
+        _ct.par("(ký và ghi rõ họ tên)", 14, bold=False, italic=True, after=0)
+
+# phần thân báo cáo: sang trang mới, có đầu trang, số trang đánh lại từ 1 ở trang Tóm tắt; các trang bìa không có đầu / chân trang và không đánh số
+_sec2 = d.add_section(WD_SECTION.NEW_PAGE)
+_sec2._sectPr.insert_element_before(_el("w:pgNumType", start=1), "w:cols", "w:formProt", "w:vAlign", "w:noEndnote", "w:titlePg", "w:textDirection", "w:bidi", "w:rtlGutter", "w:docGrid", "w:printerSettings")
+_sec2.footer.is_linked_to_previous = False
+_sec2.header.is_linked_to_previous = False
+_fp = _sec2.footer.paragraphs[0]; _fp.alignment = CENTER; _fld(_fp, "PAGE")
+_hp = _sec2.header.paragraphs[0]; _hp.alignment = WD_ALIGN_PARAGRAPH.RIGHT
+_hr = _hp.add_run("Đồ án môn Học máy — Phân loại tin tức tiếng Việt"); _hr.italic = True; _hr.font.size = Pt(10.5)
 
 # ================================================================== tóm tắt
 H("Tóm tắt")
@@ -847,5 +981,9 @@ def _resolve_tokens():
 
 _build_toc()
 _resolve_tokens()
+_lp = d.paragraphs[-1]                                    # đoạn rỗng sau bảng cuối: thu còn 1 pt để không đẩy ra một trang trắng ở cuối báo cáo
+if not _lp.text.strip():
+    _lp.paragraph_format.space_before = _lp.paragraph_format.space_after = Pt(0)
+    _lp.paragraph_format.line_spacing = Pt(1)
 d.save(Path(__file__).parent / "BAO_CAO_DO_AN.docx")
 print("Đã sinh BAO_CAO_DO_AN.docx")
