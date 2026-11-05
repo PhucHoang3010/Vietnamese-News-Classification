@@ -57,6 +57,8 @@ Dữ liệu mẫu có sẵn vài tình huống để thử:
 - kết luận ✅ / ❌ kèm số liệu kiểm tra sau khi chạy;
 - phần giải thích nguyên nhân và cách sửa, kèm đoạn SQL.
 
+**Tab "Thiết kế CSDL"** hiện ERD và dữ liệu thô của từng bảng (`SELECT *` trực tiếp từ MySQL). Sau mỗi kịch bản có thể mở bảng `dang_ky` hoặc view `v_kiem_tra_toan_ven` để chỉ cho người xem dòng dữ liệu bị sai.
+
 Sau khi chạy bản lỗi, quay lại tab 1 và chọn SV của kịch bản đó để xem dữ liệu sai trên trang chính (ví dụ SV16 có 2 lớp đỏ trong thời khoá biểu).
 
 ## 3. Thiết kế CSDL

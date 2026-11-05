@@ -7,6 +7,7 @@ const { chayKichBan, thongTinKichBan } = require('./kich-ban');
 const app = express();
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use('/docs', express.static(path.join(__dirname, '..', 'docs')));
 
 const boc = (fn) => (req, res) =>
   fn(req, res).catch((e) => res.status(e.status || 500).json({ loi: e.message }));
@@ -62,6 +63,24 @@ app.get('/api/kiem-tra', boc(async (req, res) => {
 app.post('/api/du-lieu-mau', boc(async (req, res) => {
   await napDuLieuMau();
   res.json({ ok: true });
+}));
+
+// ---------- Xem dữ liệu thô các bảng (tab "Thiết kế CSDL") ----------
+const BANG = ['sinh_vien', 'mon_hoc', 'lop_hoc_phan', 'dang_ky', 'v_kiem_tra_toan_ven'];
+
+app.get('/api/bang', boc(async (req, res) => {
+  const pool = layPool();
+  res.json(await Promise.all(BANG.map(async (ten) => {
+    const [[r]] = await pool.query(`SELECT COUNT(*) AS n FROM ${ten}`);
+    return { ten, so_dong: r.n };
+  })));
+}));
+
+app.get('/api/bang/:ten', boc(async (req, res) => {
+  const ten = req.params.ten;
+  if (!BANG.includes(ten)) return res.status(404).json({ loi: 'Bảng không tồn tại' });
+  const [rows, fields] = await layPool().query(`SELECT * FROM ${ten} ORDER BY 1, 2 LIMIT 500`);
+  res.json({ cot: fields.map((f) => f.name), dong: rows });
 }));
 
 // ---------- Giả lập xung đột ----------

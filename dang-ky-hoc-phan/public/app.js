@@ -29,6 +29,7 @@ document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () 
   document.querySelectorAll('.tab').forEach((x) => x.classList.toggle('active', x === b));
   document.querySelectorAll('.tab-panel').forEach((p) => (p.hidden = p.id !== `tab-${b.dataset.tab}`));
   if (b.dataset.tab === 'dang-ky') taiLai();
+  if (b.dataset.tab === 'csdl') taiDsBang();
 }));
 
 // ===== TAB 1: ĐĂNG KÍ =====
@@ -227,6 +228,32 @@ document.addEventListener('click', async (e) => {
     document.querySelectorAll('[data-chay]').forEach((x) => (x.disabled = false));
   }
 });
+
+// ===== TAB 3: THIẾT KẾ CSDL =====
+let bangDangXem = 'dang_ky';
+
+async function taiDsBang() {
+  const ds = await api('/api/bang');
+  $('#ds-bang').innerHTML = ds.map((b) => `<button class="btn ghost small ${b.ten === bangDangXem ? 'active' : ''}" data-bang="${esc(b.ten)}">
+    ${esc(b.ten)}<span class="n">(${b.so_dong})</span></button>`).join('');
+  await xemBang(bangDangXem);
+}
+
+async function xemBang(ten) {
+  bangDangXem = ten;
+  document.querySelectorAll('[data-bang]').forEach((x) => x.classList.toggle('active', x.dataset.bang === ten));
+  const { cot, dong } = await api(`/api/bang/${encodeURIComponent(ten)}`);
+  $('#du-lieu-bang').innerHTML = dong.length
+    ? `<table class="tbl raw"><thead><tr>${cot.map((c) => `<th>${esc(c)}</th>`).join('')}</tr></thead>
+       <tbody>${dong.map((r) => `<tr>${cot.map((c) => `<td>${esc(r[c])}</td>`).join('')}</tr>`).join('')}</tbody></table>`
+    : '<div class="empty">Bảng rỗng.</div>';
+}
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest('[data-bang]');
+  if (b) xemBang(b.dataset.bang);
+});
+$('#btn-tai-bang').addEventListener('click', taiDsBang);
 
 // ===== Khởi động =====
 taiLai().catch((e) => toast(`Không kết nối được máy chủ/CSDL: ${e.message}`, 'bad'));

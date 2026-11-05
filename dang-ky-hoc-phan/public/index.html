@@ -16,6 +16,7 @@
       <nav class="tabs">
         <button class="tab active" data-tab="dang-ky">Đăng kí học phần</button>
         <button class="tab" data-tab="xung-dot">Giả lập xung đột</button>
+        <button class="tab" data-tab="csdl">Thiết kế CSDL</button>
       </nav>
     </div>
   </header>
@@ -74,6 +75,25 @@
           Bảng lịch thao tác lấy thời điểm thật do MySQL ghi lại (<code>SYSDATE(3)</code>).</p>
       </div>
       <div id="ds-kich-ban"></div>
+    </section>
+
+    <!-- ============ TAB 3: THIẾT KẾ CSDL ============ -->
+    <section id="tab-csdl" class="tab-panel" hidden>
+      <div class="card">
+        <div class="card-head">
+          <h2>ERD <span class="muted">(ký hiệu Crow's Foot)</span></h2>
+          <a class="btn ghost small" href="/docs/erd.png" download>Tải ảnh PNG</a>
+        </div>
+        <div class="erd-wrap"><img src="/docs/erd.svg" alt="ERD CSDL đăng kí học phần" class="erd"></div>
+      </div>
+      <div class="card">
+        <div class="card-head">
+          <h2>Dữ liệu trong các bảng <span class="muted">(SELECT * trực tiếp từ MySQL)</span></h2>
+          <button id="btn-tai-bang" class="btn ghost small">Tải lại</button>
+        </div>
+        <div id="ds-bang" class="ds-bang"></div>
+        <div id="du-lieu-bang" class="table-scroll"></div>
+      </div>
     </section>
   </main>
 

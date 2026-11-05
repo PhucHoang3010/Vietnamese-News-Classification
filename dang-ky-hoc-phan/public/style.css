@@ -132,3 +132,11 @@ pre.sql.ok { border-left: 4px solid #4ade80; }
 .toast { position: fixed; right: 16px; bottom: 16px; max-width: 420px; padding: 10px 14px; border-radius: 10px; color: #fff; background: #1d2433; box-shadow: 0 6px 24px rgba(0,0,0,.18); z-index: 20; }
 .toast.ok { background: var(--ok); }
 .toast.bad { background: var(--bad); }
+
+/* ---------- Thiết kế CSDL ---------- */
+.erd-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; }
+.erd { display: block; width: 100%; min-width: 900px; height: auto; }
+.ds-bang { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+.ds-bang .btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+.ds-bang .n { opacity: .75; margin-left: 4px; }
+.tbl.raw td, .tbl.raw th { white-space: nowrap; font-size: 13px; }
