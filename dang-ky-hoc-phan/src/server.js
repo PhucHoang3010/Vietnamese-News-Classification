@@ -1,0 +1,80 @@
+// Web server: trang đăng kí học phần + API giả lập xung đột
+const path = require('path');
+const express = require('express');
+const { layPool, goiThuTuc, napDuLieuMau } = require('./db');
+const { chayKichBan, thongTinKichBan } = require('./kich-ban');
+
+const app = express();
+app.use(express.json());
+app.use(express.static(path.join(__dirname, '..', 'public')));
+
+const boc = (fn) => (req, res) =>
+  fn(req, res).catch((e) => res.status(e.status || 500).json({ loi: e.message }));
+
+// ---------- Dữ liệu cho trang đăng kí ----------
+app.get('/api/sinh-vien', boc(async (req, res) => {
+  const [rows] = await layPool().query(
+    `SELECT s.ma_sv, s.ho_ten, s.lop, s.tin_chi_toi_da, s.no_hoc_phi,
+            COUNT(d.id) AS so_lop, IFNULL(SUM(m.so_tin_chi), 0) AS so_tc
+     FROM sinh_vien s
+     LEFT JOIN dang_ky d ON d.ma_sv = s.ma_sv
+     LEFT JOIN mon_hoc m ON m.ma_mh = d.ma_mh
+     GROUP BY s.ma_sv ORDER BY s.ma_sv`);
+  res.json(rows.map((r) => ({ ...r, so_tc: Number(r.so_tc), no_hoc_phi: !!r.no_hoc_phi })));
+}));
+
+app.get('/api/lop-hoc-phan', boc(async (req, res) => {
+  const [rows] = await layPool().query(
+    `SELECT l.*, m.ten_mh, m.so_tin_chi,
+            (SELECT COUNT(*) FROM dang_ky d WHERE d.ma_lhp = l.ma_lhp) AS so_dk_thuc_te
+     FROM lop_hoc_phan l JOIN mon_hoc m ON m.ma_mh = l.ma_mh
+     ORDER BY l.ma_mh, l.ma_lhp`);
+  res.json(rows);
+}));
+
+app.get('/api/sinh-vien/:ma/dang-ky', boc(async (req, res) => {
+  const [rows] = await layPool().query(
+    `SELECT d.ma_lhp, d.ma_mh, m.ten_mh, m.so_tin_chi, l.thu, l.tiet_bd, l.tiet_kt, l.phong, l.giang_vien, d.thoi_gian
+     FROM dang_ky d
+     JOIN lop_hoc_phan l ON l.ma_lhp = d.ma_lhp
+     JOIN mon_hoc m ON m.ma_mh = d.ma_mh
+     WHERE d.ma_sv = ? ORDER BY l.thu, l.tiet_bd`, [req.params.ma]);
+  res.json(rows);
+}));
+
+app.post('/api/dang-ky', boc(async (req, res) => {
+  const { ma_sv, ma_lhp } = req.body || {};
+  const conn = await layPool().getConnection();
+  try { res.json(await goiThuTuc(conn, 'sp_dang_ky', [ma_sv, ma_lhp])); } finally { conn.release(); }
+}));
+
+app.post('/api/huy-dang-ky', boc(async (req, res) => {
+  const { ma_sv, ma_lhp } = req.body || {};
+  const conn = await layPool().getConnection();
+  try { res.json(await goiThuTuc(conn, 'sp_huy_dang_ky', [ma_sv, ma_lhp])); } finally { conn.release(); }
+}));
+
+app.get('/api/kiem-tra', boc(async (req, res) => {
+  const [rows] = await layPool().query('SELECT * FROM v_kiem_tra_toan_ven ORDER BY loai, doi_tuong');
+  res.json(rows);
+}));
+
+app.post('/api/du-lieu-mau', boc(async (req, res) => {
+  await napDuLieuMau();
+  res.json({ ok: true });
+}));
+
+// ---------- Giả lập xung đột ----------
+app.get('/api/kich-ban', (req, res) => res.json(thongTinKichBan()));
+
+app.post('/api/kich-ban/:id/chay', boc(async (req, res) => {
+  res.json(await chayKichBan(Number(req.params.id), (req.body || {}).cheDo));
+}));
+
+app.post('/api/kich-ban/:id/dat-lai', boc(async (req, res) => {
+  await layPool().query('CALL sp_dat_lai_kich_ban(?)', [Number(req.params.id)]);
+  res.json({ ok: true });
+}));
+
+const PORT = Number(process.env.PORT || 3000);
+app.listen(PORT, () => console.log(`Đăng kí học phần: http://localhost:${PORT}`));

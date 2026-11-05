@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng kí học phần</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-inner">
+      <div>
+        <h1>Đăng kí học phần</h1>
+        <p class="sub">Đồ án Hệ quản trị CSDL · MySQL · giả lập xung đột dữ liệu đồng thời</p>
+      </div>
+      <nav class="tabs">
+        <button class="tab active" data-tab="dang-ky">Đăng kí học phần</button>
+        <button class="tab" data-tab="xung-dot">Giả lập xung đột</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <!-- ============ TAB 1: ĐĂNG KÍ ============ -->
+    <section id="tab-dang-ky" class="tab-panel">
+      <div class="card sv-bar">
+        <label for="chon-sv">Sinh viên</label>
+        <select id="chon-sv"></select>
+        <div id="sv-info" class="sv-info"></div>
+        <button id="btn-du-lieu-mau" class="btn ghost small" title="Xoá hết đăng kí và nạp lại dữ liệu mẫu">Khôi phục dữ liệu mẫu</button>
+      </div>
+
+      <div class="grid-2">
+        <div class="card">
+          <div class="card-head">
+            <h2>Lớp học phần đang mở</h2>
+            <input id="tim-lop" type="search" placeholder="Tìm mã lớp, tên môn, giảng viên…">
+          </div>
+          <div class="table-scroll">
+            <table class="tbl" id="bang-lop">
+              <thead><tr><th>Mã lớp</th><th>Môn học</th><th>TC</th><th>Lịch học</th><th>Giảng viên</th><th>Sĩ số</th><th></th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="col">
+          <div class="card">
+            <h2>Đã đăng kí</h2>
+            <div id="ds-da-dk"></div>
+          </div>
+          <div class="card">
+            <h2>Thời khoá biểu</h2>
+            <div id="tkb" class="tkb"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h2>Kiểm tra toàn vẹn dữ liệu <span class="muted">(view v_kiem_tra_toan_ven)</span></h2>
+          <button id="btn-kiem-tra" class="btn ghost small">Kiểm tra lại</button>
+        </div>
+        <div id="kiem-tra"></div>
+      </div>
+    </section>
+
+    <!-- ============ TAB 2: XUNG ĐỘT ============ -->
+    <section id="tab-xung-dot" class="tab-panel" hidden>
+      <div class="card intro">
+        <p>Mỗi kịch bản cho nhiều giao dịch (T1, T2, …) chạy <b>cùng lúc</b>, mỗi giao dịch trên một kết nối MySQL riêng.
+          Stored procedure chèn một khoảng "xử lý chậm" giữa bước <b>đọc</b> và bước <b>ghi</b> để hai bên chắc chắn chen nhau.</p>
+        <p><b>Không xử lý</b> gọi thủ tục <code>sp_..._loi</code>, <b>Có xử lý</b> gọi <code>sp_..._an_toan</code>.
+          Bảng lịch thao tác lấy thời điểm thật do MySQL ghi lại (<code>SYSDATE(3)</code>).</p>
+      </div>
+      <div id="ds-kich-ban"></div>
+    </section>
+  </main>
+
+  <div id="toast" class="toast" hidden></div>
+  <script src="app.js"></script>
+</body>
+</html>

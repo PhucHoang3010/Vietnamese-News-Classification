@@ -1,0 +1,9 @@
+# Tuỳ chọn: chạy MySQL bằng Docker (đặt DB_PASSWORD=root trong .env)
+services:
+  mysql:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    command: ["--character-set-server=utf8mb4", "--collation-server=utf8mb4_unicode_ci"]

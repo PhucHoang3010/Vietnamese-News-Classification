@@ -1,0 +1,19 @@
+{
+  "name": "dang-ky-hoc-phan",
+  "version": "1.0.0",
+  "description": "Đồ án Hệ quản trị CSDL: trang đăng kí học phần + giả lập xung đột dữ liệu đồng thời (MySQL)",
+  "main": "src/server.js",
+  "private": true,
+  "scripts": {
+    "db:init": "node src/init-db.js",
+    "start": "node src/server.js",
+    "demo": "node src/demo-cli.js",
+    "test": "node --test --test-concurrency=1"
+  },
+  "engines": { "node": ">=18" },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.21.2",
+    "mysql2": "^3.11.5"
+  }
+}
