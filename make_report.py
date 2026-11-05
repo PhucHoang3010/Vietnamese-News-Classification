@@ -53,6 +53,8 @@ _sec = d.sections[0]
 _sec.page_width, _sec.page_height = Cm(21), Cm(29.7)    # A4
 _sec.left_margin, _sec.right_margin, _sec.top_margin, _sec.bottom_margin = Cm(3), Cm(2), Cm(2.5), Cm(2.5)
 _sec.different_first_page_header_footer = True           # trang bìa không có đầu trang / số trang
+_sec.first_page_header.is_linked_to_previous = False       # tạo sẵn đầu/chân trang riêng (để trống) cho trang bìa; thiếu thì một số phần mềm vẫn hiện số trang
+_sec.first_page_footer.is_linked_to_previous = False
 
 
 def _style_font(st, size, bold=None, italic=None, name=FONT):
