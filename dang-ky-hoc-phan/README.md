@@ -61,14 +61,63 @@ Sau khi chạy bản lỗi, quay lại tab 1 và chọn SV của kịch bản đ
 
 ## 3. Thiết kế CSDL
 
+### ERD
+
+![ERD CSDL đăng kí học phần](docs/erd.png)
+
+Bản vector để chèn vào báo cáo: [`docs/erd.svg`](docs/erd.svg). Muốn có EER diagram do MySQL Workbench tự vẽ thì chạy `db:init` xong vào *Database → Reverse Engineer…* và chọn schema `dkhp`.
+
+`SINH_VIEN` và `LOP_HOC_PHAN` có quan hệ **nhiều – nhiều**, được tách thành thực thể kết hợp `DANG_KY`:
+- một SV đăng kí 0..N lớp, một lớp có 0..N SV đăng kí;
+- một môn học mở 0..N lớp, mỗi lớp thuộc đúng 1 môn.
+
+```mermaid
+erDiagram
+    SINH_VIEN ||--o{ DANG_KY : "đăng kí"
+    LOP_HOC_PHAN ||--o{ DANG_KY : "thuộc lớp"
+    MON_HOC ||--o{ LOP_HOC_PHAN : "mở cho môn"
+
+    SINH_VIEN {
+        varchar ma_sv PK
+        varchar ho_ten
+        varchar lop
+        tinyint tin_chi_toi_da
+        boolean no_hoc_phi
+    }
+    DANG_KY {
+        int id PK
+        varchar ma_sv FK "UNIQUE(ma_sv, ma_lhp)"
+        varchar ma_lhp FK "FK kép (ma_lhp, ma_mh)"
+        varchar ma_mh FK
+        datetime thoi_gian
+    }
+    LOP_HOC_PHAN {
+        varchar ma_lhp PK
+        varchar ma_mh FK
+        varchar giang_vien
+        tinyint thu
+        tinyint tiet_bd
+        tinyint tiet_kt
+        varchar phong
+        int si_so_toi_da
+        int si_so_hien_tai
+    }
+    MON_HOC {
+        varchar ma_mh PK
+        varchar ten_mh
+        tinyint so_tin_chi
+    }
 ```
-sinh_vien(ma_sv PK, ho_ten, lop, tin_chi_toi_da, no_hoc_phi)
-mon_hoc(ma_mh PK, ten_mh, so_tin_chi)
-lop_hoc_phan(ma_lhp PK, ma_mh FK, giang_vien, thu, tiet_bd, tiet_kt, phong, si_so_toi_da, si_so_hien_tai)
-dang_ky(id PK, ma_sv FK, ma_lhp, ma_mh, thoi_gian)
+
+### Lược đồ quan hệ
+
+```
+SINH_VIEN(ma_sv, ho_ten, lop, tin_chi_toi_da, no_hoc_phi)
+MON_HOC(ma_mh, ten_mh, so_tin_chi)
+LOP_HOC_PHAN(ma_lhp, ma_mh → MON_HOC, giang_vien, thu, tiet_bd, tiet_kt, phong, si_so_toi_da, si_so_hien_tai)
+DANG_KY(id, ma_sv → SINH_VIEN, (ma_lhp, ma_mh) → LOP_HOC_PHAN, thoi_gian)
     UNIQUE (ma_sv, ma_lhp)                        -- không đăng kí 1 lớp 2 lần
-    FK (ma_lhp, ma_mh) → lop_hoc_phan(ma_lhp, ma_mh)  -- ma_mh luôn khớp với lớp
-    INDEX (ma_sv, ma_mh)                          -- kiểm tra trùng học phần
+    INDEX  (ma_sv, ma_mh)                         -- kiểm tra trùng học phần
 ```
 
 Bảng `dang_ky` lưu kèm `ma_mh` để kiểm tra trùng học phần bằng index và để có thể thêm `UNIQUE(ma_sv, ma_mh)`. Khoá ngoại kép bảo đảm cột lưu kèm này không bị sai lệch so với lớp.
@@ -177,6 +226,7 @@ src/server.js            web server (Express) + API
 src/kich-ban.js          định nghĩa kịch bản + bộ chạy giao dịch đồng thời
 src/db.js                kết nối MySQL, chạy file .sql (hiểu lệnh DELIMITER)
 public/                  giao diện (HTML/CSS/JS thuần)
+docs/erd.svg, erd.png    ERD
 test/                    test tự động (node:test)
 ```
 

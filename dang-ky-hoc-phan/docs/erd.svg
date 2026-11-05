@@ -1,0 +1,147 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1550" height="712" viewBox="0 0 1550 712" font-family="'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif">
+<rect width="1550" height="712" fill="#ffffff"/>
+<text x="40" y="48" font-size="24" font-weight="700" fill="#0f172a">ERD: CSDL Đăng kí học phần (dkhp)</text>
+<text x="40" y="74" font-size="14" fill="#64748b">Ký hiệu Crow's Foot · MySQL 8 / InnoDB · SINH_VIEN và LOP_HOC_PHAN quan hệ nhiều – nhiều thông qua DANG_KY</text>
+<g>
+  <rect x="43" y="152" width="270" height="194" rx="8" fill="#0f172a" opacity=".08"/>
+  <rect x="40" y="148" width="270" height="194" rx="8" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+  <path d="M40 156 a8 8 0 0 1 8 -8 h254 a8 8 0 0 1 8 8 v46 h-270 z" fill="#1e3a8a"/>
+  <text x="54" y="172" font-size="16" font-weight="700" fill="#fff" letter-spacing=".5">SINH_VIEN</text>
+  <text x="54" y="191" font-size="12.5" fill="#c7d2fe">Sinh viên</text>
+  <text x="52" y="220.5" font-size="11" font-weight="700" fill="#b45309">PK</text>
+  <text x="90" y="220.5" font-size="13.5" fill="#0f172a" font-weight="700" text-decoration="underline">ma_sv</text>
+  <text x="298" y="220.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(10)</text>
+  <line x1="40" y1="230" x2="310" y2="230" stroke="#e2e8f0"/>
+  <text x="90" y="248.5" font-size="13.5" fill="#0f172a" >ho_ten</text>
+  <text x="298" y="248.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(100)</text>
+  <line x1="40" y1="258" x2="310" y2="258" stroke="#e2e8f0"/>
+  <text x="90" y="276.5" font-size="13.5" fill="#0f172a" >lop</text>
+  <text x="298" y="276.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(20)</text>
+  <line x1="40" y1="286" x2="310" y2="286" stroke="#e2e8f0"/>
+  <text x="90" y="304.5" font-size="13.5" fill="#0f172a" >tin_chi_toi_da</text>
+  <text x="298" y="304.5" font-size="11.5" fill="#64748b" text-anchor="end">TINYINT</text>
+  <line x1="40" y1="314" x2="310" y2="314" stroke="#e2e8f0"/>
+  <text x="90" y="332.5" font-size="13.5" fill="#0f172a" >no_hoc_phi</text>
+  <text x="298" y="332.5" font-size="11.5" fill="#64748b" text-anchor="end">BOOLEAN</text>
+</g>
+<g>
+  <rect x="443" y="124" width="270" height="194" rx="8" fill="#0f172a" opacity=".08"/>
+  <rect x="440" y="120" width="270" height="194" rx="8" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+  <path d="M440 128 a8 8 0 0 1 8 -8 h254 a8 8 0 0 1 8 8 v46 h-270 z" fill="#1e3a8a"/>
+  <text x="454" y="144" font-size="16" font-weight="700" fill="#fff" letter-spacing=".5">DANG_KY</text>
+  <text x="454" y="163" font-size="12.5" fill="#c7d2fe">Đăng kí học phần</text>
+  <text x="452" y="192.5" font-size="11" font-weight="700" fill="#b45309">PK</text>
+  <text x="490" y="192.5" font-size="13.5" fill="#0f172a" font-weight="700" text-decoration="underline">id</text>
+  <text x="698" y="192.5" font-size="11.5" fill="#64748b" text-anchor="end">INT AUTO_INCREMENT</text>
+  <line x1="440" y1="202" x2="710" y2="202" stroke="#e2e8f0"/>
+  <text x="452" y="220.5" font-size="11" font-weight="700" fill="#1d4ed8">FK</text>
+  <text x="490" y="220.5" font-size="13.5" fill="#0f172a" font-style="italic">ma_sv</text>
+  <text x="556" y="220.5" font-size="10.5" font-weight="700" fill="#047857">UQ¹</text>
+  <text x="698" y="220.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(10)</text>
+  <line x1="440" y1="230" x2="710" y2="230" stroke="#e2e8f0"/>
+  <text x="452" y="248.5" font-size="11" font-weight="700" fill="#1d4ed8">FK²</text>
+  <text x="490" y="248.5" font-size="13.5" fill="#0f172a" font-style="italic">ma_lhp</text>
+  <text x="556" y="248.5" font-size="10.5" font-weight="700" fill="#047857">UQ¹</text>
+  <text x="698" y="248.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(15)</text>
+  <line x1="440" y1="258" x2="710" y2="258" stroke="#e2e8f0"/>
+  <text x="452" y="276.5" font-size="11" font-weight="700" fill="#1d4ed8">FK²</text>
+  <text x="490" y="276.5" font-size="13.5" fill="#0f172a" font-style="italic">ma_mh</text>
+  <text x="698" y="276.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(10)</text>
+  <line x1="440" y1="286" x2="710" y2="286" stroke="#e2e8f0"/>
+  <text x="490" y="304.5" font-size="13.5" fill="#0f172a" >thoi_gian</text>
+  <text x="698" y="304.5" font-size="11.5" fill="#64748b" text-anchor="end">DATETIME(3)</text>
+</g>
+<g>
+  <rect x="843" y="180" width="290" height="306" rx="8" fill="#0f172a" opacity=".08"/>
+  <rect x="840" y="176" width="290" height="306" rx="8" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+  <path d="M840 184 a8 8 0 0 1 8 -8 h274 a8 8 0 0 1 8 8 v46 h-290 z" fill="#1e3a8a"/>
+  <text x="854" y="200" font-size="16" font-weight="700" fill="#fff" letter-spacing=".5">LOP_HOC_PHAN</text>
+  <text x="854" y="219" font-size="12.5" fill="#c7d2fe">Lớp học phần</text>
+  <text x="852" y="248.5" font-size="11" font-weight="700" fill="#b45309">PK</text>
+  <text x="890" y="248.5" font-size="13.5" fill="#0f172a" font-weight="700" text-decoration="underline">ma_lhp</text>
+  <text x="956" y="248.5" font-size="10.5" font-weight="700" fill="#047857">UQ³</text>
+  <text x="1118" y="248.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(15)</text>
+  <line x1="840" y1="258" x2="1130" y2="258" stroke="#e2e8f0"/>
+  <text x="852" y="276.5" font-size="11" font-weight="700" fill="#1d4ed8">FK</text>
+  <text x="890" y="276.5" font-size="13.5" fill="#0f172a" font-style="italic">ma_mh</text>
+  <text x="956" y="276.5" font-size="10.5" font-weight="700" fill="#047857">UQ³</text>
+  <text x="1118" y="276.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(10)</text>
+  <line x1="840" y1="286" x2="1130" y2="286" stroke="#e2e8f0"/>
+  <text x="890" y="304.5" font-size="13.5" fill="#0f172a" >giang_vien</text>
+  <text x="1118" y="304.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(100)</text>
+  <line x1="840" y1="314" x2="1130" y2="314" stroke="#e2e8f0"/>
+  <text x="890" y="332.5" font-size="13.5" fill="#0f172a" >thu</text>
+  <text x="1118" y="332.5" font-size="11.5" fill="#64748b" text-anchor="end">TINYINT</text>
+  <line x1="840" y1="342" x2="1130" y2="342" stroke="#e2e8f0"/>
+  <text x="890" y="360.5" font-size="13.5" fill="#0f172a" >tiet_bd</text>
+  <text x="1118" y="360.5" font-size="11.5" fill="#64748b" text-anchor="end">TINYINT</text>
+  <line x1="840" y1="370" x2="1130" y2="370" stroke="#e2e8f0"/>
+  <text x="890" y="388.5" font-size="13.5" fill="#0f172a" >tiet_kt</text>
+  <text x="1118" y="388.5" font-size="11.5" fill="#64748b" text-anchor="end">TINYINT</text>
+  <line x1="840" y1="398" x2="1130" y2="398" stroke="#e2e8f0"/>
+  <text x="890" y="416.5" font-size="13.5" fill="#0f172a" >phong</text>
+  <text x="1118" y="416.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(20)</text>
+  <line x1="840" y1="426" x2="1130" y2="426" stroke="#e2e8f0"/>
+  <text x="890" y="444.5" font-size="13.5" fill="#0f172a" >si_so_toi_da</text>
+  <text x="1118" y="444.5" font-size="11.5" fill="#64748b" text-anchor="end">INT</text>
+  <line x1="840" y1="454" x2="1130" y2="454" stroke="#e2e8f0"/>
+  <text x="890" y="472.5" font-size="13.5" fill="#0f172a" >si_so_hien_tai</text>
+  <text x="1118" y="472.5" font-size="11.5" fill="#64748b" text-anchor="end">INT</text>
+</g>
+<g>
+  <rect x="1263" y="208" width="250" height="138" rx="8" fill="#0f172a" opacity=".08"/>
+  <rect x="1260" y="204" width="250" height="138" rx="8" fill="#fff" stroke="#334155" stroke-width="1.5"/>
+  <path d="M1260 212 a8 8 0 0 1 8 -8 h234 a8 8 0 0 1 8 8 v46 h-250 z" fill="#1e3a8a"/>
+  <text x="1274" y="228" font-size="16" font-weight="700" fill="#fff" letter-spacing=".5">MON_HOC</text>
+  <text x="1274" y="247" font-size="12.5" fill="#c7d2fe">Môn học (học phần)</text>
+  <text x="1272" y="276.5" font-size="11" font-weight="700" fill="#b45309">PK</text>
+  <text x="1310" y="276.5" font-size="13.5" fill="#0f172a" font-weight="700" text-decoration="underline">ma_mh</text>
+  <text x="1498" y="276.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(10)</text>
+  <line x1="1260" y1="286" x2="1510" y2="286" stroke="#e2e8f0"/>
+  <text x="1310" y="304.5" font-size="13.5" fill="#0f172a" >ten_mh</text>
+  <text x="1498" y="304.5" font-size="11.5" fill="#64748b" text-anchor="end">VARCHAR(100)</text>
+  <line x1="1260" y1="314" x2="1510" y2="314" stroke="#e2e8f0"/>
+  <text x="1310" y="332.5" font-size="13.5" fill="#0f172a" >so_tin_chi</text>
+  <text x="1498" y="332.5" font-size="11.5" fill="#64748b" text-anchor="end">TINYINT</text>
+</g>
+<g stroke="#334155" stroke-width="1.6" fill="none">
+  <line x1="310" y1="216" x2="440" y2="216"/>
+  <line x1="320" y1="207" x2="320" y2="225"/><line x1="327" y1="207" x2="327" y2="225"/>
+  <line x1="422" y1="216" x2="440" y2="206"/><line x1="422" y1="216" x2="440" y2="226"/><circle cx="414" cy="216" r="6" fill="#fff"/>
+</g>
+<text x="375" y="204" font-size="13" font-style="italic" font-weight="600" fill="#0f172a" text-anchor="middle">đăng kí</text>
+<text x="324" y="240" font-size="12" font-weight="700" fill="#64748b">1</text>
+<text x="426" y="240" font-size="12" font-weight="700" fill="#64748b" text-anchor="end">N</text>
+<g stroke="#334155" stroke-width="1.6" fill="none">
+  <line x1="710" y1="244" x2="840" y2="244"/>
+  <line x1="728" y1="244" x2="710" y2="234"/><line x1="728" y1="244" x2="710" y2="254"/><circle cx="736" cy="244" r="6" fill="#fff"/>
+  <line x1="830" y1="235" x2="830" y2="253"/><line x1="823" y1="235" x2="823" y2="253"/>
+</g>
+<text x="775" y="232" font-size="13" font-style="italic" font-weight="600" fill="#0f172a" text-anchor="middle">thuộc lớp</text>
+<text x="724" y="268" font-size="12" font-weight="700" fill="#64748b">N</text>
+<text x="826" y="268" font-size="12" font-weight="700" fill="#64748b" text-anchor="end">1</text>
+<g stroke="#334155" stroke-width="1.6" fill="none">
+  <line x1="1130" y1="272" x2="1260" y2="272"/>
+  <line x1="1148" y1="272" x2="1130" y2="262"/><line x1="1148" y1="272" x2="1130" y2="282"/><circle cx="1156" cy="272" r="6" fill="#fff"/>
+  <line x1="1250" y1="263" x2="1250" y2="281"/><line x1="1243" y1="263" x2="1243" y2="281"/>
+</g>
+<text x="1195" y="260" font-size="13" font-style="italic" font-weight="600" fill="#0f172a" text-anchor="middle">mở cho môn</text>
+<text x="1144" y="296" font-size="12" font-weight="700" fill="#64748b">N</text>
+<text x="1246" y="296" font-size="12" font-weight="700" fill="#64748b" text-anchor="end">1</text>
+<g font-size="13" fill="#0f172a">
+<text x="40" y="532" font-size="14" font-weight="700">Ký hiệu</text>
+<g stroke="#334155" stroke-width="1.6" fill="none"><line x1="40" y1="562" x2="100" y2="562"/><line x1="90" y1="553" x2="90" y2="571"/><line x1="83" y1="553" x2="83" y2="571"/></g>
+<text x="112" y="567">đúng 1</text>
+<g stroke="#334155" stroke-width="1.6" fill="none"><line x1="40" y1="594" x2="100" y2="594"/><line x1="82" y1="594" x2="100" y2="584"/><line x1="82" y1="594" x2="100" y2="604"/><circle cx="74" cy="594" r="6" fill="#fff"/></g>
+<text x="112" y="599">0 hoặc nhiều</text>
+<text x="40" y="632"><tspan font-weight="700" fill="#b45309">PK</tspan> khoá chính (gạch chân)   <tspan font-weight="700" fill="#1d4ed8">FK</tspan> khoá ngoại (in nghiêng)</text>
+</g>
+<g font-size="13" fill="#0f172a">
+<text x="440" y="532" font-size="14" font-weight="700">Ràng buộc</text>
+<text x="440" y="562"><tspan font-weight="700" fill="#047857">UQ¹</tspan><tspan x="500">UNIQUE (ma_sv, ma_lhp): một SV không đăng kí một lớp hai lần</tspan></text>
+<text x="440" y="586"><tspan font-weight="700" fill="#1d4ed8">FK²</tspan><tspan x="500">Khoá ngoại kép (ma_lhp, ma_mh) → LOP_HOC_PHAN(ma_lhp, ma_mh): ma_mh lưu kèm luôn khớp với lớp</tspan></text>
+<text x="440" y="610"><tspan font-weight="700" fill="#047857">UQ³</tspan><tspan x="500">UNIQUE (ma_lhp, ma_mh) trên LOP_HOC_PHAN: khoá được khoá ngoại kép² tham chiếu</tspan></text>
+<text x="440" y="634"><tspan font-weight="700" fill="#047857">IDX</tspan><tspan x="500">INDEX (ma_sv, ma_mh) trên DANG_KY: kiểm tra trùng học phần (và gap lock ở kịch bản 3)</tspan></text>
+<text x="440" y="658"><tspan font-weight="700" fill="#047857">CHECK</tspan><tspan x="500">thu ∈ [2, 8] · 1 ≤ tiet_bd ≤ tiet_kt ≤ 12 · si_so_toi_da > 0 · si_so_hien_tai ≥ 0 · so_tin_chi ∈ [1, 10]</tspan></text>
+</g>
+</svg>
