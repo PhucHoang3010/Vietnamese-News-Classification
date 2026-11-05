@@ -75,3 +75,22 @@ test('sp_dang_ky an toàn khi bấm đồng thời (tranh slot, trùng lịch, t
   const [vp] = await pool.query('SELECT * FROM v_kiem_tra_toan_ven');
   assert.deepEqual(vp, []);
 });
+
+test('Trang đăng kí: sp_dang_ky_mo_phong KHÔNG xử lý gây lỗi, CÓ xử lý thì không', async () => {
+  const pool = layPool();
+  const haiCuaSo = (coXuLy) => Promise.all([
+    goi('sp_dang_ky_mo_phong', ['SV09', 'KTCT.02', coXuLy, TRE]),
+    new Promise((r) => setTimeout(r, 150)).then(() => goi('sp_dang_ky_mo_phong', ['SV10', 'KTCT.02', coXuLy, TRE])),
+  ]);
+  await napDuLieuMau();
+  await haiCuaSo(false);
+  const [vp1] = await pool.query("SELECT loai FROM v_kiem_tra_toan_ven WHERE doi_tuong = 'KTCT.02' ORDER BY loai");
+  assert.deepEqual(vp1.map((v) => v.loai), ['SAI_SI_SO', 'VUOT_SI_SO']);
+
+  await napDuLieuMau();
+  const [a, b] = await haiCuaSo(true);
+  assert.equal(a.ket_qua, 'THANH_CONG');
+  assert.equal(b.thong_bao, 'Lớp đã đủ sĩ số');
+  const [vp2] = await pool.query('SELECT * FROM v_kiem_tra_toan_ven');
+  assert.deepEqual(vp2, []);
+});

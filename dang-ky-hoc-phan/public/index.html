@@ -24,6 +24,44 @@
   <main class="wrap">
     <!-- ============ TAB 1: ĐĂNG KÍ ============ -->
     <section id="tab-dang-ky" class="tab-panel">
+      <div class="card mo-phong" id="mo-phong">
+        <div class="mp-row">
+          <h2>Mô phỏng xung đột trên trang này</h2>
+          <div class="mp-ctrl">
+            <span class="mp-lbl">Xử lý đồng thời</span>
+            <div class="seg" role="group">
+              <button data-che-do-trang="1" class="seg-btn">✅ CÓ xử lý</button>
+              <button data-che-do-trang="0" class="seg-btn">⚠ KHÔNG xử lý</button>
+            </div>
+            <span class="mp-lbl">Xử lý chậm</span>
+            <select id="tre-trang">
+              <option value="0">0 giây</option><option value="3">3 giây</option>
+              <option value="5">5 giây</option><option value="8">8 giây</option>
+            </select>
+          </div>
+        </div>
+        <p id="mp-trang-thai" class="mp-tt"></p>
+        <details class="mp-huong-dan">
+          <summary>Cách mô phỏng bằng 2 cửa sổ trình duyệt</summary>
+          <ol>
+            <li>Bấm <b>Khôi phục dữ liệu mẫu</b>. Chọn chế độ <b>KHÔNG xử lý</b> và xử lý chậm <b>5 giây</b>. Chế độ áp dụng cho mọi cửa sổ.</li>
+            <li>Mở thêm một cửa sổ cùng địa chỉ này, đặt hai cửa sổ cạnh nhau. Mỗi cửa sổ là một sinh viên, tức một giao dịch riêng.</li>
+            <li>Trong vòng 5 giây, bấm <b>Đăng kí</b> ở cả hai cửa sổ theo một trong ba tình huống:
+              <table class="tbl mp-tbl">
+                <thead><tr><th>Tình huống</th><th>Cửa sổ 1</th><th>Cửa sổ 2</th><th>Kết quả khi KHÔNG xử lý</th></tr></thead>
+                <tbody>
+                  <tr><td><b>Tranh slot</b></td><td>SV09 → KTCT.02</td><td>SV10 → KTCT.02</td><td>Lớp 1 chỗ có 2 SV, sĩ số lưu sai (lost update)</td></tr>
+                  <tr><td><b>Trùng lịch</b></td><td>SV09 → CSDL.01</td><td>SV09 → CTDL.01</td><td>SV09 có 2 lớp cùng Thứ 2, tiết 1-3 / 2-4</td></tr>
+                  <tr><td><b>Trùng học phần</b></td><td>SV10 → CSDL.01</td><td>SV10 → CSDL.02</td><td>SV10 học 2 lớp của cùng môn CSDL</td></tr>
+                </tbody>
+              </table>
+            </li>
+            <li>Xem khung <b>Kiểm tra toàn vẹn dữ liệu</b> ở cuối trang: các vi phạm hiện ra.</li>
+            <li>Khôi phục dữ liệu, chuyển sang <b>CÓ xử lý</b> và làm lại. Cửa sổ thứ hai phải <b>chờ khoá</b> (SELECT ... FOR UPDATE) cho tới khi cửa sổ thứ nhất COMMIT, sau đó bị từ chối đúng lý do. Dữ liệu không bị sai.</li>
+          </ol>
+        </details>
+      </div>
+
       <div class="card sv-bar">
         <label for="chon-sv">Sinh viên</label>
         <select id="chon-sv"></select>

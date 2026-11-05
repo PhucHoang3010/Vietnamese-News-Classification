@@ -35,14 +35,28 @@ Mở http://localhost:3000.
 
 - `npm run db:init` tạo CSDL `dkhp` (**xoá CSDL `dkhp` cũ nếu có**), các bảng, view, stored procedure và dữ liệu mẫu. Cách khác: mở 3 file trong `sql/` bằng MySQL Workbench và chạy lần lượt `01_schema.sql` → `02_procedures.sql` → `03_seed.sql`.
 - `npm run demo` chạy cả 4 kịch bản ngay trên terminal và in lịch thao tác (thêm `-- 2` để chỉ chạy kịch bản 2).
-- `npm test` chạy 12 test tự động: bản lỗi phải ra xung đột, bản sửa phải ra dữ liệu đúng, `sp_dang_ky` kiểm tra đúng mọi quy tắc. **Test sẽ nạp lại dữ liệu mẫu.**
+- `npm test` chạy 13 test tự động: bản lỗi phải ra xung đột, bản sửa phải ra dữ liệu đúng, `sp_dang_ky` kiểm tra đúng mọi quy tắc. **Test sẽ nạp lại dữ liệu mẫu.**
 - Chưa có MySQL thì có thể chạy bằng Docker: `docker compose up -d` (MySQL 8.4, user `root`, mật khẩu `root`).
 
 ## 2. Trang web
 
-**Tab "Đăng kí học phần"**
-- Chọn sinh viên, xem các lớp đang mở (sĩ số dạng thanh), bấm **Đăng kí** hoặc **Huỷ**. Mọi thao tác gọi stored procedure `sp_dang_ky` / `sp_huy_dang_ky`.
-- `sp_dang_ky` từ chối khi: lớp đã đầy, đã đăng kí lớp đó, trùng học phần, trùng lịch, vượt số tín chỉ tối đa, hoặc còn nợ học phí.
+**Tab "Đăng kí học phần"**: phần chính, xung đột được mô phỏng ngay trên trang này.
+- Khung **Mô phỏng xung đột trên trang này** có công tắc **CÓ xử lý / KHÔNG xử lý** và ô **xử lý chậm** (0, 3, 5 hoặc 8 giây). Nút Đăng kí gọi `sp_dang_ky_mo_phong(ma_sv, ma_lhp, co_xu_ly, tre)`:
+  - CÓ xử lý: khoá dòng sinh viên và dòng lớp bằng `SELECT ... FOR UPDATE`;
+  - KHÔNG xử lý: đọc thường, không khoá, ghi sĩ số bằng giá trị đã đọc.
+- Cách mô phỏng: mở **2 cửa sổ trình duyệt** cạnh nhau. Mỗi cửa sổ là một sinh viên, tức một giao dịch. Chế độ chọn ở cửa sổ này tự áp dụng sang cửa sổ kia. Bấm Đăng kí ở cả hai cửa sổ trong khoảng thời gian xử lý chậm:
+
+  | Tình huống | Cửa sổ 1 | Cửa sổ 2 | KHÔNG xử lý | CÓ xử lý |
+  |---|---|---|---|---|
+  | Tranh slot | SV09 → KTCT.02 | SV10 → KTCT.02 | lớp 1 chỗ có 2 SV, sĩ số lưu = 1 | cửa sổ 2 chờ khoá, rồi nhận "Lớp đã đủ sĩ số" |
+  | Trùng lịch | SV09 → CSDL.01 | SV09 → CTDL.01 | 2 lớp trùng giờ | "Trùng lịch với lớp CSDL.01" |
+  | Trùng học phần | SV10 → CSDL.01 | SV10 → CSDL.02 | 2 lớp cùng môn | "Trùng học phần ..." |
+
+  Trước mỗi lần thử, bấm **Khôi phục dữ liệu mẫu**. Trang tự làm mới mỗi 2 giây nên cửa sổ này thấy ngay thay đổi do cửa sổ kia gây ra.
+
+Các chức năng khác của tab này:
+- Chọn sinh viên, xem các lớp đang mở (sĩ số dạng thanh), bấm **Đăng kí** hoặc **Huỷ**. Nút Đăng kí gọi `sp_dang_ky_mo_phong`, nút Huỷ gọi `sp_huy_dang_ky`.
+- Thủ tục đăng kí từ chối khi: lớp đã đầy, đã đăng kí lớp đó, trùng học phần, trùng lịch, vượt số tín chỉ tối đa, hoặc còn nợ học phí.
 - Thời khoá biểu tô **đỏ** các lớp trùng giờ.
 - Khung **Kiểm tra toàn vẹn dữ liệu** đọc view `v_kiem_tra_toan_ven` và liệt kê các vi phạm: vượt sĩ số, sai sĩ số, trùng lịch, trùng học phần, vượt tín chỉ.
 
@@ -52,7 +66,7 @@ Dữ liệu mẫu có sẵn vài tình huống để thử:
 - `SV08` còn nợ học phí.
 - `SV01` đã học `CSDL.01`: thử đăng kí `CTDL.01` sẽ bị báo trùng lịch, `CSDL.02` sẽ bị báo trùng học phần.
 
-**Tab "Giả lập xung đột"**: mỗi kịch bản có 2 nút **Chạy KHÔNG xử lý** và **Chạy CÓ xử lý**. Kết quả gồm:
+**Tab "Giả lập xung đột"**: chạy tự động (không cần bấm tay) và vẽ lịch thao tác T1/T2. Mỗi kịch bản có 2 nút **Chạy KHÔNG xử lý** và **Chạy CÓ xử lý**. Kết quả gồm:
 - bảng **lịch thao tác** theo kiểu sách giáo khoa (cột thời điểm | T1 | T2 | …). Thời điểm do chính MySQL ghi bằng `SYSDATE(3)`, có ghi chú "⏳ đã chờ x giây" khi một giao dịch phải đợi khoá;
 - kết luận ✅ / ❌ kèm số liệu kiểm tra sau khi chạy;
 - phần giải thích nguyên nhân và cách sửa, kèm đoạn SQL.
@@ -221,7 +235,7 @@ Các file trong `sql/demo/` dùng để demo bằng tay với **2 phiên**, mỗ
 
 ```
 sql/01_schema.sql        bảng, ràng buộc, view v_kiem_tra_toan_ven
-sql/02_procedures.sql    sp_dang_ky, sp_huy_dang_ky, 4 cặp thủ tục kịch bản, sp_dat_lai_kich_ban
+sql/02_procedures.sql    sp_dang_ky_mo_phong, sp_dang_ky, sp_huy_dang_ky, 4 cặp thủ tục kịch bản, sp_dat_lai_kich_ban
 sql/03_seed.sql          dữ liệu mẫu
 sql/demo/*.sql           script demo 2 phiên cho từng kịch bản
 src/server.js            web server (Express) + API

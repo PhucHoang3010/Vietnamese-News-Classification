@@ -1,7 +1,8 @@
 -- =====================================================================
 --  File 2/3: Stored procedure
 --
---  A. sp_dang_ky / sp_huy_dang_ky   — dùng cho trang web (bản ĐÚNG, đầy đủ kiểm tra)
+--  A. sp_dang_ky_mo_phong / sp_dang_ky / sp_huy_dang_ky — dùng cho trang web
+--     (đủ mọi kiểm tra; có công tắc CÓ / KHÔNG xử lý đồng thời để mô phỏng trực tiếp trên web)
 --  B. Các cặp thủ tục giả lập xung đột (tham số p_tre = số giây "xử lý chậm"
 --     chèn giữa bước ĐỌC và bước GHI để mở rộng cửa sổ tranh chấp):
 --       KB1 Tranh slot          sp_tranh_slot_loi      / sp_tranh_slot_an_toan
@@ -36,16 +37,21 @@ END $$
 -- =====================================================================
 
 -- ---------------------------------------------------------------------
--- sp_dang_ky: đăng kí 1 lớp học phần, an toàn khi nhiều người bấm cùng lúc.
---   B1. Khoá dòng SINH_VIEN (FOR UPDATE)  → mọi thao tác của cùng 1 SV chạy tuần tự
---       ⇒ chống trùng lịch, trùng học phần, vượt tín chỉ.
---       Phải là câu lệnh ĐẦU TIÊN của giao dịch (xem giải thích KB2).
---   B2. Khoá dòng LOP_HOC_PHAN (FOR UPDATE) → các SV tranh 1 lớp chạy tuần tự
---       ⇒ chống tranh slot / lost update.
---   Thứ tự khoá luôn là SV → LHP để không gây deadlock giữa các lần gọi.
+-- sp_dang_ky_mo_phong: thủ tục đăng kí mà nút "Đăng kí" trên trang web gọi.
+--   p_co_xu_ly = TRUE  (CÓ xử lý đồng thời):
+--     B1. Khoá dòng SINH_VIEN (FOR UPDATE) → mọi thao tác của cùng 1 SV chạy tuần tự
+--         ⇒ chống trùng lịch, trùng học phần, vượt tín chỉ.
+--         Phải là câu lệnh ĐẦU TIÊN của giao dịch (xem giải thích KB2).
+--     B2. Khoá dòng LOP_HOC_PHAN (FOR UPDATE) → các SV tranh 1 lớp chạy tuần tự
+--         ⇒ chống tranh slot / lost update.
+--     Thứ tự khoá luôn là SV → LHP để không gây deadlock giữa các lần gọi.
+--   p_co_xu_ly = FALSE (KHÔNG xử lý): cùng các bước kiểm tra nhưng đọc thường,
+--     không khoá, ghi sĩ số bằng giá trị đã đọc → mở 2 cửa sổ bấm cùng lúc sẽ thấy lỗi.
+--   p_tre: số giây "xử lý chậm" giữa bước kiểm tra và bước ghi (0 = không chậm).
 -- ---------------------------------------------------------------------
-DROP PROCEDURE IF EXISTS sp_dang_ky $$
-CREATE PROCEDURE sp_dang_ky(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15))
+DROP PROCEDURE IF EXISTS sp_dang_ky_mo_phong $$
+CREATE PROCEDURE sp_dang_ky_mo_phong(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15),
+                                     IN p_co_xu_ly BOOLEAN, IN p_tre DECIMAL(5,2))
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -65,22 +71,33 @@ BEGIN
     SELECT 'LOI' AS ket_qua, v_tb AS thong_bao, v_loi AS ma_loi, v_log AS nhat_ky;
   END;
 
-  CALL sp_log(v_log, 'BEGIN', CONCAT(p_ma_sv, ' đăng kí ', p_ma_lhp));
+  CALL sp_log(v_log, 'BEGIN', CONCAT(p_ma_sv, ' đăng kí ', p_ma_lhp, IF(p_co_xu_ly, '', ' [KHÔNG xử lý]')));
   START TRANSACTION;
 
   xu_ly: BEGIN
-    -- B1. Khoá dòng sinh viên
-    SELECT tin_chi_toi_da, no_hoc_phi INTO v_tc_max, v_no_hp
-    FROM sinh_vien WHERE ma_sv = p_ma_sv FOR UPDATE;
+    -- B1. Đọc (và khoá) dòng sinh viên
+    IF p_co_xu_ly THEN
+      SELECT tin_chi_toi_da, no_hoc_phi INTO v_tc_max, v_no_hp
+      FROM sinh_vien WHERE ma_sv = p_ma_sv FOR UPDATE;
+    ELSE
+      SELECT tin_chi_toi_da, no_hoc_phi INTO v_tc_max, v_no_hp
+      FROM sinh_vien WHERE ma_sv = p_ma_sv;
+    END IF;
     IF v_khong_thay THEN SET v_kq = 'TU_CHOI', v_tb = 'Không tìm thấy sinh viên'; LEAVE xu_ly; END IF;
     IF v_no_hp THEN SET v_kq = 'TU_CHOI', v_tb = 'Sinh viên còn nợ học phí, không được đăng kí'; LEAVE xu_ly; END IF;
 
-    -- B2. Khoá dòng lớp học phần
-    SELECT ma_mh, thu, tiet_bd, tiet_kt, si_so_hien_tai, si_so_toi_da
-      INTO v_ma_mh, v_thu, v_bd, v_kt, v_si_so, v_toi_da
-    FROM lop_hoc_phan WHERE ma_lhp = p_ma_lhp FOR UPDATE;
+    -- B2. Đọc (và khoá) dòng lớp học phần
+    IF p_co_xu_ly THEN
+      SELECT ma_mh, thu, tiet_bd, tiet_kt, si_so_hien_tai, si_so_toi_da
+        INTO v_ma_mh, v_thu, v_bd, v_kt, v_si_so, v_toi_da
+      FROM lop_hoc_phan WHERE ma_lhp = p_ma_lhp FOR UPDATE;
+    ELSE
+      SELECT ma_mh, thu, tiet_bd, tiet_kt, si_so_hien_tai, si_so_toi_da
+        INTO v_ma_mh, v_thu, v_bd, v_kt, v_si_so, v_toi_da
+      FROM lop_hoc_phan WHERE ma_lhp = p_ma_lhp;
+    END IF;
     IF v_khong_thay THEN SET v_kq = 'TU_CHOI', v_tb = 'Không tìm thấy lớp học phần'; LEAVE xu_ly; END IF;
-    CALL sp_log(v_log, 'LOCK', CONCAT('Đã khoá ', p_ma_sv, ' và ', p_ma_lhp, ' (sĩ số ', v_si_so, '/', v_toi_da, ')'));
+    CALL sp_log(v_log, 'READ', CONCAT('Đọc ', p_ma_lhp, ': sĩ số ', v_si_so, '/', v_toi_da));
 
     -- B3. Kiểm tra nghiệp vụ
     SELECT COUNT(*) INTO v_dem FROM dang_ky WHERE ma_sv = p_ma_sv AND ma_lhp = p_ma_lhp;
@@ -112,8 +129,18 @@ BEGIN
 
     IF v_si_so >= v_toi_da THEN SET v_kq = 'TU_CHOI', v_tb = 'Lớp đã đủ sĩ số'; LEAVE xu_ly; END IF;
 
+    -- Xử lý chậm (để kịp bấm ở cửa sổ thứ hai)
+    IF p_tre > 0 THEN
+      CALL sp_log(v_log, 'INFO', CONCAT('Hợp lệ → xử lý ', p_tre, 's...'));
+      DO SLEEP(p_tre);
+    END IF;
+
     -- B4. Ghi (cập nhật dòng cha trước, chèn dòng con sau)
-    UPDATE lop_hoc_phan SET si_so_hien_tai = si_so_hien_tai + 1 WHERE ma_lhp = p_ma_lhp;
+    IF p_co_xu_ly THEN
+      UPDATE lop_hoc_phan SET si_so_hien_tai = si_so_hien_tai + 1 WHERE ma_lhp = p_ma_lhp;
+    ELSE
+      UPDATE lop_hoc_phan SET si_so_hien_tai = v_si_so + 1 WHERE ma_lhp = p_ma_lhp;  -- ghi đè giá trị đã đọc
+    END IF;
     INSERT INTO dang_ky (ma_sv, ma_lhp, ma_mh) VALUES (p_ma_sv, p_ma_lhp, v_ma_mh);
     CALL sp_log(v_log, 'WRITE', CONCAT('Ghi dang_ky; si_so_hien_tai := ', v_si_so + 1));
   END xu_ly;
@@ -122,6 +149,16 @@ BEGIN
   ELSE ROLLBACK; CALL sp_log(v_log, 'ROLLBACK', v_tb);
   END IF;
   SELECT v_kq AS ket_qua, v_tb AS thong_bao, v_loi AS ma_loi, v_log AS nhat_ky;
+END $$
+
+
+-- ---------------------------------------------------------------------
+-- sp_dang_ky: bản đăng kí chuẩn = có xử lý đồng thời, không chậm
+-- ---------------------------------------------------------------------
+DROP PROCEDURE IF EXISTS sp_dang_ky $$
+CREATE PROCEDURE sp_dang_ky(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15))
+BEGIN
+  CALL sp_dang_ky_mo_phong(p_ma_sv, p_ma_lhp, TRUE, 0);
 END $$
 
 

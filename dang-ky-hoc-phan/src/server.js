@@ -43,10 +43,14 @@ app.get('/api/sinh-vien/:ma/dang-ky', boc(async (req, res) => {
   res.json(rows);
 }));
 
+// coXuLy: true = có xử lý đồng thời (khoá), false = không xử lý; tre: số giây xử lý chậm (0..10)
 app.post('/api/dang-ky', boc(async (req, res) => {
-  const { ma_sv, ma_lhp } = req.body || {};
+  const { ma_sv, ma_lhp, coXuLy = true, tre = 0 } = req.body || {};
+  const giay = Math.min(10, Math.max(0, Number(tre) || 0));
   const conn = await layPool().getConnection();
-  try { res.json(await goiThuTuc(conn, 'sp_dang_ky', [ma_sv, ma_lhp])); } finally { conn.release(); }
+  try {
+    res.json(await goiThuTuc(conn, 'sp_dang_ky_mo_phong', [ma_sv, ma_lhp, coXuLy !== false, giay]));
+  } finally { conn.release(); }
 }));
 
 app.post('/api/huy-dang-ky', boc(async (req, res) => {

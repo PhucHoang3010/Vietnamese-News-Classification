@@ -33,10 +33,18 @@ document.querySelectorAll('.tab').forEach((b) => b.addEventListener('click', () 
 }));
 
 // ===== TAB 1: ĐĂNG KÍ =====
-const st = { sv: [], lop: [], daDk: [], maSv: localStorageGet('ma_sv') || 'SV01' };
-
-function localStorageGet(k) { try { return localStorage.getItem(k); } catch { return null; } }
-function localStorageSet(k, v) { try { localStorage.setItem(k, v); } catch { /* bỏ qua */ } }
+// SV đang chọn lưu theo từng cửa sổ (sessionStorage) để 2 cửa sổ đóng vai 2 SV khác nhau;
+// chế độ mô phỏng lưu chung (localStorage) để mọi cửa sổ cùng một chế độ.
+const kho = (loai) => ({
+  get: (k) => { try { return window[loai].getItem(k); } catch { return null; } },
+  set: (k, v) => { try { window[loai].setItem(k, v); } catch { /* bỏ qua */ } },
+});
+const cuaSo = kho('sessionStorage'), chung = kho('localStorage');
+const st = {
+  sv: [], lop: [], daDk: [], maSv: cuaSo.get('ma_sv') || 'SV01', dangXuLy: new Set(),
+  coXuLy: chung.get('co_xu_ly') !== '0', tre: Number(chung.get('tre') || 0),
+};
+let khoaDsSv = '';
 
 async function taiLai() {
   const [sv, lop, kt] = await Promise.all([api('/api/sinh-vien'), api('/api/lop-hoc-phan'), api('/api/kiem-tra')]);
@@ -48,6 +56,9 @@ async function taiLai() {
 
 function veChonSv() {
   const sel = $('#chon-sv');
+  const khoa = st.sv.map((s) => s.ma_sv).join() + '|' + st.maSv;
+  if (khoa === khoaDsSv) return; // không vẽ lại khi không đổi (tránh đóng dropdown đang mở)
+  khoaDsSv = khoa;
   sel.innerHTML = st.sv.map((s) => `<option value="${esc(s.ma_sv)}" ${s.ma_sv === st.maSv ? 'selected' : ''}>${esc(s.ma_sv)} — ${esc(s.ho_ten)}</option>`).join('');
 }
 
@@ -68,7 +79,9 @@ function veBangLop() {
       const pct = Math.min(100, (l.so_dk_thuc_te / l.si_so_toi_da) * 100);
       const lech = l.so_dk_thuc_te !== l.si_so_hien_tai;
       const coDk = daDk.has(l.ma_lhp);
-      const nut = coDk
+      const nut = st.dangXuLy.has(l.ma_lhp)
+        ? '<button class="btn small cho" disabled>Đang xử lý…</button>'
+        : coDk
         ? `<button class="btn small outline-bad" data-huy="${esc(l.ma_lhp)}">Huỷ</button>`
         : `<button class="btn small" data-dk="${esc(l.ma_lhp)}" ${full ? 'disabled' : ''}>${full ? 'Đã đầy' : 'Đăng kí'}</button>`;
       return `<tr class="${coDk ? 'da-dk' : ''}">
@@ -126,7 +139,32 @@ function veKiemTra(ds) {
     : '<div class="vp-ok">✅ Không có vi phạm: không vượt sĩ số, sĩ số khớp số đăng kí, không trùng lịch, không trùng học phần, không vượt tín chỉ.</div>';
 }
 
-$('#chon-sv').addEventListener('change', (e) => { st.maSv = e.target.value; localStorageSet('ma_sv', st.maSv); taiLai(); });
+$('#chon-sv').addEventListener('change', (e) => { st.maSv = e.target.value; cuaSo.set('ma_sv', st.maSv); taiLai(); });
+
+// ----- Công tắc mô phỏng xung đột trên trang -----
+function veCheDo() {
+  document.querySelectorAll('[data-che-do-trang]').forEach((b) => b.classList.toggle('on', (b.dataset.cheDoTrang === '1') === st.coXuLy));
+  $('#tre-trang').value = String(st.tre);
+  const card = $('#mo-phong');
+  card.classList.toggle('co-xu-ly', st.coXuLy);
+  card.classList.toggle('khong-xu-ly', !st.coXuLy);
+  $('#mp-trang-thai').innerHTML = st.coXuLy
+    ? `Nút <b>Đăng kí</b> gọi <code>sp_dang_ky_mo_phong(…, TRUE, ${st.tre})</code>: khoá dòng sinh viên và lớp bằng <code>SELECT ... FOR UPDATE</code>, nên hai người bấm cùng lúc sẽ được xử lý lần lượt.`
+    : `<b style="color:var(--bad)">Đang tắt xử lý xung đột.</b> Nút <b>Đăng kí</b> gọi <code>sp_dang_ky_mo_phong(…, FALSE, ${st.tre})</code>: đọc thường, không khoá, ghi sĩ số bằng giá trị đã đọc.`;
+}
+document.querySelectorAll('[data-che-do-trang]').forEach((b) => b.addEventListener('click', () => {
+  st.coXuLy = b.dataset.cheDoTrang === '1'; chung.set('co_xu_ly', st.coXuLy ? '1' : '0'); veCheDo();
+}));
+$('#tre-trang').addEventListener('change', (e) => { st.tre = Number(e.target.value); chung.set('tre', String(st.tre)); veCheDo(); });
+window.addEventListener('storage', (e) => { // đồng bộ chế độ giữa các cửa sổ
+  if (e.key === 'co_xu_ly') st.coXuLy = e.newValue !== '0';
+  if (e.key === 'tre') st.tre = Number(e.newValue || 0);
+  veCheDo();
+});
+veCheDo();
+
+// Tự làm mới mỗi 2 giây để thấy thay đổi do cửa sổ khác gây ra
+setInterval(() => { if (!$('#tab-dang-ky').hidden && !document.hidden) taiLai().catch(() => {}); }, 2000);
 $('#tim-lop').addEventListener('input', veBangLop);
 $('#btn-kiem-tra').addEventListener('click', async () => veKiemTra(await api('/api/kiem-tra')));
 $('#btn-du-lieu-mau').addEventListener('click', async () => {
@@ -139,11 +177,17 @@ document.addEventListener('click', async (e) => {
   const dk = e.target.closest('[data-dk]'), huy = e.target.closest('[data-huy]');
   if (!dk && !huy) return;
   const btn = dk || huy;
-  btn.disabled = true;
+  const maLhp = btn.dataset.dk || btn.dataset.huy;
+  const maSv = st.maSv;
+  st.dangXuLy.add(maLhp);
+  veBangLop();
   try {
-    const kq = await api(dk ? '/api/dang-ky' : '/api/huy-dang-ky', { ma_sv: st.maSv, ma_lhp: btn.dataset.dk || btn.dataset.huy });
-    toast(`${btn.dataset.dk || btn.dataset.huy}: ${kq.thong_bao}`, kq.ket_qua === 'THANH_CONG' ? 'ok' : 'bad');
+    const kq = dk
+      ? await api('/api/dang-ky', { ma_sv: maSv, ma_lhp: maLhp, coXuLy: st.coXuLy, tre: st.tre })
+      : await api('/api/huy-dang-ky', { ma_sv: maSv, ma_lhp: maLhp });
+    toast(`${maSv} → ${maLhp}: ${kq.thong_bao}`, kq.ket_qua === 'THANH_CONG' ? 'ok' : 'bad');
   } catch (err) { toast(err.message, 'bad'); }
+  st.dangXuLy.delete(maLhp);
   taiLai();
 });
 

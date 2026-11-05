@@ -140,3 +140,24 @@ pre.sql.ok { border-left: 4px solid #4ade80; }
 .ds-bang .btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
 .ds-bang .n { opacity: .75; margin-left: 4px; }
 .tbl.raw td, .tbl.raw th { white-space: nowrap; font-size: 13px; }
+
+/* ---------- Mô phỏng trên trang đăng kí ---------- */
+.mo-phong { border-width: 2px; }
+.mo-phong.khong-xu-ly { border-color: #f0a8a8; background: #fffafa; }
+.mo-phong.co-xu-ly { border-color: #a9dcbc; }
+.mp-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.mp-row h2 { margin: 0; }
+.mp-ctrl { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+.mp-lbl { color: var(--muted); font-size: 13px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; }
+.seg-btn { font: inherit; border: 0; background: #fff; padding: 7px 12px; cursor: pointer; }
+.seg-btn + .seg-btn { border-left: 1px solid var(--line); }
+.seg-btn.on[data-che-do-trang="1"] { background: var(--ok); color: #fff; }
+.seg-btn.on[data-che-do-trang="0"] { background: var(--bad); color: #fff; }
+.mp-tt { margin: 8px 0 0; font-size: 13.5px; }
+.mp-huong-dan { margin-top: 8px; }
+.mp-huong-dan summary { cursor: pointer; font-weight: 600; color: var(--primary); }
+.mp-huong-dan ol { margin: 8px 0 0; padding-left: 20px; }
+.mp-huong-dan li { margin: 4px 0; }
+.mp-tbl { margin: 6px 0; font-size: 13px; }
+.btn.cho::before { content: ""; display: inline-block; width: 10px; height: 10px; border: 2px solid #fff; border-right-color: transparent; border-radius: 50%; margin-right: 6px; vertical-align: -1px; animation: xoay .8s linear infinite; }
