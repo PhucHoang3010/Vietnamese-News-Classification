@@ -135,7 +135,10 @@ def th(n):
 
 
 def H(t, l=1): d.add_heading(t, l)
-def P(t): return d.add_paragraph(t)
+def P(t):
+    p = d.add_paragraph(t)
+    p.paragraph_format.first_line_indent = Cm(1)         # thụt đầu dòng 1 cm như đoạn văn trong tệp mẫu của khoa
+    return p
 def B(items): [d.add_paragraph(i, style="List Bullet") for i in items]
 
 
@@ -158,9 +161,10 @@ def FORMULA(text):
 
 
 def CODE(lines):
-    for ln in lines:
+    for k, ln in enumerate(lines):
         p = d.add_paragraph(ln, style="Code Block")
         p.paragraph_format.left_indent = Cm(0.6)
+        p.paragraph_format.keep_with_next = k < len(lines) - 1 and len(lines) <= 10      # khối lệnh ngắn không bị tách giữa hai trang
         sh = OxmlElement("w:shd"); sh.set(qn("w:val"), "clear"); sh.set(qn("w:color"), "auto"); sh.set(qn("w:fill"), "EEF2F6")
         p._p.get_or_add_pPr().insert_element_before(sh, "w:tabs", "w:suppressAutoHyphens", "w:kinsoku", "w:wordWrap", "w:overflowPunct", "w:topLinePunct", "w:autoSpaceDE", "w:autoSpaceDN", "w:bidi",
                                                     "w:adjustRightInd", "w:snapToGrid", "w:spacing", "w:ind", "w:contextualSpacing", "w:mirrorIndents", "w:suppressOverlap", "w:jc", "w:textDirection",
@@ -204,11 +208,12 @@ def TABLE(df, fmt="{:.3f}", widths=None):
             c.width = Cm(wd)
         trpr = row._tr.get_or_add_trPr(); cs = OxmlElement("w:cantSplit"); cs.set(qn("w:val"), "true"); trpr.append(cs)       # không tách một dòng giữa hai trang
     hdr = t.rows[0]._tr.get_or_add_trPr(); hh = OxmlElement("w:tblHeader"); hh.set(qn("w:val"), "true"); hdr.append(hh)     # lặp dòng tiêu đề khi bảng qua trang
-    if len(t.rows) <= 18:                                # bảng ngắn: giữ liền một khối trên cùng một trang
-        for row in list(t.rows)[:-1]:
-            for c in row.cells:
-                for p_ in c.paragraphs:
-                    p_.paragraph_format.keep_with_next = True
+    rows_ = list(t.rows)                                 # bảng ngắn (≤ 8 dòng): giữ liền một khối trên cùng một trang;
+    glued = rows_[:-1] if len(rows_) <= 8 else rows_[:2] + rows_[-3:-1]   # bảng dài được phép qua trang, nhưng dòng tiêu đề đi kèm 2 dòng đầu và 3 dòng cuối đi liền nhau
+    for row in glued:
+        for c in row.cells:
+            for p_ in c.paragraphs:
+                p_.paragraph_format.keep_with_next = True
     sp = d.add_paragraph(); sp.paragraph_format.space_after, sp.paragraph_format.line_spacing = Pt(0), 0.7
 
 
@@ -554,7 +559,7 @@ P(f"Trên {m['test_size']} mẫu kiểm thử (chưa từng dùng khi huấn luy
 r = rep.loc[[i for i in rep.index if i not in ("accuracy", "macro avg", "weighted avg")], ["precision", "recall", "f1-score", "support"]].reset_index()
 CAP("Precision, Recall và F1 của từng chủ đề trên tập kiểm thử")
 r.columns = ["Chủ đề", "Precision", "Recall", "F1", "Số mẫu"]; r["Số mẫu"] = r["Số mẫu"].astype(int).astype(str); TABLE(r, "{:.3f}")
-IMG("ma_tran_nham_lan.png", "Ma trận nhầm lẫn trên tập kiểm thử", 15)
+IMG("ma_tran_nham_lan.png", "Ma trận nhầm lẫn trên tập kiểm thử", 13.5)
 
 H("4.3 Độ ổn định khi chia lại dữ liệu", 2)
 P("Kết quả trên một lần chia dữ liệu có thể may rủi. Chúng em lặp lại phép chia 70/15/15 với 10 hạt giống ngẫu nhiên khác nhau (seed 0–9), huấn luyện lại và đo trên tập kiểm thử của mỗi lần chia; "
@@ -656,7 +661,7 @@ P(f"Độ phủ trung bình bám sát mục tiêu (95% → {pc(mg.cov_mean)} v�
   "Phép thử thứ hai kiểm tra việc trộn hai nguồn điểm khi hiệu chỉnh: nếu chỉ dùng dự đoán chéo của 3.850 bài huấn luyện để hiệu chỉnh rồi đo trên 1.650 bài kiểm định + kiểm thử, độ phủ vẫn là "
   + ", ".join(f"{pc(coof[(coof.alpha.round(2) == a) & (coof.method == 'Khoảng cách điểm SVM (theo chuyên mục)')].coverage.iloc[0])} (mục tiêu {round((1 - a) * 100)}%)" for a in (0.1, 0.05, 0.01))
   + ". Nếu chỉ hiệu chỉnh bằng 825 bài kiểm định thì mức 99% không làm được (mỗi chuyên mục chỉ có khoảng 75 bài nên ngưỡng buộc phải nêu cả 11 chuyên mục), đó là lý do chúng em dùng thêm dự đoán chéo.")
-IMG("conformal.png", "Dự đoán có bảo đảm (hiệu chỉnh trên 4.675 bài chưa từng thấy, đo trên 825 bài kiểm thử)", 15, E, key="conformal")
+IMG("conformal.png", "Dự đoán có bảo đảm (hiệu chỉnh trên 4.675 bài chưa từng thấy, đo trên 825 bài kiểm thử)", 14, E, key="conformal")
 P("Lưu ý khi diễn giải: (1) bảo đảm là trung bình trên nhiều bài mới và giả định bài mới cùng phân phối với dữ liệu hiệu chỉnh, không bảo đảm cho từng bài và không bảo đảm với bài của báo khác; "
   "(2) bài thuộc tập huấn luyện được chấm bằng dự đoán chéo nên tập chuyên mục của chúng phản ánh sự mơ hồ thật chứ không phải việc mô hình đã học thuộc; (3) ngưỡng riêng cho chuyên mục khó (Thời sự) khiến chuyên mục này xuất hiện trong tập của nhiều bài thuộc mục khác.")
 
@@ -721,7 +726,7 @@ H("6.4 AI Lab – giải thích dự đoán (Explainable AI)", 2)
 P("Vì Linear SVM là mô hình tuyến tính nên điểm của mỗi chủ đề bằng tổng (trọng số × giá trị TF-IDF); có thể tách chính xác đóng góp của từng từ mà không cần xấp xỉ như LIME/SHAP: "
   "đóng góp(từ) = (w của chủ đề dự đoán − w trung bình các chủ đề khác) × TF-IDF(từ), cụm hai từ chia đều cho hai từ. "
   "Trang AI Lab tô đậm từng từ theo mức ủng hộ chủ đề dự đoán, cho phép bỏ từ để thử What-if, và phát hiện bài đa chủ đề bằng cách phân loại riêng từng đoạn.")
-IMG("man-hinh-ai-lab.png", "Trang AI Lab: từ được tô đậm theo mức ủng hộ chuyên mục AI dự đoán (ảnh chụp website)", 15.5, O / "man_hinh")
+IMG("man-hinh-ai-lab.png", "Trang AI Lab: từ được tô đậm theo mức ủng hộ chuyên mục AI dự đoán (ảnh chụp website)", 12.5, O / "man_hinh")
 P("Kiểm chứng độ trung thực của lời giải thích (experiments/exp7_explain.py): với cả 825 bài kiểm thử, chúng em (a) xóa m từ mà AI cho là đóng góp nhiều nhất cho chủ đề dự đoán rồi dự đoán lại, "
   "(b) chỉ giữ lại m từ đó. Đối chứng gồm: m từ ngẫu nhiên theo loại từ, m từ ngẫu nhiên theo vị trí (từ hay gặp dễ trúng hơn) và m từ có TF-IDF lớn nhất. Đây là hai phép đo “comprehensiveness” và “sufficiency” thường dùng khi đánh giá giải thích (DeYoung và cs., 2020).")
 
@@ -751,7 +756,7 @@ B(["Truy hồi bài: điểm bài = 0,7 × cosine TF-IDF trên toàn văn (tiêu
    "Chọn câu: tách các bài thành câu, xếp hạng câu theo cosine với câu hỏi (có thưởng nhẹ cho câu đầu bài), trả về tối đa 3 câu, mỗi bài không quá 2 câu.",
    "Độ chắc chắn dựa trên điểm của bài cao nhất: từ 0,30 là cao, từ 0,20 là trung bình, từ 0,10 là thấp; dưới 0,10 hệ thống trả lời “chưa tìm thấy thông tin phù hợp” thay vì đoán.",
    "Chủ đề của câu hỏi được suy ra bằng cách bỏ phiếu theo chuyên mục AI đã xếp cho các bài tìm được (phân loại trực tiếp câu hỏi ngắn không đủ tin cậy)."])
-IMG("man-hinh-hoi-ai.png", "Trang Hỏi AI: câu trả lời trích nguyên văn từ bài, kèm nguồn và chuyên mục do AI xếp (ảnh chụp website)", 15.5, O / "man_hinh")
+IMG("man-hinh-hoi-ai.png", "Trang Hỏi AI: câu trả lời trích nguyên văn từ bài, kèm nguồn và chuyên mục do AI xếp (ảnh chụp website)", 12.5, O / "man_hinh")
 P("Đánh giá (experiments/exp8_qa.py): phép thử “tìm đúng bài” — dùng tiêu đề của mỗi bài làm câu hỏi, chỉ mục không chứa chính tiêu đề đó (tránh rò rỉ), xem bài đúng đứng thứ mấy trong kết quả trên 5.500 truy vấn.")
 want = ["Chỉ sapo (TF-IDF tìm kiếm)", "Chỉ nội dung (TF-IDF của bộ phân loại)", "Kết hợp: nội dung 0.5 + sapo 0.5", "Kết hợp: nội dung 0.7 + sapo 0.3", "+ định tuyến chuyên mục (λ=0.5)"]
 qq = qr.set_index("bien_the").loc[want].reset_index()
@@ -771,7 +776,7 @@ P(f"Khả năng từ chối: đối chiếu 5.500 truy vấn thật với 5.500 
 H("6.6 Tìm kiếm nâng cao và tìm theo nghĩa", 2)
 P("Trang tìm kiếm có ba chế độ: (1) theo từ khóa (TF-IDF); (2) nâng cao, tự bật khi truy vấn có toán tử Boolean AND / OR / NOT, cụm từ trong ngoặc kép, ký tự đại diện (bóng*), ngoặc đơn hoặc trường (tieude:, sapo:, noidung:, chuyenmuc:); "
   "(3) theo nghĩa (LSA). Mọi so khớp không phân biệt dấu tiếng Việt. Giao diện hiển thị cách hiểu truy vấn (ví dụ “giá VÀ vàng VÀ (tăng HOẶC giảm) VÀ KHÔNG bitcoin”), tô sáng từ khóa trong câu trích và có bộ lọc (chuyên mục, AI tự tin ≥ 95%, bài có thể thuộc nhiều mục, đọc ≤ 3 phút).")
-IMG("man-hinh-tim-kiem.png", "Tìm kiếm nâng cao: website hiển thị cách hiểu truy vấn và số bài khớp (ảnh chụp website)", 15.5, O / "man_hinh")
+IMG("man-hinh-tim-kiem.png", "Tìm kiếm nâng cao: website hiển thị cách hiểu truy vấn và số bài khớp (ảnh chụp website)", 12.5, O / "man_hinh")
 P(f"Bộ tìm Boolean dùng chỉ mục ngược nhị phân theo từng trường. Để kiểm tra tính đúng, chúng em sinh truy vấn ngẫu nhiên (AND/OR/NOT, cụm từ, tiền tố, trường) và so với một cách duyệt tuần tự độc lập: {boolt['n_match']}/{boolt['n_queries_checked']} truy vấn cho đúng cùng tập bài; "
   f"thời gian trả lời trung bình {vn(boolt['ms_mean'], 1)} ms (phân vị 95%: {vn(boolt['ms_p95'], 0)} ms) trên 5.500 bài. Kiểm thử đơn vị nằm ở tests/test_features.py.")
 P("Tìm theo nghĩa dùng LSA: TF-IDF (từ đơn, 30.000 đặc trưng) rồi TruncatedSVD 300 chiều. Chúng em so với TF-IDF thường trên ba phép thử (tham số chọn trên một nửa số bài, báo cáo trên nửa còn lại): tìm lại bài từ tiêu đề, tìm lại bài từ sapo, và độ thuần chủ đề "
@@ -797,15 +802,15 @@ P("Mỗi bài báo có khu bình luận quen thuộc ở các trang tin: đăng 
   "Bình luận lưu trong SQLite (data/comments.db) và không cần tài khoản: mỗi trình duyệt tự sinh một mã ngẫu nhiên, máy chủ chỉ giữ bản băm SHA-256 của mã đó để biết bình luận nào là của mình và ai đã thích. "
   "Hệ thống giới hạn độ dài (1.000 ký tự), tốc độ (cách nhau 5 giây; tối đa 20 bình luận mỗi giờ cho mỗi trình duyệt và 60 cho mỗi địa chỉ IP), từ chối bình luận trùng, và luôn thoát ký tự HTML khi hiển thị nên nội dung người dùng không chèn được mã. "
   f"Phần này được kiểm thử bằng {N_CMT} bài kiểm tra đơn vị (tests/test_comments.py) và một kịch bản trình duyệt tự động (tests/e2e/comments_e2e.js: đăng, trả lời, thích, xóa, tải lại trang, trình duyệt thứ hai, chuỗi chứa HTML).")
-IMG("man-hinh-binh-luan.png", "Khu bình luận dưới mỗi bài (nội dung bình luận trong ảnh là ví dụ minh họa do nhóm nhập)", 12.5, O / "man_hinh")
+IMG("man-hinh-binh-luan.png", "Khu bình luận dưới mỗi bài (nội dung bình luận trong ảnh là ví dụ minh họa do nhóm nhập)", 9.5, O / "man_hinh")
 H("6.10 Giao diện", 2)
 P("Giao diện theo bố cục báo điện tử hiện đại: đầu trang trắng, thanh menu chuyển màu xanh ngọc sang xanh dương (Trang chủ, Chuyên mục, Thử phân loại, Độ chính xác, Công cụ AI, ô tìm kiếm và nút menu), nền xanh với cột nội dung trắng ở giữa và cụm tin nổi bật ba cột (tiêu đề, ảnh, danh sách). "
   "Ảnh minh họa được tự vẽ bằng SVG, mỗi chuyên mục một bảng màu. Giao diện có chế độ sáng/tối và dùng được trên điện thoại; toàn bộ phần màu nằm trong static/theme.css (nạp sau style.css).")
 P("Vì đề tài là phân loại nên giao diện được làm gọn để người xem hiểu ngay: trang chủ chỉ giữ ba việc (thử phân loại theo ba bước, giải thích ba bước AI làm việc, tin theo chuyên mục); thẻ tin chỉ có một nhãn “AI xếp” (kèm cảnh báo nếu AI xếp khác báo gốc); "
   "trang bài báo cho thấy ngay chuyên mục AI chọn, độ tự tin và AI có khớp báo gốc không, còn các chi tiết (các chuyên mục AI cân nhắc, từ khóa, mức bảo đảm) thu vào mục “Xem AI phân tích chi tiết”; các công cụ phụ gom vào mục “Công cụ AI”. "
   "Một số thuật ngữ được đổi sang từ dễ hiểu: “mức nghiêng” thành “độ tự tin”, “bài giao thoa” thành “bài có thể thuộc nhiều mục”.")
-IMG("man-hinh-trang-chu.png", "Trang chủ: dán đoạn văn, bấm Phân loại và xem AI xếp vào chuyên mục nào (ảnh chụp website)", 15.5, O / "man_hinh")
-IMG("man-hinh-trang-bai.png", "Trang bài báo: kết quả AI gọn ở đầu, chi tiết mở ra khi cần (ảnh chụp website)", 13.5, O / "man_hinh")
+IMG("man-hinh-trang-chu.png", "Trang chủ: dán đoạn văn, bấm Phân loại và xem AI xếp vào chuyên mục nào (ảnh chụp website)", 12.5, O / "man_hinh")
+IMG("man-hinh-trang-bai.png", "Trang bài báo: kết quả AI gọn ở đầu, chi tiết mở ra khi cần (ảnh chụp website)", 10, O / "man_hinh")
 H("6.11 Kiểm thử phần mềm", 2)
 P(f"Mã nguồn có {N_FEAT + N_CMT} bài kiểm tra đơn vị (python -m unittest discover -s tests): {N_FEAT} bài cho dự đoán có bảo đảm và tìm kiếm Boolean (độ phủ conformal, các trường hợp biên, toán tử AND/OR/NOT, cụm từ, ký tự đại diện, trường, không phân biệt dấu, báo lỗi cú pháp) "
   f"và {N_CMT} bài cho bình luận (đăng, trả lời, thích, xóa, sắp xếp, phân trang, kiểm tra đầu vào, giới hạn tốc độ, API, tự phục hồi khi tệp dữ liệu bị xóa lúc đang chạy). "
@@ -897,6 +902,7 @@ B(["Pedregosa et al., Scikit-learn: Machine Learning in Python, JMLR 12, 2011.",
 
 # ------------------------------------------------------------------ phụ lục
 H("Phụ lục A. Cấu trúc mã nguồn")
+d.paragraphs[-1].paragraph_format.page_break_before = True      # phụ lục bắt đầu ở trang mới
 CAP("Các tệp và thư mục chính")
 TABLE(pd.DataFrame([["app.py", "Website Flask: các trang, API phân loại, Hỏi AI, tìm kiếm, bộ sưu tập, bình luận"],
                     ["train.py", "Huấn luyện, so sánh nhanh các mô hình, sinh model.joblib và biểu đồ trong outputs/"],
