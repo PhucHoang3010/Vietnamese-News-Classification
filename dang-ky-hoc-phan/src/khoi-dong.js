@@ -95,7 +95,7 @@ async function main() {
   log('   ✔ Xong.');
 
   // 4. Web
-  const { batDau } = require('./server');
+  const { batDau, inDiaChi } = require('./server');
   let cong = Number(process.env.PORT || 3000);
   for (let i = 0; ; i++) {
     try { await batDau(cong); break; } catch (e) {
@@ -104,9 +104,8 @@ async function main() {
     }
   }
   const url = `http://localhost:${cong}/`;
-  log(`[4/4] Web đang chạy.\n`);
-  log(`   ➜ Trang demo:            ${url}`);
-  log(`   ➜ Trang đăng kí đầy đủ:  http://localhost:${cong}/day-du.html`);
+  log('[4/4] Web đang chạy:');
+  inDiaChi(cong);
   log('\n   Giữ cửa sổ này mở trong lúc dùng web. Muốn tắt web: bấm Ctrl+C hoặc đóng cửa sổ.');
   moTrinhDuyet(url);
 }

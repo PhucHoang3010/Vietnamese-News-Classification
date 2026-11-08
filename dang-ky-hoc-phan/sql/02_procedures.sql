@@ -26,6 +26,7 @@ DELIMITER $$
 -- ---------------------------------------------------------------------
 DROP PROCEDURE IF EXISTS sp_log $$
 CREATE PROCEDURE sp_log(INOUT p_log TEXT, IN p_loai VARCHAR(10), IN p_msg VARCHAR(500))
+COMMENT 'Tiện ích: ghi một bước vào nhật kí (thời điểm|loại|nội dung)'
 BEGIN
   SET p_log = CONCAT(IFNULL(p_log, ''),
                      DATE_FORMAT(SYSDATE(3), '%Y-%m-%d %H:%i:%s.%f'), '|', p_loai, '|', p_msg, '\n');
@@ -52,6 +53,7 @@ END $$
 DROP PROCEDURE IF EXISTS sp_dang_ky_mo_phong $$
 CREATE PROCEDURE sp_dang_ky_mo_phong(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15),
                                      IN p_co_xu_ly BOOLEAN, IN p_tre DECIMAL(5,2))
+COMMENT 'Đăng kí học phần, kiểm tra đủ 6 quy tắc. p_co_xu_ly bật/tắt khoá FOR UPDATE, p_tre là số giây xử lý chậm'
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -158,6 +160,7 @@ END $$
 -- ---------------------------------------------------------------------
 DROP PROCEDURE IF EXISTS sp_dang_ky $$
 CREATE PROCEDURE sp_dang_ky(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15))
+COMMENT 'Đăng kí chuẩn: có xử lý xung đột, không chậm'
 BEGIN
   CALL sp_dang_ky_mo_phong(p_ma_sv, p_ma_lhp, TRUE, 0);
 END $$
@@ -168,6 +171,7 @@ END $$
 -- ---------------------------------------------------------------------
 DROP PROCEDURE IF EXISTS sp_huy_dang_ky $$
 CREATE PROCEDURE sp_huy_dang_ky(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15))
+COMMENT 'Huỷ một lớp đã đăng kí và giảm sĩ số'
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -212,6 +216,7 @@ END $$
 -- =====================================================================
 DROP PROCEDURE IF EXISTS sp_tranh_slot_loi $$
 CREATE PROCEDURE sp_tranh_slot_loi(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15), IN p_tre DECIMAL(5,2))
+COMMENT 'Tranh slot, KHÔNG xử lý: đọc thường rồi ghi đè sĩ số (lost update)'
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -254,6 +259,7 @@ END $$
 
 DROP PROCEDURE IF EXISTS sp_tranh_slot_an_toan $$
 CREATE PROCEDURE sp_tranh_slot_an_toan(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15), IN p_tre DECIMAL(5,2))
+COMMENT 'Tranh slot, CÓ xử lý: khoá dòng lớp bằng SELECT ... FOR UPDATE'
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -305,6 +311,7 @@ END $$
 -- =====================================================================
 DROP PROCEDURE IF EXISTS sp_trung_lich_loi $$
 CREATE PROCEDURE sp_trung_lich_loi(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15), IN p_tre DECIMAL(5,2))
+COMMENT 'Trùng lịch, KHÔNG xử lý: kiểm tra lịch không khoá (write skew)'
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -353,6 +360,7 @@ END $$
 
 DROP PROCEDURE IF EXISTS sp_trung_lich_an_toan $$
 CREATE PROCEDURE sp_trung_lich_an_toan(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15), IN p_tre DECIMAL(5,2))
+COMMENT 'Trùng lịch, CÓ xử lý: khoá dòng sinh viên ở câu đầu tiên'
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -416,6 +424,7 @@ END $$
 -- =====================================================================
 DROP PROCEDURE IF EXISTS sp_trung_hp_loi $$
 CREATE PROCEDURE sp_trung_hp_loi(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15), IN p_tre DECIMAL(5,2))
+COMMENT 'Trùng học phần, KHÔNG xử lý: kiểm tra môn không khoá (phantom)'
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -465,6 +474,7 @@ END $$
 
 DROP PROCEDURE IF EXISTS sp_trung_hp_an_toan $$
 CREATE PROCEDURE sp_trung_hp_an_toan(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15), IN p_tre DECIMAL(5,2))
+COMMENT 'Trùng học phần, CÓ xử lý: mức SERIALIZABLE, bị deadlock thì thử lại'
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -529,6 +539,7 @@ END $$
 -- =====================================================================
 DROP PROCEDURE IF EXISTS sp_giu_cho_roi_huy $$
 CREATE PROCEDURE sp_giu_cho_roi_huy(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15), IN p_tre DECIMAL(5,2))
+COMMENT 'SV đăng kí: giữ chỗ trước, kiểm tra học phí sau, nợ thì ROLLBACK'
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -571,6 +582,7 @@ END $$
 
 DROP PROCEDURE IF EXISTS sp_dirty_read_loi $$
 CREATE PROCEDURE sp_dirty_read_loi(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15))
+COMMENT 'SV đăng kí, KHÔNG xử lý: READ UNCOMMITTED đọc cả chỗ giữ tạm (dirty read)'
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -612,6 +624,7 @@ END $$
 
 DROP PROCEDURE IF EXISTS sp_dirty_read_an_toan $$
 CREATE PROCEDURE sp_dirty_read_an_toan(IN p_ma_sv VARCHAR(10), IN p_ma_lhp VARCHAR(15))
+COMMENT 'SV đăng kí, CÓ xử lý: READ COMMITTED và UPDATE có điều kiện'
 BEGIN
   DECLARE v_log TEXT DEFAULT '';
   DECLARE v_kq VARCHAR(20) DEFAULT 'THANH_CONG';
@@ -663,6 +676,7 @@ END $$
 -- =====================================================================
 DROP PROCEDURE IF EXISTS sp_dat_lai_kich_ban $$
 CREATE PROCEDURE sp_dat_lai_kich_ban(IN p_kb TINYINT)
+COMMENT 'Đưa dữ liệu của một kịch bản SQL (sql/demo) về trạng thái ban đầu'
 BEGIN
   DECLARE v_ds_sv  VARCHAR(200) DEFAULT '';
   DECLARE v_ds_lhp VARCHAR(200) DEFAULT '';

@@ -12,46 +12,46 @@ USE dkhp;
 -- SINH_VIEN
 -- ---------------------------------------------------------------------
 CREATE TABLE sinh_vien (
-  ma_sv          VARCHAR(10)  NOT NULL,
-  ho_ten         VARCHAR(100) NOT NULL,
-  lop            VARCHAR(20)  NOT NULL,
-  tin_chi_toi_da TINYINT      NOT NULL DEFAULT 24,
-  no_hoc_phi     BOOLEAN      NOT NULL DEFAULT FALSE,
+  ma_sv          VARCHAR(10)  NOT NULL COMMENT 'Mã sinh viên',
+  ho_ten         VARCHAR(100) NOT NULL COMMENT 'Họ và tên',
+  lop            VARCHAR(20)  NOT NULL COMMENT 'Lớp sinh hoạt',
+  tin_chi_toi_da TINYINT      NOT NULL DEFAULT 24 COMMENT 'Số tín chỉ tối đa được đăng kí',
+  no_hoc_phi     BOOLEAN      NOT NULL DEFAULT FALSE COMMENT 'Còn nợ học phí thì không được đăng kí',
   PRIMARY KEY (ma_sv)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB COMMENT = 'Sinh viên';
 
 -- ---------------------------------------------------------------------
 -- MON_HOC (học phần)
 -- ---------------------------------------------------------------------
 CREATE TABLE mon_hoc (
-  ma_mh      VARCHAR(10)  NOT NULL,
-  ten_mh     VARCHAR(100) NOT NULL,
-  so_tin_chi TINYINT      NOT NULL,
+  ma_mh      VARCHAR(10)  NOT NULL COMMENT 'Mã môn học',
+  ten_mh     VARCHAR(100) NOT NULL COMMENT 'Tên môn học',
+  so_tin_chi TINYINT      NOT NULL COMMENT 'Số tín chỉ',
   PRIMARY KEY (ma_mh),
   CONSTRAINT ck_mh_tin_chi CHECK (so_tin_chi BETWEEN 1 AND 10)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB COMMENT = 'Môn học (học phần)';
 
 -- ---------------------------------------------------------------------
 -- LOP_HOC_PHAN (lớp mở cho 1 môn, có lịch học và sĩ số)
 --   thu: 2..7 = Thứ 2..Thứ 7, 8 = Chủ nhật;  tiet: 1..12
 -- ---------------------------------------------------------------------
 CREATE TABLE lop_hoc_phan (
-  ma_lhp         VARCHAR(15)  NOT NULL,
-  ma_mh          VARCHAR(10)  NOT NULL,
-  giang_vien     VARCHAR(100) NOT NULL,
-  thu            TINYINT      NOT NULL,
-  tiet_bd        TINYINT      NOT NULL,
-  tiet_kt        TINYINT      NOT NULL,
-  phong          VARCHAR(20)  NOT NULL,
-  si_so_toi_da   INT          NOT NULL,
-  si_so_hien_tai INT          NOT NULL DEFAULT 0,
+  ma_lhp         VARCHAR(15)  NOT NULL COMMENT 'Mã lớp học phần',
+  ma_mh          VARCHAR(10)  NOT NULL COMMENT 'Môn của lớp',
+  giang_vien     VARCHAR(100) NOT NULL COMMENT 'Giảng viên',
+  thu            TINYINT      NOT NULL COMMENT 'Thứ học: 2..7, 8 = Chủ nhật',
+  tiet_bd        TINYINT      NOT NULL COMMENT 'Tiết bắt đầu (1..12)',
+  tiet_kt        TINYINT      NOT NULL COMMENT 'Tiết kết thúc (1..12)',
+  phong          VARCHAR(20)  NOT NULL COMMENT 'Phòng học',
+  si_so_toi_da   INT          NOT NULL COMMENT 'Sĩ số tối đa',
+  si_so_hien_tai INT          NOT NULL DEFAULT 0 COMMENT 'Số sinh viên đã đăng kí',
   PRIMARY KEY (ma_lhp),
   UNIQUE KEY uq_lhp_mh (ma_lhp, ma_mh),        -- để dang_ky tham chiếu cặp (ma_lhp, ma_mh)
   CONSTRAINT fk_lhp_mh FOREIGN KEY (ma_mh) REFERENCES mon_hoc (ma_mh),
   CONSTRAINT ck_lhp_thu   CHECK (thu BETWEEN 2 AND 8),
   CONSTRAINT ck_lhp_tiet  CHECK (tiet_bd BETWEEN 1 AND 12 AND tiet_kt BETWEEN tiet_bd AND 12),
   CONSTRAINT ck_lhp_si_so CHECK (si_so_toi_da > 0 AND si_so_hien_tai >= 0)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB COMMENT = 'Lớp học phần: lớp mở cho một môn, có lịch học và sĩ số';
 
 -- ---------------------------------------------------------------------
 -- DANG_KY (sinh viên đăng kí lớp học phần)
@@ -59,17 +59,17 @@ CREATE TABLE lop_hoc_phan (
 --   khoá ngoại kép (ma_lhp, ma_mh) bảo đảm ma_mh luôn khớp với lớp.
 -- ---------------------------------------------------------------------
 CREATE TABLE dang_ky (
-  id        INT          NOT NULL AUTO_INCREMENT,
-  ma_sv     VARCHAR(10)  NOT NULL,
-  ma_lhp    VARCHAR(15)  NOT NULL,
-  ma_mh     VARCHAR(10)  NOT NULL,
-  thoi_gian DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3),
+  id        INT          NOT NULL AUTO_INCREMENT COMMENT 'Mã lượt đăng kí (tự tăng)',
+  ma_sv     VARCHAR(10)  NOT NULL COMMENT 'Sinh viên đăng kí',
+  ma_lhp    VARCHAR(15)  NOT NULL COMMENT 'Lớp được đăng kí',
+  ma_mh     VARCHAR(10)  NOT NULL COMMENT 'Môn của lớp (lưu kèm để kiểm tra trùng học phần)',
+  thoi_gian DATETIME(3)  NOT NULL DEFAULT CURRENT_TIMESTAMP(3) COMMENT 'Thời điểm đăng kí',
   PRIMARY KEY (id),
   UNIQUE KEY uq_dk_sv_lhp (ma_sv, ma_lhp),     -- không đăng kí 1 lớp 2 lần
   KEY idx_dk_sv_mh (ma_sv, ma_mh),             -- phục vụ kiểm tra trùng học phần
   CONSTRAINT fk_dk_sv  FOREIGN KEY (ma_sv) REFERENCES sinh_vien (ma_sv),
   CONSTRAINT fk_dk_lhp FOREIGN KEY (ma_lhp, ma_mh) REFERENCES lop_hoc_phan (ma_lhp, ma_mh)
-) ENGINE = InnoDB;
+) ENGINE = InnoDB COMMENT = 'Đăng kí: sinh viên đăng kí lớp học phần';
 
 -- ---------------------------------------------------------------------
 -- VIEW kiểm tra toàn vẹn: mỗi dòng là 1 vi phạm do xung đột đồng thời gây ra.

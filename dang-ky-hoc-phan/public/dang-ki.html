@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Đăng kí học phần · Cổng đăng kí học phần</title>
+  <meta name="description" content="Đăng kí và huỷ lớp học phần, xem thời khoá biểu và kiểm tra toàn vẹn dữ liệu trên MySQL.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="giao-dien.css">
+</head>
+<body>
+  <header class="site">
+    <div class="wrap site-trong">
+      <a class="logo" href="/"><span class="logo-o">ĐK</span><span><span class="logo-ten">Cổng đăng kí học phần</span><span class="logo-phu">Học kì 1 · Năm học 2026 – 2027</span></span></a>
+      <nav class="site-menu" aria-label="Các trang">
+        <a href="/">Mô phỏng xung đột</a>
+        <a href="/dang-ki.html" aria-current="page">Đăng kí học phần</a>
+        <a href="/csdl.html">Thiết kế CSDL</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap trang-chinh">
+    <div class="tieu-de-trang"><h1>Đăng kí học phần</h1></div>
+
+    <section class="the chon-sv" aria-label="Sinh viên">
+      <div class="dong">
+        <label for="chon-sv">Sinh viên</label>
+        <select id="chon-sv" class="chon"></select>
+        <div class="the-sv" id="the-sv"></div>
+      </div>
+      <button type="button" class="nut phu nho" id="nut-du-lieu-mau">↺ Khôi phục dữ liệu mẫu</button>
+    </section>
+
+    <section class="thu-xung-dot" id="thu-xung-dot" aria-label="Thử xung đột bằng hai cửa sổ">
+      <span class="nhom"><span class="nhan-nhom" id="nhan-xl">Xử lý xung đột</span>
+        <span class="cong-tac" role="group" aria-labelledby="nhan-xl">
+          <button type="button" class="tat" data-xl="0" aria-pressed="false">Tắt</button>
+          <button type="button" class="bat" data-xl="1" aria-pressed="true">Bật</button>
+        </span></span>
+      <span class="nhom"><label class="nhan-nhom" for="chon-tre">Thời gian xử lý</label>
+        <select id="chon-tre" class="chon"><option value="0">0 giây</option><option value="3">3 giây</option><option value="5">5 giây</option><option value="8">8 giây</option></select></span>
+      <span class="goi-y" id="goi-y-xd"></span>
+    </section>
+
+    <div class="luoi-dk">
+      <section class="the" aria-labelledby="tieu-de-lop">
+        <div class="the-dau">
+          <h2 id="tieu-de-lop">Lớp học phần đang mở <span class="nhat" id="so-lop"></span></h2>
+          <div class="loc">
+            <input id="tim-lop" class="o-nhap" type="search" placeholder="Tìm mã lớp, môn, giảng viên…" aria-label="Tìm lớp">
+            <select id="loc-mon" class="chon" aria-label="Lọc theo môn"><option value="">Tất cả môn</option></select>
+          </div>
+        </div>
+        <div class="co-khung">
+          <table class="lop" id="bang-lop">
+            <thead><tr><th>Mã lớp</th><th>Môn học</th><th>TC</th><th>Lịch học</th><th>Sĩ số</th><th><span class="an">Thao tác</span></th></tr></thead>
+            <tbody><tr><td colspan="6" class="trong">Đang tải…</td></tr></tbody>
+          </table>
+        </div>
+      </section>
+
+      <div class="cot-phai">
+        <section class="the" aria-labelledby="tieu-de-da-dk">
+          <div class="the-dau"><h2 id="tieu-de-da-dk">Lớp đã đăng kí</h2><span class="tong-tc" id="tong-tc"></span></div>
+          <div id="ds-da-dk"></div>
+        </section>
+        <section class="the" aria-labelledby="tieu-de-tkb">
+          <div class="the-dau"><h2 id="tieu-de-tkb">Thời khoá biểu</h2></div>
+          <div class="tkb" id="tkb" aria-label="Thời khoá biểu theo tiết"></div>
+        </section>
+      </div>
+    </div>
+
+    <section class="the" aria-labelledby="tieu-de-kt">
+      <div class="the-dau">
+        <h2 id="tieu-de-kt">Kiểm tra toàn vẹn dữ liệu <span class="nhat">· view v_kiem_tra_toan_ven</span></h2>
+        <button type="button" class="nut phu nho" id="nut-kiem-tra">Kiểm tra lại</button>
+      </div>
+      <div id="kiem-tra"></div>
+    </section>
+  </main>
+
+  <footer class="chan-trang">
+    <div class="wrap"><span>Đồ án môn Hệ quản trị cơ sở dữ liệu</span><span>MySQL 8 (InnoDB) · Node.js · Express</span></div>
+  </footer>
+
+  <script src="chung.js"></script>
+  <script src="dang-ki.js"></script>
+</body>
+</html>

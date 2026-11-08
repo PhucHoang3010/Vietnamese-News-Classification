@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mô phỏng xung đột · Cổng đăng kí học phần</title>
+  <meta name="description" content="Mô phỏng 4 xung đột dữ liệu khi đăng kí học phần đồng thời trên MySQL: tranh slot, trùng lịch, SV đăng kí, trùng học phần.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="giao-dien.css">
+</head>
+<body>
+  <header class="site">
+    <div class="wrap site-trong">
+      <a class="logo" href="/"><span class="logo-o">ĐK</span><span><span class="logo-ten">Cổng đăng kí học phần</span><span class="logo-phu">Học kì 1 · Năm học 2026 – 2027</span></span></a>
+      <nav class="site-menu" aria-label="Các trang">
+        <a href="/" aria-current="page">Mô phỏng xung đột</a>
+        <a href="/dang-ki.html">Đăng kí học phần</a>
+        <a href="/csdl.html">Thiết kế CSDL</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap trang-chinh">
+    <div class="tieu-de-trang"><h1>Mô phỏng xung đột dữ liệu</h1></div>
+
+    <section class="the dieu-khien" aria-label="Điều khiển mô phỏng">
+      <div class="dk-nhom dk-th">
+        <span class="nhan-nhom" id="nhan-th">Tình huống</span>
+        <div class="chip-ds" id="tinh-huong" role="tablist" aria-labelledby="nhan-th"></div>
+      </div>
+      <div class="dk-nhom">
+        <span class="nhan-nhom" id="nhan-xl">Xử lý xung đột</span>
+        <div class="cong-tac" role="group" aria-labelledby="nhan-xl">
+          <button type="button" id="xl-tat" class="tat" aria-pressed="true">Tắt</button>
+          <button type="button" id="xl-bat" class="bat" aria-pressed="false">Bật</button>
+        </div>
+      </div>
+      <div class="dk-nut">
+        <button type="button" class="nut chinh" id="nut-cung-luc">▶ Hai bạn cùng bấm Đăng kí</button>
+        <button type="button" class="nut phu" id="nut-dat-lai">↺ Đặt lại</button>
+      </div>
+    </section>
+
+    <div class="hai-may">
+      <section class="may" id="may-A" data-vai="A" aria-label="Cửa sổ A"></section>
+      <section class="may" id="may-B" data-vai="B" aria-label="Cửa sổ B"></section>
+    </div>
+
+    <section class="ket-luan" id="kiem-tra" aria-live="polite"></section>
+
+    <details class="nhat-ki" id="nhat-ki" hidden>
+      <summary>Nhật kí giao dịch (thời điểm do MySQL ghi)</summary>
+      <ol class="chat" id="dien-bien"></ol>
+    </details>
+  </main>
+
+  <footer class="chan-trang">
+    <div class="wrap"><span>Đồ án môn Hệ quản trị cơ sở dữ liệu</span><span>MySQL 8 (InnoDB) · Node.js · Express</span></div>
+  </footer>
+
+  <script src="chung.js"></script>
+  <script src="mo-phong.js"></script>
+</body>
+</html>

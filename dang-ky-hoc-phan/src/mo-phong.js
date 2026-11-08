@@ -1,5 +1,7 @@
-// API cho trang "Mô phỏng 2 sinh viên" (public/mo-phong.html):
+// API cho trang chủ "Mô phỏng xung đột" (public/index.html):
 // hai sinh viên A và B trên cùng một màn hình, mỗi lần bấm Đăng kí là một giao dịch thật trên MySQL.
+//   Tranh slot, Trùng lịch, Trùng học phần: cùng gọi sp_dang_ky_mo_phong(sv, lớp, co_xu_ly, tre)
+//   SV đăng kí: A gọi sp_giu_cho_roi_huy, B gọi sp_dirty_read_loi / sp_dirty_read_an_toan
 const express = require('express');
 const { layPool, goiThuTuc, napDuLieuMau } = require('./db');
 
@@ -8,46 +10,22 @@ const TINH_HUONG = {
     ten: 'Tranh slot', loai: 'Lost update', lop: ['KTCT.02'],
     moTa: 'Lớp KTCT.02 chỉ còn 1 chỗ. Hai sinh viên khác nhau cùng bấm Đăng kí lớp này.',
     A: { ma_sv: 'SV09', ma_lhp: 'KTCT.02' }, B: { ma_sv: 'SV10', ma_lhp: 'KTCT.02' },
-    giaiThich: {
-      nguyenNhan: 'Không khoá nên A và B cùng đọc sĩ số 0/1, cùng thấy còn chỗ, rồi cùng ghi si_so_hien_tai = 0 + 1. Lớp 1 chỗ có 2 sinh viên, còn cột sĩ số chỉ là 1: lần ghi sau đè lên lần ghi trước (lost update).',
-      cachSua: 'SELECT ... FROM lop_hoc_phan ... FOR UPDATE đặt khoá X lên dòng lớp đến khi COMMIT. B phải chờ A xong, đọc lại thấy 1/1 nên bị từ chối "Lớp đã đủ sĩ số".',
-      sqlLoi: 'SELECT si_so_hien_tai, si_so_toi_da INTO v_si_so, v_toi_da\nFROM lop_hoc_phan WHERE ma_lhp = p_ma_lhp;      -- đọc thường\n...\nUPDATE lop_hoc_phan SET si_so_hien_tai = v_si_so + 1 ...;',
-      sqlSua: 'SELECT si_so_hien_tai, si_so_toi_da INTO v_si_so, v_toi_da\nFROM lop_hoc_phan WHERE ma_lhp = p_ma_lhp\nFOR UPDATE;                                     -- khoá X đến khi COMMIT',
-    },
   },
   'trung-lich': {
     ten: 'Trùng lịch đồng thời', loai: 'Write skew / phantom', lop: ['CSDL.01', 'CTDL.01'],
     moTa: 'Cùng một sinh viên mở 2 tab, đăng kí cùng lúc CSDL.01 (Thứ 2, tiết 1-3) và CTDL.01 (Thứ 2, tiết 2-4).',
     A: { ma_sv: 'SV09', ma_lhp: 'CSDL.01' }, B: { ma_sv: 'SV09', ma_lhp: 'CTDL.01' },
-    giaiThich: {
-      nguyenNhan: 'A và B chèn hai dòng khác nhau nên không đụng khoá của nhau. Mỗi bên kiểm tra lịch trên dữ liệu đã COMMIT, chưa thấy lớp bên kia vừa chèn, nên cả hai đều lọt (write skew). Khoá dòng lớp không giúp được vì hai bên đăng kí hai lớp khác nhau.',
-      cachSua: 'Khoá dòng cha chung là sinh viên: SELECT ... FROM sinh_vien WHERE ma_sv = ? FOR UPDATE, đặt ở câu đầu tiên của giao dịch. B phải chờ A COMMIT rồi mới kiểm tra lịch, nên thấy CSDL.01 và từ chối.',
-      sqlLoi: 'START TRANSACTION;\nSELECT COUNT(*) INTO v_dem FROM dang_ky d JOIN lop_hoc_phan l ...\nWHERE d.ma_sv = p_ma_sv AND l.thu = v_thu\n  AND l.tiet_bd <= v_kt AND v_bd <= l.tiet_kt;   -- không khoá',
-      sqlSua: 'START TRANSACTION;\nSELECT ... FROM sinh_vien WHERE ma_sv = p_ma_sv\nFOR UPDATE;                                     -- khoá dòng cha, câu đầu tiên\nSELECT COUNT(*) INTO v_dem FROM dang_ky ...;    -- giờ thấy lớp của A',
-    },
   },
   'trung-hoc-phan': {
     ten: 'Trùng học phần', loai: 'Phantom khi chèn', lop: ['CSDL.01', 'CSDL.02'],
     moTa: 'Cùng một sinh viên đăng kí cùng lúc CSDL.01 và CSDL.02: hai lớp khác giờ nhưng cùng môn Cơ sở dữ liệu.',
     A: { ma_sv: 'SV10', ma_lhp: 'CSDL.01' }, B: { ma_sv: 'SV10', ma_lhp: 'CSDL.02' },
-    giaiThich: {
-      nguyenNhan: 'Cả A và B kiểm tra "đã đăng kí môn CSDL chưa" trước khi bên kia chèn, đều được 0, rồi cùng chèn. UNIQUE(ma_sv, ma_lhp) không chặn được vì hai lớp có mã khác nhau.',
-      cachSua: 'Khoá dòng sinh viên ở đầu giao dịch để hai lần đăng kí của cùng một sinh viên chạy lần lượt. Có thể thêm UNIQUE(ma_sv, ma_mh) làm lớp bảo vệ cuối, hoặc dùng mức SERIALIZABLE (xem kịch bản 3 ở tab Giả lập xung đột).',
-      sqlLoi: 'SELECT COUNT(*) INTO v_dem FROM dang_ky\nWHERE ma_sv = p_ma_sv AND ma_mh = v_ma_mh;     -- không khoá',
-      sqlSua: 'SELECT ... FROM sinh_vien WHERE ma_sv = p_ma_sv FOR UPDATE;\nSELECT COUNT(*) INTO v_dem FROM dang_ky\nWHERE ma_sv = p_ma_sv AND ma_mh = v_ma_mh;\n-- thêm: ALTER TABLE dang_ky ADD UNIQUE (ma_sv, ma_mh);',
-    },
   },
   'dirty-read': {
-    ten: 'Đọc dữ liệu chưa COMMIT', loai: 'Dirty read', lop: ['KTCT.02'],
+    ten: 'SV đăng kí', loai: 'Dirty read', lop: ['KTCT.02'],
     moTa: 'KTCT.02 còn 1 chỗ. A (SV18, đang nợ học phí) giữ chỗ trước rồi mới kiểm tra học phí, thấy nợ nên ROLLBACK. B (SV19) bấm Đăng kí trong lúc A chưa xong.',
     A: { ma_sv: 'SV18', ma_lhp: 'KTCT.02', vaiTro: 'Giữ chỗ trước, kiểm tra học phí sau rồi ROLLBACK' },
     B: { ma_sv: 'SV19', ma_lhp: 'KTCT.02' },
-    giaiThich: {
-      nguyenNhan: 'Không xử lý thì B chạy ở READ UNCOMMITTED, đọc được sĩ số 1/1 mà A mới ghi tạm, nên từ chối SV19. Sau đó A ROLLBACK, lớp về 0/1: SV19 bị từ chối oan vì con số B đọc chưa bao giờ được COMMIT.',
-      cachSua: 'Dùng mức cô lập READ COMMITTED trở lên (mặc định của MySQL là REPEATABLE READ). B chỉ đọc dữ liệu đã COMMIT (0/1), đến UPDATE thì chờ khoá của A; A ROLLBACK xong, B kiểm tra lại và đăng kí thành công.',
-      sqlLoi: 'SET TRANSACTION ISOLATION LEVEL READ UNCOMMITTED;\nSTART TRANSACTION;\nSELECT si_so_hien_tai ...;                      -- thấy 1/1 chưa COMMIT',
-      sqlSua: 'SET TRANSACTION ISOLATION LEVEL READ COMMITTED;\nSTART TRANSACTION;\nSELECT si_so_hien_tai ...;                      -- thấy 0/1 đã COMMIT\nUPDATE lop_hoc_phan SET si_so_hien_tai = si_so_hien_tai + 1\nWHERE ma_lhp = p_ma_lhp AND si_so_hien_tai < si_so_toi_da;',
-    },
   },
 };
 
@@ -66,7 +44,7 @@ const phanTich = (nhatKy) => (nhatKy || '').split('\n').filter(Boolean).map((d) 
   return { t: thoiDiem(tg), loai, msg: msg.join('|') };
 });
 
-const boc = (fn) => (req, res) => fn(req, res).catch((e) => res.status(e.status || 500).json({ loi: e.message }));
+const boc = (fn) => (req, res, next) => fn(req, res).catch(next); // lỗi do server.js trả về dạng JSON
 const layTinhHuong = (id) => {
   const th = TINH_HUONG[id];
   if (!th) throw Object.assign(new Error('Tình huống không tồn tại'), { status: 404 });
@@ -86,7 +64,7 @@ router.get('/tinh-huong', boc(async (req, res) => {
          WHERE s.ma_sv = ? AND l.ma_lhp = ?`, [th[v].ma_sv, th[v].ma_lhp]);
       vai[v] = { ...th[v], ...r };
     }
-    return { id, ten: th.ten, loai: th.loai, moTa: th.moTa, giaiThich: th.giaiThich, A: vai.A, B: vai.B };
+    return { id, ten: th.ten, loai: th.loai, moTa: th.moTa, A: vai.A, B: vai.B };
   }));
   res.json(ds);
 }));
@@ -105,7 +83,7 @@ router.post('/giao-dich', boc(async (req, res) => {
   const { tinhHuong, vai, coXuLy = true, tre = 3 } = req.body || {};
   layTinhHuong(tinhHuong);
   if (!['A', 'B'].includes(vai)) throw Object.assign(new Error('vai phải là A hoặc B'), { status: 400 });
-  const giay = Math.min(10, Math.max(0, Number(tre) || 0));
+  const giay = Math.min(10, Math.max(0, Number(tre) || 0)); // giới hạn 0..10 giây
   const [ten, thamSo] = thuTucCho(tinhHuong, vai, coXuLy !== false, giay);
   const conn = await layPool().getConnection();
   try {
@@ -116,7 +94,9 @@ router.post('/giao-dich', boc(async (req, res) => {
   }
 }));
 
-// Trạng thái CSDL (dữ liệu đã COMMIT) của các lớp và sinh viên trong tình huống
+// Trạng thái CSDL (dữ liệu đã COMMIT) của các lớp và sinh viên trong tình huống.
+// dung = view v_kiem_tra_toan_ven không báo vi phạm nào liên quan; riêng tình huống SV đăng kí,
+// trang web còn xét thêm SV19 có bị từ chối oan không (lớp vẫn còn chỗ mà SV19 bị báo đầy).
 router.get('/trang-thai', boc(async (req, res) => {
   const id = String(req.query.tinhHuong || '');
   const th = layTinhHuong(id);
@@ -140,13 +120,6 @@ router.get('/trang-thai', boc(async (req, res) => {
     'SELECT loai, doi_tuong, chi_tiet FROM v_kiem_tra_toan_ven WHERE doi_tuong IN (?) ORDER BY loai',
     [[...th.lop, ...dsSv]]);
   const loi = viPham.map((v) => `${v.doi_tuong}: ${v.chi_tiet}`);
-  if (id === 'dirty-read') {
-    const l = lop[0];
-    const coB = (l.ds || '').split(', ').includes(th.B.ma_sv);
-    if (!coB && l.si_so_hien_tai < l.si_so_toi_da) {
-      loi.push(`${th.B.ma_sv} không vào được lớp dù ${l.ma_lhp} vẫn còn chỗ (${l.si_so_hien_tai}/${l.si_so_toi_da}): bị từ chối oan vì đã đọc dữ liệu chưa COMMIT của A`);
-    }
-  }
   res.json({ lop, dangKy, sinhVien: sinhVien.map((x) => ({ ...x, so_tc: Number(x.so_tc), no_hoc_phi: !!x.no_hoc_phi })), viPham, loi, dung: loi.length === 0 });
 }));
 

@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Thiết kế CSDL · Cổng đăng kí học phần</title>
+  <meta name="description" content="ERD, lược đồ quan hệ với khoá chính và khoá ngoại, stored procedure và dữ liệu của CSDL đăng kí học phần.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="giao-dien.css">
+</head>
+<body>
+  <header class="site">
+    <div class="wrap site-trong">
+      <a class="logo" href="/"><span class="logo-o">ĐK</span><span><span class="logo-ten">Cổng đăng kí học phần</span><span class="logo-phu">Học kì 1 · Năm học 2026 – 2027</span></span></a>
+      <nav class="site-menu" aria-label="Các trang">
+        <a href="/">Mô phỏng xung đột</a>
+        <a href="/dang-ki.html">Đăng kí học phần</a>
+        <a href="/csdl.html" aria-current="page">Thiết kế CSDL</a>
+      </nav>
+    </div>
+  </header>
+
+  <main class="wrap trang-chinh">
+    <div class="tieu-de-trang"><h1>Thiết kế cơ sở dữ liệu</h1><span class="phu">CSDL <code>dkhp</code> · MySQL 8 · InnoDB · utf8mb4</span></div>
+
+    <section class="the" aria-labelledby="tieu-de-erd">
+      <div class="the-dau">
+        <h2 id="tieu-de-erd">ERD <span class="nhat">· mô hình thực thể – kết hợp, ký hiệu Chen</span></h2>
+        <a class="nut phu nho" href="/docs/erd-chen.png" download>Tải ảnh PNG</a>
+      </div>
+      <div class="erd-khung"><img src="/docs/erd-chen.svg" alt="ERD kiểu Chen: thực thể SINH_VIEN, DANG_KY, LOP_HOC_PHAN, MON_HOC; mối kết hợp ĐĂNG KÍ (SINH_VIEN 1 – N DANG_KY), THUỘC LỚP (DANG_KY N – 1 LOP_HOC_PHAN), MỞ CHO (LOP_HOC_PHAN N – 1 MON_HOC); khoá chính gạch chân, khoá ngoại ghi FK viền nét đứt" width="1900" height="1090"></div>
+    </section>
+
+    <section class="the" aria-labelledby="tieu-de-ld">
+      <div class="the-dau">
+        <h2 id="tieu-de-ld">Lược đồ quan hệ <span class="nhat">· đọc trực tiếp từ information_schema của MySQL</span></h2>
+      </div>
+      <div class="luoc-do" id="luoc-do"><p class="trong">Đang tải…</p></div>
+    </section>
+
+    <section class="the" aria-labelledby="tieu-de-cf">
+      <div class="the-dau">
+        <h2 id="tieu-de-cf">Sơ đồ quan hệ <span class="nhat">· ký hiệu Crow's Foot, kèm kiểu dữ liệu</span></h2>
+        <a class="nut phu nho" href="/docs/erd.png" download>Tải ảnh PNG</a>
+      </div>
+      <div class="erd-khung"><img src="/docs/erd.svg" alt="Sơ đồ quan hệ 4 bảng SINH_VIEN, DANG_KY, LOP_HOC_PHAN, MON_HOC kèm kiểu dữ liệu, khoá chính, khoá ngoại và ràng buộc" width="1550" height="712" loading="lazy"></div>
+    </section>
+
+    <section class="the" aria-labelledby="tieu-de-tt">
+      <div class="the-dau">
+        <h2 id="tieu-de-tt">Stored procedure <span class="nhat" id="so-tt"></span></h2>
+        <span class="nho-chu">Toàn bộ nghiệp vụ đăng kí chạy trong MySQL, web chỉ gọi <code>CALL</code></span>
+      </div>
+      <div class="ds-thu-tuc" id="ds-thu-tuc"><p class="trong">Đang tải…</p></div>
+    </section>
+
+    <section class="the" aria-labelledby="tieu-de-dl">
+      <div class="the-dau">
+        <h2 id="tieu-de-dl">Dữ liệu trong các bảng <span class="nhat">· SELECT * từ MySQL</span></h2>
+        <button type="button" class="nut phu nho" id="nut-tai-bang">↻ Tải lại</button>
+      </div>
+      <div class="chip-ds chip-bang" id="ds-bang" role="tablist" aria-label="Chọn bảng"></div>
+      <div class="du-lieu" id="du-lieu-bang"><p class="trong" style="padding:12px">Đang tải…</p></div>
+    </section>
+  </main>
+
+  <footer class="chan-trang">
+    <div class="wrap"><span>Đồ án môn Hệ quản trị cơ sở dữ liệu</span><span>MySQL 8 (InnoDB) · Node.js · Express</span></div>
+  </footer>
+
+  <script src="chung.js"></script>
+  <script src="csdl.js"></script>
+</body>
+</html>

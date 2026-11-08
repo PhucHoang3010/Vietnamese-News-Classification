@@ -1,104 +1,109 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="1960" height="976" viewBox="0 0 1960 976" font-family="'Be Vietnam Pro', 'Segoe UI', Arial, sans-serif">
-<rect width="100%" height="100%" fill="#ffffff"/>
-<text x="30" y="50" font-size="30" font-weight="700" fill="#14213d">ERD: CSDL Đăng kí học phần (mô hình thực thể – kết hợp, ký hiệu Chen)</text>
-<g transform="translate(30,100)"><line x1="260" y1="300" x2="605" y2="300" stroke="#5d6782" stroke-width="2.5"/>
-<line x1="605" y1="300" x2="950" y2="300" stroke="#5d6782" stroke-width="2.5"/>
-<line x1="950" y1="300" x2="1275" y2="300" stroke="#5d6782" stroke-width="2.5"/>
-<line x1="1275" y1="300" x2="1600" y2="300" stroke="#5d6782" stroke-width="2.5"/>
-<line x1="1600" y1="300" x2="1600" y2="475" stroke="#5d6782" stroke-width="2.5"/>
-<line x1="1600" y1="475" x2="1600" y2="640" stroke="#5d6782" stroke-width="2.5"/>
-<line x1="260" y1="300" x2="110" y2="130" stroke="#5d6782" stroke-width="2"/>
-<line x1="260" y1="300" x2="290" y2="110" stroke="#5d6782" stroke-width="2"/>
-<line x1="260" y1="300" x2="440" y2="160" stroke="#5d6782" stroke-width="2"/>
-<line x1="260" y1="300" x2="150" y2="470" stroke="#5d6782" stroke-width="2"/>
-<line x1="260" y1="300" x2="390" y2="490" stroke="#5d6782" stroke-width="2"/>
-<line x1="950" y1="300" x2="850" y2="130" stroke="#5d6782" stroke-width="2"/>
-<line x1="950" y1="300" x2="1030" y2="130" stroke="#5d6782" stroke-width="2"/>
-<line x1="950" y1="300" x2="790" y2="480" stroke="#5d6782" stroke-width="2"/>
-<line x1="950" y1="300" x2="960" y2="555" stroke="#5d6782" stroke-width="2"/>
-<line x1="950" y1="300" x2="1120" y2="480" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="300" x2="1450" y2="130" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="300" x2="1640" y2="105" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="300" x2="1810" y2="150" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="300" x2="1830" y2="260" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="300" x2="1820" y2="345" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="300" x2="1820" y2="430" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="300" x2="1370" y2="450" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="300" x2="1390" y2="545" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="300" x2="1760" y2="560" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="640" x2="1380" y2="690" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="640" x2="1600" y2="745" stroke="#5d6782" stroke-width="2"/>
-<line x1="1600" y1="640" x2="1810" y2="700" stroke="#5d6782" stroke-width="2"/>
-<ellipse cx="110" cy="130" rx="80" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="3"/>
-<text x="110" y="130" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" text-decoration="underline" fill="#14213d">ma_sv</text>
-<ellipse cx="290" cy="110" rx="75" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="290" y="110" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">ho_ten</text>
-<ellipse cx="440" cy="160" rx="50" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="440" y="160" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">lop</text>
-<ellipse cx="150" cy="470" rx="115" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="150" y="470" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">tin_chi_toi_da</text>
-<ellipse cx="390" cy="490" rx="100" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="390" y="490" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">no_hoc_phi</text>
-<ellipse cx="850" cy="130" rx="50" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="3"/>
-<text x="850" y="130" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" text-decoration="underline" fill="#14213d">id</text>
-<ellipse cx="1030" cy="130" rx="90" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="1030" y="130" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">thoi_gian</text>
-<ellipse cx="790" cy="480" rx="95" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="3" stroke-dasharray="7 4"/>
-<text x="790" y="480" font-size="20" text-anchor="middle" dominant-baseline="central" font-style="italic" font-weight="600" fill="#2456c4">ma_sv (FK)</text>
-<ellipse cx="960" cy="555" rx="100" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="3" stroke-dasharray="7 4"/>
-<text x="960" y="555" font-size="20" text-anchor="middle" dominant-baseline="central" font-style="italic" font-weight="600" fill="#2456c4">ma_lhp (FK)</text>
-<ellipse cx="1120" cy="480" rx="95" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="3" stroke-dasharray="7 4"/>
-<text x="1120" y="480" font-size="20" text-anchor="middle" dominant-baseline="central" font-style="italic" font-weight="600" fill="#2456c4">ma_mh (FK)</text>
-<ellipse cx="1450" cy="130" rx="85" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="3"/>
-<text x="1450" y="130" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" text-decoration="underline" fill="#14213d">ma_lhp</text>
-<ellipse cx="1640" cy="105" rx="95" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="1640" y="105" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">giang_vien</text>
-<ellipse cx="1810" cy="150" rx="65" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="1810" y="150" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">phong</text>
-<ellipse cx="1830" cy="260" rx="50" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="1830" y="260" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">thu</text>
-<ellipse cx="1820" cy="345" rx="70" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="1820" y="345" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">tiet_bd</text>
-<ellipse cx="1820" cy="430" rx="70" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="1820" y="430" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">tiet_kt</text>
-<ellipse cx="1370" cy="450" rx="105" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="1370" y="450" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">si_so_toi_da</text>
-<ellipse cx="1390" cy="545" rx="115" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="1390" y="545" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">si_so_hien_tai</text>
-<ellipse cx="1760" cy="560" rx="95" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="3" stroke-dasharray="7 4"/>
-<text x="1760" y="560" font-size="20" text-anchor="middle" dominant-baseline="central" font-style="italic" font-weight="600" fill="#2456c4">ma_mh (FK)</text>
-<ellipse cx="1380" cy="690" rx="85" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="3"/>
-<text x="1380" y="690" font-size="20" text-anchor="middle" dominant-baseline="central" font-weight="700" text-decoration="underline" fill="#14213d">ma_mh</text>
-<ellipse cx="1600" cy="745" rx="75" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="1600" y="745" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">ten_mh</text>
-<ellipse cx="1810" cy="700" rx="80" ry="30" fill="#fcfdff" stroke="#2456c4" stroke-width="2"/>
-<text x="1810" y="700" font-size="20" text-anchor="middle" dominant-baseline="central" fill="#14213d">so_tin_chi</text>
-<rect x="140" y="268" width="240" height="64" rx="4" fill="#14213d"/>
-<text x="260" y="300" font-size="24" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#eef2fa">SINH_VIEN</text>
-<rect x="840" y="268" width="220" height="64" rx="4" fill="#14213d"/>
-<text x="950" y="300" font-size="24" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#eef2fa">DANG_KY</text>
-<rect x="1465" y="268" width="270" height="64" rx="4" fill="#14213d"/>
-<text x="1600" y="300" font-size="24" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#eef2fa">LOP_HOC_PHAN</text>
-<rect x="1490" y="609" width="220" height="62" rx="4" fill="#14213d"/>
-<text x="1600" y="640" font-size="24" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#eef2fa">MON_HOC</text>
-<polygon points="490,300 605,240 720,300 605,360" fill="#e3eaf8" stroke="#14213d" stroke-width="2.5"/>
-<text x="605" y="300" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#14213d">ĐĂNG KÍ</text>
-<polygon points="1150,300 1275,240 1400,300 1275,360" fill="#e3eaf8" stroke="#14213d" stroke-width="2.5"/>
-<text x="1275" y="300" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#14213d">THUỘC LỚP</text>
-<polygon points="1505,475 1600,427 1695,475 1600,523" fill="#e3eaf8" stroke="#14213d" stroke-width="2.5"/>
-<text x="1600" y="475" font-size="19" font-weight="700" text-anchor="middle" dominant-baseline="central" fill="#14213d">MỞ CHO</text>
-<text x="395" y="280" font-size="24" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#b34a12">1</text>
-<text x="780" y="280" font-size="24" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#b34a12">N</text>
-<text x="1105" y="280" font-size="24" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#b34a12">N</text>
-<text x="1430" y="280" font-size="24" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#b34a12">1</text>
-<text x="1622" y="378" font-size="24" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#b34a12">N</text>
-<text x="1622" y="568" font-size="24" font-weight="800" text-anchor="middle" dominant-baseline="central" fill="#b34a12">1</text></g>
-<g font-size="19" fill="#5d6782">
-<rect x="30" y="902" width="34" height="22" rx="3" fill="#14213d"/><text x="74" y="919">Thực thể</text>
-<polygon points="220,913 238,902 256,913 238,924" fill="#e3eaf8" stroke="#14213d" stroke-width="2"/><text x="266" y="919">Mối kết hợp</text>
-<text x="430" y="919"><tspan font-weight="700" text-decoration="underline" fill="#14213d">gạch chân</tspan> = khoá chính (PK)</text>
-<text x="730" y="919"><tspan font-style="italic" font-weight="600" fill="#2456c4">… (FK)</tspan>, viền nét đứt = khoá ngoại (khoá phụ)</text>
-<text x="1240" y="919">1, N = bản số</text>
-<text x="30" y="956">DANG_KY: khoá ngoại ma_sv → SINH_VIEN(ma_sv); khoá ngoại kép (ma_lhp, ma_mh) → LOP_HOC_PHAN(ma_lhp, ma_mh); UNIQUE (ma_sv, ma_lhp). LOP_HOC_PHAN: khoá ngoại ma_mh → MON_HOC(ma_mh).</text>
-</g>
+<svg xmlns="http://www.w3.org/2000/svg" width="1900" height="1090" viewBox="0 0 1900 1090" font-family="'Segoe UI', Inter, Arial, sans-serif">
+<defs><marker id="mui" viewBox="0 0 10 10" refX="9.5" refY="5" markerWidth="9" markerHeight="9" orient="auto-start-reverse"><path d="M0,0.8 L10,5 L0,9.2 z" fill="#2f3b57"/></marker></defs>
+<rect width="1900" height="1090" fill="#ffffff"/>
+<line x1="154.5" y1="157" x2="382.35" y2="248" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="286.5" y1="147" x2="421.95" y2="248" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="418.5" y1="137" x2="461.55" y2="248" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="592" y1="147" x2="513.6" y2="248" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="785.5" y1="157" x2="571.65" y2="248" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1248" y1="147" x2="1354.4" y2="248" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1380" y1="137" x2="1394" y2="248" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1532" y1="147" x2="1439.6" y2="248" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="135.5" y1="858" x2="379" y2="722" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="287.5" y1="868" x2="422.25" y2="722" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="465" y1="878" x2="475.5" y2="722" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="642.5" y1="868" x2="528.75" y2="722" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="809.5" y1="858" x2="578.85" y2="722" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1023.5" y1="858" x2="1287.05" y2="722" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1175.5" y1="868" x2="1332.65" y2="722" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1347.5" y1="878" x2="1384.25" y2="722" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1530.5" y1="868" x2="1439.15" y2="722" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1735" y1="858" x2="1500.5" y2="722" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1689" y1="572" x2="1540" y2="668" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1685" y1="646" x2="1540" y2="674.6" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1685" y1="720" x2="1540" y2="700.5" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="1689" y1="794" x2="1540" y2="712" stroke="#2f3b57" stroke-width="1.8"/>
+<line x1="480" y1="431" x2="480" y2="314" stroke="#2f3b57" stroke-width="1.8" marker-end="url(#mui)"/>
+<text x="502" y="342" font-size="22" font-weight="700" fill="#1c2333" text-anchor="middle">1</text>
+<line x1="480" y1="539" x2="480" y2="656" stroke="#2f3b57" stroke-width="1.8" marker-end="url(#mui)"/>
+<text x="504" y="644" font-size="22" font-weight="700" fill="#1c2333" text-anchor="middle">N</text>
+<line x1="821" y1="690" x2="597" y2="690" stroke="#2f3b57" stroke-width="1.8" marker-end="url(#mui)"/>
+<text x="621" y="676" font-size="22" font-weight="700" fill="#1c2333" text-anchor="middle">N</text>
+<line x1="1069" y1="690" x2="1258" y2="690" stroke="#2f3b57" stroke-width="1.8" marker-end="url(#mui)"/>
+<text x="1234" y="676" font-size="22" font-weight="700" fill="#1c2333" text-anchor="middle">1</text>
+<line x1="1400" y1="537" x2="1400" y2="656" stroke="#2f3b57" stroke-width="1.8" marker-end="url(#mui)"/>
+<text x="1424" y="644" font-size="22" font-weight="700" fill="#1c2333" text-anchor="middle">N</text>
+<line x1="1400" y1="433" x2="1400" y2="314" stroke="#2f3b57" stroke-width="1.8" marker-end="url(#mui)"/>
+<text x="1422" y="342" font-size="22" font-weight="700" fill="#1c2333" text-anchor="middle">1</text>
+<polygon points="480,431 592,485 480,539 368,485" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="480" y="491.5" font-size="18" font-weight="600" text-anchor="middle" fill="#1c2333">ĐĂNG KÍ</text>
+<polygon points="945,634 1069,690 945,746 821,690" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="945" y="696.5" font-size="18" font-weight="600" text-anchor="middle" fill="#1c2333">THUỘC LỚP</text>
+<polygon points="1400,433 1504,485 1400,537 1296,485" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1400" y="491.5" font-size="18" font-weight="600" text-anchor="middle" fill="#1c2333">MỞ CHO</text>
+<rect x="355" y="248" width="250" height="64" fill="#fff" stroke="#2f3b57" stroke-width="2.2"/>
+<text x="480" y="287.5" font-size="21" font-weight="700" text-anchor="middle" fill="#1c2333" letter-spacing="0.5">SINH_VIEN</text>
+<rect x="365" y="658" width="230" height="64" fill="#fff" stroke="#2f3b57" stroke-width="2.2"/>
+<text x="480" y="697.5" font-size="21" font-weight="700" text-anchor="middle" fill="#1c2333" letter-spacing="0.5">DANG_KY</text>
+<rect x="1260" y="658" width="280" height="64" fill="#fff" stroke="#2f3b57" stroke-width="2.2"/>
+<text x="1400" y="697.5" font-size="21" font-weight="700" text-anchor="middle" fill="#1c2333" letter-spacing="0.5">LOP_HOC_PHAN</text>
+<rect x="1285" y="248" width="230" height="64" fill="#fff" stroke="#2f3b57" stroke-width="2.2"/>
+<text x="1400" y="287.5" font-size="21" font-weight="700" text-anchor="middle" fill="#1c2333" letter-spacing="0.5">MON_HOC</text>
+<ellipse cx="154.5" cy="130" rx="56" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="154.5" y="136.5" font-size="19" text-anchor="middle" fill="#1c2333" text-decoration="underline" font-weight="600">ma_sv</text>
+<ellipse cx="286.5" cy="120" rx="56" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="286.5" y="126.5" font-size="19" text-anchor="middle" fill="#1c2333">ho_ten</text>
+<ellipse cx="418.5" cy="110" rx="56" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="418.5" y="116.5" font-size="19" text-anchor="middle" fill="#1c2333">lop</text>
+<ellipse cx="592" cy="120" rx="97.5" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="592" y="126.5" font-size="19" text-anchor="middle" fill="#1c2333">tin_chi_toi_da</text>
+<ellipse cx="785.5" cy="130" rx="76" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="785.5" y="136.5" font-size="19" text-anchor="middle" fill="#1c2333">no_hoc_phi</text>
+<ellipse cx="1248" cy="120" rx="56" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1248" y="126.5" font-size="19" text-anchor="middle" fill="#1c2333" text-decoration="underline" font-weight="600">ma_mh</text>
+<ellipse cx="1380" cy="110" rx="56" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1380" y="116.5" font-size="19" text-anchor="middle" fill="#1c2333">ten_mh</text>
+<ellipse cx="1532" cy="120" rx="76" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1532" y="126.5" font-size="19" text-anchor="middle" fill="#1c2333">so_tin_chi</text>
+<ellipse cx="135.5" cy="885" rx="56" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="135.5" y="891.5" font-size="19" text-anchor="middle" fill="#1c2333" text-decoration="underline" font-weight="600">id</text>
+<ellipse cx="287.5" cy="895" rx="76" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="287.5" y="901.5" font-size="19" text-anchor="middle" fill="#1c2333" font-style="italic">ma_sv (FK)</text>
+<ellipse cx="465" cy="905" rx="81.5" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="465" y="911.5" font-size="19" text-anchor="middle" fill="#1c2333" font-style="italic">ma_lhp (FK)</text>
+<ellipse cx="642.5" cy="895" rx="76" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="642.5" y="901.5" font-size="19" text-anchor="middle" fill="#1c2333" font-style="italic">ma_mh (FK)</text>
+<ellipse cx="809.5" cy="885" rx="71" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="809.5" y="891.5" font-size="19" text-anchor="middle" fill="#1c2333">thoi_gian</text>
+<ellipse cx="1023.5" cy="885" rx="56" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1023.5" y="891.5" font-size="19" text-anchor="middle" fill="#1c2333" text-decoration="underline" font-weight="600">ma_lhp</text>
+<ellipse cx="1175.5" cy="895" rx="76" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2" stroke-dasharray="7 5"/>
+<text x="1175.5" y="901.5" font-size="19" text-anchor="middle" fill="#1c2333" font-style="italic">ma_mh (FK)</text>
+<ellipse cx="1347.5" cy="905" rx="76" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1347.5" y="911.5" font-size="19" text-anchor="middle" fill="#1c2333">giang_vien</text>
+<ellipse cx="1530.5" cy="895" rx="87" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1530.5" y="901.5" font-size="19" text-anchor="middle" fill="#1c2333">si_so_toi_da</text>
+<ellipse cx="1735" cy="885" rx="97.5" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1735" y="891.5" font-size="19" text-anchor="middle" fill="#1c2333">si_so_hien_tai</text>
+<ellipse cx="1745" cy="572" rx="56" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1745" y="578.5" font-size="19" text-anchor="middle" fill="#1c2333">thu</text>
+<ellipse cx="1745" cy="646" rx="60" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1745" y="652.5" font-size="19" text-anchor="middle" fill="#1c2333">tiet_bd</text>
+<ellipse cx="1745" cy="720" rx="60" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1745" y="726.5" font-size="19" text-anchor="middle" fill="#1c2333">tiet_kt</text>
+<ellipse cx="1745" cy="794" rx="56" ry="27" fill="#fff" stroke="#2f3b57" stroke-width="2"/>
+<text x="1745" y="800.5" font-size="19" text-anchor="middle" fill="#1c2333">phong</text>
+<line x1="40" y1="1014" x2="1860" y2="1014" stroke="#e3e6ec" stroke-width="1.5"/>
+<rect x="40" y="1039" width="44" height="26" fill="#fff" stroke="#2f3b57" stroke-width="1.8"/>
+<text x="96" y="1058" font-size="17" fill="#5b6478">Thực thể</text>
+<polygon points="222,1037 244,1052 222,1067 200,1052" fill="#fff" stroke="#2f3b57" stroke-width="1.8"/>
+<text x="256" y="1058" font-size="17" fill="#5b6478">Mối kết hợp</text>
+<ellipse cx="422" cy="1052" rx="22" ry="13" fill="#fff" stroke="#2f3b57" stroke-width="1.8"/>
+<text x="456" y="1058" font-size="17" fill="#5b6478">Thuộc tính</text>
+<text x="602" y="1058" font-size="17" font-weight="600" text-anchor="middle" fill="#1c2333" text-decoration="underline">ma</text>
+<text x="636" y="1058" font-size="17" fill="#5b6478">Gạch chân = khoá chính (PK)</text>
+<ellipse cx="932" cy="1052" rx="22" ry="13" fill="#fff" stroke="#2f3b57" stroke-width="1.8" stroke-dasharray="5 4"/>
+<text x="966" y="1058" font-size="17" fill="#5b6478">(FK), viền nét đứt = khoá ngoại (khoá phụ)</text>
+<text x="1382" y="1058" font-size="18" font-weight="700" text-anchor="middle" fill="#1c2333">1 · N</text>
+<text x="1416" y="1058" font-size="17" fill="#5b6478">Bản số (một – nhiều)</text>
 </svg>
