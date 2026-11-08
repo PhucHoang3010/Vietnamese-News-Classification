@@ -1,16 +1,16 @@
 // Web server: trang đăng kí học phần + API giả lập xung đột
 const path = require('path');
 const express = require('express');
-const { layPool, goiThuTuc, napDuLieuMau } = require('./db');
+const { layPool, goiThuTuc, napDuLieuMau, giaiThichLoi } = require('./db');
 const { chayKichBan, thongTinKichBan } = require('./kich-ban');
 
 const app = express();
 app.use(express.json());
-app.use(express.static(path.join(__dirname, '..', 'public')));
+app.use(express.static(path.join(__dirname, '..', 'public'), { index: 'mo-phong.html' })); // trang chính = trang demo
 app.use('/docs', express.static(path.join(__dirname, '..', 'docs')));
 
 const boc = (fn) => (req, res) =>
-  fn(req, res).catch((e) => res.status(e.status || 500).json({ loi: e.message }));
+  fn(req, res).catch((e) => res.status(e.status || 500).json({ loi: giaiThichLoi(e) }));
 
 // ---------- Dữ liệu cho trang đăng kí ----------
 app.get('/api/sinh-vien', boc(async (req, res) => {
@@ -102,5 +102,28 @@ app.post('/api/kich-ban/:id/dat-lai', boc(async (req, res) => {
 // ---------- Trang mô phỏng 2 sinh viên trên một màn hình ----------
 app.use('/api/mo-phong', require('./mo-phong').router);
 
-const PORT = Number(process.env.PORT || 3000);
-app.listen(PORT, () => console.log(`Đăng kí học phần: http://localhost:${PORT}`));
+/** Mở web ở cổng `port`; trả về server (lỗi EADDRINUSE nếu cổng đang bị dùng). */
+function batDau(port) {
+  return new Promise((resolve, reject) => {
+    const sv = app.listen(port, () => resolve(sv));
+    sv.on('error', reject);
+  });
+}
+
+if (require.main === module) {
+  const PORT = Number(process.env.PORT || 3000);
+  batDau(PORT)
+    .then(async () => {
+      console.log(`Trang demo:              http://localhost:${PORT}`);
+      console.log(`Trang đăng kí đầy đủ:    http://localhost:${PORT}/day-du.html`);
+      try { await layPool().query('SELECT 1 FROM sinh_vien LIMIT 1'); } catch (e) { console.error('⚠ ' + giaiThichLoi(e)); }
+    })
+    .catch((e) => {
+      console.error(e.code === 'EADDRINUSE'
+        ? `✖ Cổng ${PORT} đang bị chương trình khác dùng (thường là web cũ còn chạy). Tắt cửa sổ đó, hoặc bấm đúp chay-web.bat: nó tự chọn cổng khác.`
+        : '✖ ' + e.message);
+      process.exit(1);
+    });
+}
+
+module.exports = { app, batDau };

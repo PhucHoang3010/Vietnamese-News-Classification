@@ -91,8 +91,12 @@ router.get('/tinh-huong', boc(async (req, res) => {
   res.json(ds);
 }));
 
+// Đặt lại dữ liệu lần lượt từng yêu cầu một (bấm nhanh nhiều lần không bị chồng nhau)
+let hangDoi = Promise.resolve();
+const tuanTu = (fn) => { const p = hangDoi.then(fn, fn); hangDoi = p.catch(() => {}); return p; };
+
 router.post('/dat-lai', boc(async (req, res) => {
-  await napDuLieuMau();
+  await tuanTu(() => napDuLieuMau());
   res.json({ ok: true });
 }));
 

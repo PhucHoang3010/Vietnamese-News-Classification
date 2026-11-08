@@ -7,6 +7,7 @@
   "scripts": {
     "db:init": "node src/init-db.js",
     "start": "node src/server.js",
+    "chay": "node src/khoi-dong.js",
     "demo": "node src/demo-cli.js",
     "test": "node --test --test-concurrency=1"
   },

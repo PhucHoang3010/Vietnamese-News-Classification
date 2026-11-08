@@ -15,6 +15,10 @@ Project là một trang web đơn giản chỉ có chức năng đăng kí học
 
 ## 1. Cài đặt và chạy
 
+**Cách nhanh nhất (Windows):** cài Node.js và MySQL 8, rồi **bấm đúp file `chay-web.bat`**. File này tự cài thư viện, hỏi mật khẩu MySQL (sai thì hỏi lại, đúng thì lưu vào `.env`), tạo CSDL, chọn cổng trống và mở trình duyệt vào trang demo. Trên macOS / Linux dùng lệnh `npm run chay`.
+
+Hoặc làm từng bước:
+
 Cần có **MySQL 8** và **Node.js 18 trở lên**.
 
 ```bash
@@ -31,7 +35,7 @@ npm run db:init
 npm start
 ```
 
-Mở http://localhost:3000.
+Mở http://localhost:3000 (trang demo). Trang đăng kí đầy đủ nhiều tab ở http://localhost:3000/day-du.html.
 
 - `npm run db:init` tạo CSDL `dkhp` (**xoá CSDL `dkhp` cũ nếu có**), các bảng, view, stored procedure và dữ liệu mẫu. Cách khác: mở 3 file trong `sql/` bằng MySQL Workbench và chạy lần lượt `01_schema.sql` → `02_procedures.sql` → `03_seed.sql`.
 - `npm run demo` chạy cả 4 kịch bản ngay trên terminal và in lịch thao tác (thêm `-- 2` để chỉ chạy kịch bản 2).
@@ -40,11 +44,13 @@ Mở http://localhost:3000.
 
 ## 2. Trang web
 
-**Trang "Mô phỏng 2 sinh viên"** (`http://localhost:3000/mo-phong.html`, hoặc nút **Mô phỏng 2 sinh viên →** ở đầu trang): gộp cả 4 trường hợp xung đột vào một màn hình để trình bày.
+**Trang demo, cũng là trang chính** (`http://localhost:3000`): gộp 4 trường hợp vào một màn hình để trình bày: **Tranh slot**, **Trùng lịch đồng thời**, **SV đăng kí** (đăng kí bị huỷ giữa chừng), **Trùng học phần**. Mỗi trường hợp chỉ có 2 nút: **Chạy khi CHƯA xử lý** và **Chạy khi ĐÃ xử lý**; trang hiện bạn A, bạn B, hình minh hoạ dữ liệu (ghế trong lớp / thời khoá biểu / môn đã học), kết quả ✅ / ❌ và diễn biến từng bước.
 - Chọn tình huống: **Tranh slot**, **Trùng lịch đồng thời**, **Trùng học phần**, **Đọc dữ liệu chưa COMMIT**. Sinh viên và lớp được điền sẵn, dữ liệu tự đặt lại.
 - Hai khung **Sinh viên A** và **Sinh viên B** đặt cạnh nhau, mỗi khung có nút Đăng kí riêng: mỗi lần bấm là một giao dịch thật trên một kết nối MySQL riêng.
 - Gạt **CÓ / KHÔNG xử lý**, rồi bấm **Cho A và B bấm cùng lúc** (hoặc tự bấm hai nút trong khoảng xử lý chậm).
 - Trang hiện: giao dịch nào đang chờ, kết quả từng bên, dữ liệu đã COMMIT trong MySQL (sĩ số, ai đã vào lớp), kết luận ✅ / ❌ lấy từ view kiểm tra toàn vẹn, lịch thao tác A/B, nguyên nhân và cách sửa kèm SQL.
+
+**Trang đăng kí đầy đủ** (`/day-du.html`) có 3 tab.
 
 **Tab "Đăng kí học phần"**: phần chính, xung đột được mô phỏng ngay trên trang này.
 - Khung **Mô phỏng xung đột trên trang này** có công tắc **CÓ xử lý / KHÔNG xử lý** và ô **xử lý chậm** (0, 3, 5 hoặc 8 giây). Nút Đăng kí gọi `sp_dang_ky_mo_phong(ma_sv, ma_lhp, co_xu_ly, tre)`:

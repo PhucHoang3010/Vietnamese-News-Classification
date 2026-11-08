@@ -7,20 +7,30 @@ require('dotenv').config({ path: path.join(__dirname, '..', '.env') });
 const DB_NAME = 'dkhp';
 const SQL_DIR = path.join(__dirname, '..', 'sql');
 
-const cauHinh = {
+// Đọc cấu hình mỗi lần dùng, để trình khởi động (khoi-dong.js) đổi mật khẩu xong là có hiệu lực ngay
+const layCauHinh = () => ({
   host: process.env.DB_HOST || '127.0.0.1',
   port: Number(process.env.DB_PORT || 3306),
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
   charset: 'utf8mb4_unicode_ci',
   dateStrings: true,
-};
+});
+
+/** Đổi lỗi kết nối MySQL thành câu tiếng Việt dễ hiểu. */
+function giaiThichLoi(e) {
+  const u = process.env.DB_USER || 'root';
+  if (e.code === 'ER_ACCESS_DENIED_ERROR') return `Sai mật khẩu MySQL của tài khoản "${u}". Bấm đúp chay-web.bat (hoặc chạy npm run chay) để nhập lại mật khẩu.`;
+  if (e.code === 'ECONNREFUSED') return 'MySQL chưa chạy. Bấm phím Windows + R, gõ services.msc, tìm MySQL80, bấm Start, rồi chạy lại.';
+  if (e.code === 'ER_BAD_DB_ERROR') return 'Chưa có CSDL "dkhp". Chạy npm run db:init (hoặc bấm đúp chay-web.bat).';
+  return e.message;
+}
 
 let pool;
 function layPool() {
   if (!pool) {
     // Mỗi giao dịch giả lập cần 1 kết nối riêng (= 1 phiên làm việc riêng trên MySQL)
-    pool = mysql.createPool({ ...cauHinh, database: DB_NAME, connectionLimit: 20, waitForConnections: true });
+    pool = mysql.createPool({ ...layCauHinh(), database: DB_NAME, connectionLimit: 20, waitForConnections: true });
   }
   return pool;
 }
@@ -64,7 +74,7 @@ async function chayFileSql(conn, tenFile) {
 
 /** Tạo lại toàn bộ CSDL: bảng + thủ tục + dữ liệu mẫu. */
 async function khoiTaoCsdl() {
-  const conn = await mysql.createConnection(cauHinh);
+  const conn = await mysql.createConnection(layCauHinh());
   try {
     for (const f of ['01_schema.sql', '02_procedures.sql', '03_seed.sql']) await chayFileSql(conn, f);
   } finally {
@@ -86,4 +96,4 @@ async function goiThuTuc(conn, ten, thamSo) {
   return dong;
 }
 
-module.exports = { layPool, dongPool, khoiTaoCsdl, napDuLieuMau, goiThuTuc, tachCauLenh, DB_NAME };
+module.exports = { layPool, dongPool, khoiTaoCsdl, napDuLieuMau, goiThuTuc, tachCauLenh, layCauHinh, giaiThichLoi, DB_NAME };
