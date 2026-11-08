@@ -156,11 +156,11 @@ def stage_durations(events: pd.DataFrame) -> list[dict]:
     return rows
 
 
-def stuck_applications(apps: pd.DataFrame, events: pd.DataFrame) -> list[dict]:
-    """Hồ sơ đang xử lý nhưng đã quá SLA ở vòng hiện tại."""
+def stuck_applications(apps: pd.DataFrame, events: pd.DataFrame, now: datetime | None = None) -> list[dict]:
+    """Hồ sơ đang xử lý nhưng đã quá SLA ở vòng hiện tại (tính tại thời điểm `now`)."""
     if apps.empty or events.empty:
         return []
-    now = now_vn()
+    now = now or now_vn()
     active = apps[apps.status == "active"][["id", "application_code", "position", "current_stage"]]
     cur = events.merge(active, left_on=["application_id", "stage"], right_on=["id", "current_stage"])
     cur = cur.assign(days_in_stage=(now - cur.entered_at).dt.total_seconds() / 86400)
@@ -170,7 +170,7 @@ def stuck_applications(apps: pd.DataFrame, events: pd.DataFrame) -> list[dict]:
              "sla_days": int(r.sla_days)} for r in stuck.sort_values("days_in_stage", ascending=False).itertuples()]
 
 
-def bottlenecks(apps: pd.DataFrame, events: pd.DataFrame) -> list[dict]:
+def bottlenecks(apps: pd.DataFrame, events: pd.DataFrame, now: datetime | None = None) -> list[dict]:
     result = []
     fn = [r for r in funnel(apps, events) if r.get("pass_rate_pct") is not None and r["reached"] >= 10]
     if fn:
@@ -186,7 +186,7 @@ def bottlenecks(apps: pd.DataFrame, events: pd.DataFrame) -> list[dict]:
                        "severity": "high" if slow["median_days"] > slow["sla_days"] else "medium",
                        "message": f"Chuyển vòng chậm nhất: {slow['transition']} mất trung vị {slow['median_days']} ngày "
                                   f"(SLA {slow['sla_days']} ngày, {slow['over_sla_pct']}% hồ sơ vượt SLA)."})
-    stuck = stuck_applications(apps, events)
+    stuck = stuck_applications(apps, events, now)
     if stuck:
         by_stage = pd.Series([s["stage"] for s in stuck]).value_counts()
         stage = by_stage.index[0]

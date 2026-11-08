@@ -37,8 +37,9 @@ def _week_metrics(apps: pd.DataFrame, events: pd.DataFrame, start: datetime, end
         "top_source": new.source.value_counts().index[0] if len(new) else None,
         "top_position": new.position.value_counts().index[0] if len(new) else None,
         "top_rejection_reason": CATEGORY_LABELS.get(reasons.value_counts().index[0]) if len(reasons) else None,
-        "by_source": {k: int(v) for k, v in new.source.value_counts().items()},
-        "by_position": {k: int(v) for k, v in new.position.value_counts().items()},
+        # danh sách cặp (JSONB của PostgreSQL không giữ thứ tự khoá của dict)
+        "by_source": [[k, int(v)] for k, v in new.source.value_counts().items()],
+        "by_position": [[k, int(v)] for k, v in new.position.value_counts().items()],
     }
 
 
@@ -49,14 +50,14 @@ def build_metrics(db: Session, user: User, week_start: date) -> dict:
     previous = _week_metrics(apps, events, start - timedelta(days=7), start)
     as_of_apps = apps[apps.applied_at < end] if not apps.empty else apps
     as_of_events = events[events.entered_at < end] if not events.empty else events
-    current["stuck_applications"] = len(analytics.stuck_applications(as_of_apps, as_of_events))
+    current["stuck_applications"] = len(analytics.stuck_applications(as_of_apps, as_of_events, now=end))
     return {
         "week_start": start.date().isoformat(), "week_end": (end - timedelta(days=1)).date().isoformat(),
         "week_label": f"{start:%d/%m} – {(end - timedelta(days=1)):%d/%m/%Y}",
         "current": current, "previous": previous,
         "kpis_to_date": analytics.kpis(as_of_apps, as_of_events),
         "funnel_to_date": analytics.funnel(as_of_apps, as_of_events),
-        "bottlenecks": analytics.bottlenecks(as_of_apps, as_of_events),
+        "bottlenecks": analytics.bottlenecks(as_of_apps, as_of_events, now=end),
     }
 
 
@@ -104,7 +105,8 @@ def render_markdown(metrics: dict, narrative: dict, approved_by: str | None = No
     lines += ["", "## 5. Hành động đề xuất"] + [f"- {a}" for a in narrative.get("actions", [])]
     if cur.get("by_source"):
         lines += ["", "## 6. Hồ sơ mới theo nguồn", "", "| Nguồn | Số hồ sơ |", "|---|---:|"]
-        lines += [f"| {s} | {n} |" for s, n in cur["by_source"].items()]
+        by_source = cur["by_source"].items() if isinstance(cur["by_source"], dict) else cur["by_source"]
+        lines += [f"| {s} | {n} |" for s, n in by_source]
     lines += ["", "---", "_Báo cáo được tạo tự động bởi TalentLens. Phần nhận định do AI hỗ trợ và "
                      + (f"đã được {approved_by} kiểm duyệt._" if approved_by else "đang chờ HR kiểm duyệt._")]
     return "\n".join(lines)

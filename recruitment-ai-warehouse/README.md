@@ -10,6 +10,11 @@ phỏng vấn theo JD, viết báo cáo tuần. Hệ thống có **phân quyền
 
 ![Kiến trúc](docs/images/kien_truc.png)
 
+## Báo cáo
+
+* Báo cáo Word theo mẫu của Học viện: [docs/BaoCao_Nhom8_AI9_KhoDuLieuTuyenDung.docx](docs/BaoCao_Nhom8_AI9_KhoDuLieuTuyenDung.docx)
+  (bản PDF cùng tên để xem nhanh). Sinh lại bằng `python docs/report/build_report.py` (cần LibreOffice để tính số trang).
+
 ## Chức năng chính
 
 | Task | Nội dung | Thành phần |
