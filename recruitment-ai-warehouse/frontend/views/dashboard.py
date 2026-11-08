@@ -51,16 +51,15 @@ if not k.get("total_applications"):
     st.stop()
 
 trend = pd.DataFrame(data["trend"])
-spark = trend["applications"].tolist()[-12:] if not trend.empty else None
-m = st.columns(6)
-m[0].metric("Tổng hồ sơ", f"{k['total_applications']:,}".replace(",", "."), f"+{k['new_last_7_days']} trong 7 ngày",
-            chart_data=spark, chart_type="bar", border=False, delta_color="off")
-m[1].metric("Ứng viên (đã khử trùng)", k["unique_candidates"])
+m = st.columns(7)
+m[0].metric("Tổng hồ sơ", k["total_applications"], f"+{k['new_last_7_days']} / 7 ngày", delta_color="off")
+m[1].metric("Ứng viên", k["unique_candidates"], help="Sau khi khử trùng giữa các nguồn")
 m[2].metric("Đang xử lý", k["active"])
-m[3].metric("Đã nhận việc", k["hired"], f"Tỷ lệ tuyển {k['hire_rate_pct']}%", delta_color="off")
-m[4].metric("Thời gian tuyển TB", f"{k['avg_time_to_hire_days'] or '–'} ngày",
-            f"Trung vị {k['median_time_to_hire_days'] or '–'} ngày", delta_color="off")
-m[5].metric("Tỷ lệ nhận offer", f"{k['offer_acceptance_pct'] or '–'}%")
+m[3].metric("Đã nhận việc", k["hired"])
+m[4].metric("Tỷ lệ tuyển", f"{k['hire_rate_pct']}%", help="Số nhận việc / tổng hồ sơ")
+m[5].metric("TG tuyển TB", f"{k['avg_time_to_hire_days'] or '–'} ngày",
+            help=f"Trung vị {k['median_time_to_hire_days'] or '–'} ngày (từ nộp hồ sơ đến nhận việc)")
+m[6].metric("Tỷ lệ nhận offer", f"{k['offer_acceptance_pct'] or '–'}%")
 
 # ---------------------------------------------------------------- Điểm nghẽn
 if data["bottlenecks"]:
@@ -73,7 +72,7 @@ if data["bottlenecks"]:
 # ---------------------------------------------------------------- Phễu + tỷ lệ qua vòng
 st.markdown("### Phễu tuyển dụng")
 fn = pd.DataFrame(data["funnel"])
-left, right = st.columns([1.15, 1])
+left, right = st.columns([1, 1.1])
 with left:
     fig = go.Figure(go.Funnel(
         y=fn.stage_name, x=fn.reached, textinfo="value+percent initial", textposition="inside",
@@ -151,28 +150,34 @@ ui.show_table(src.drop(columns=["source_code"]).rename(columns={
     "reached_tech_pct": "% đến PV chuyên môn", "offers": "Offer", "hires": "Nhận việc", "hire_rate_pct": "% tuyển",
     "avg_time_to_hire_days": "TG tuyển TB (ngày)"}), "Xem bảng hiệu quả nguồn")
 
-# ---------------------------------------------------------------- Lý do rớt + vị trí
-left, right = st.columns([1, 1.2])
-with left:
-    st.markdown("### Lý do loại / rút hồ sơ")
-    cats = data["rejections"]["categories"]
-    if cats:
+# ---------------------------------------------------------------- Lý do rớt
+st.markdown("### Lý do loại / rút hồ sơ")
+cats = data["rejections"]["categories"]
+if cats:
+    left, right = st.columns([1.2, 1])
+    with left:
         st.plotly_chart(ui.hbar([c["label"] for c in cats], [c["share_pct"] for c in cats], "%",
                                 hover=[f"{c['count']} hồ sơ · vòng {', '.join(c['main_stages'])}" for c in cats]),
                         width="stretch", config={"displayModeBar": False})
-        st.caption(f"Phân loại tự động (NLP) {data['rejections']['total']} hồ sơ bị loại/rút hồ sơ.")
-with right:
-    st.markdown("### Pipeline theo vị trí")
-    pos = pd.DataFrame(data["positions"])
-    if not pos.empty:
-        pos["Đang xử lý theo vòng"] = pos.active_by_stage.apply(lambda d: ", ".join(f"{k}: {v}" for k, v in d.items()))
-        pos["fill"] = (pos.hired / pos.headcount * 100).clip(upper=100)
-        st.dataframe(pos[["position", "applications", "active", "hired", "headcount", "fill", "Đang xử lý theo vòng"]],
-                     hide_index=True, width="stretch", column_config={
-                         "position": "Vị trí", "applications": "Hồ sơ", "active": "Đang xử lý",
-                         "hired": "Đã tuyển", "headcount": "Chỉ tiêu",
-                         "fill": st.column_config.ProgressColumn("% chỉ tiêu", format="%.0f%%", min_value=0,
-                                                                 max_value=100)})
+    with right:
+        st.dataframe(pd.DataFrame([{"Nhóm lý do": c["label"], "Số HS": c["count"], "Rút": c["withdrawn"],
+                                    "Vòng chính": ", ".join(c["main_stages"])} for c in cats]),
+                     hide_index=True, width="stretch")
+        st.caption(f"Phân loại tự động (NLP) {data['rejections']['total']} hồ sơ bị loại/rút hồ sơ. "
+                   "Xem nhận định chi tiết ở trang AI phân tích CV → Lý do rớt phổ biến.")
+
+# ---------------------------------------------------------------- Vị trí
+st.markdown("### Pipeline theo vị trí")
+pos = pd.DataFrame(data["positions"])
+if not pos.empty:
+    pos["Đang xử lý theo vòng"] = pos.active_by_stage.apply(lambda d: ", ".join(f"{k}: {v}" for k, v in d.items()))
+    pos["fill"] = (pos.hired / pos.headcount * 100).clip(upper=100)
+    st.dataframe(pos[["position", "department", "applications", "active", "hired", "headcount", "fill",
+                      "Đang xử lý theo vòng"]], hide_index=True, width="stretch", column_config={
+                     "position": "Vị trí", "department": "Phòng ban", "applications": "Hồ sơ",
+                     "active": "Đang xử lý", "hired": "Đã tuyển", "headcount": "Chỉ tiêu",
+                     "fill": st.column_config.ProgressColumn("% chỉ tiêu", format="%.0f%%", min_value=0,
+                                                             max_value=100)})
 
 if data["stuck"]:
     with st.expander(f"⏰ {len(data['stuck'])} hồ sơ đang quá hạn SLA ở vòng hiện tại"):

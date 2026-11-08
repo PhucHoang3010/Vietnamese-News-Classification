@@ -41,7 +41,8 @@ CSS = """
   .tl-muted {color:#898781; font-size:.82rem;}
   div[data-testid="stMetric"] {background: #ffffff; border: 1px solid rgba(11,11,11,.08); border-radius: 10px;
                                padding: .7rem .9rem;}
-  div[data-testid="stMetricValue"] {font-size: 1.6rem;}
+  div[data-testid="stMetricValue"] {font-size: 1.35rem;}
+  div[data-testid="stMetricLabel"] p {font-size: .82rem;}
 </style>
 """
 
@@ -112,7 +113,8 @@ def hbar(labels: list[str], values: list[float], value_suffix: str = "", height:
         hovertext=hover, hovertemplate="%{y}: %{x}" + value_suffix + ("<br>%{hovertext}" if hover else "") +
                                         "<extra></extra>"))
     fig.update_yaxes(autorange="reversed", showgrid=False)
-    fig.update_xaxes(showticklabels=False, showgrid=False)
+    top = max([v for v in values if v is not None] or [1])
+    fig.update_xaxes(showticklabels=False, showgrid=False, range=[0, top * 1.22])
     return style_fig(fig, height or max(220, 46 * len(labels) + 40))
 
 

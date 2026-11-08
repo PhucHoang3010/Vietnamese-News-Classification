@@ -105,7 +105,9 @@ def tfidf_similarity(text_a: str, text_b: str) -> float | None:
 
 
 def _bullets(section: str, limit: int = 3) -> list[str]:
-    lines = [l.strip(" -•*\t") for l in section.splitlines()]
+    raw = [l.strip() for l in section.splitlines()]
+    marked = [l for l in raw if l[:1] in "-•*+"]  # ưu tiên các gạch đầu dòng mô tả thành tích
+    lines = [l.strip(" -•*+\t") for l in (marked or raw)]
     lines = [l for l in lines if 25 <= len(l) <= 220]
     scored = sorted(lines, key=lambda l: (bool(re.search(r"\d", l)), len(l)), reverse=True)
     return scored[:limit]
