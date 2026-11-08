@@ -77,6 +77,7 @@ BEGIN
   xu_ly: BEGIN
     -- B1. Đọc (và khoá) dòng sinh viên
     IF p_co_xu_ly THEN
+      CALL sp_log(v_log, 'LOCK', CONCAT('SELECT ... FOR UPDATE: xin khoá dòng ', p_ma_sv, ' và ', p_ma_lhp));
       SELECT tin_chi_toi_da, no_hoc_phi INTO v_tc_max, v_no_hp
       FROM sinh_vien WHERE ma_sv = p_ma_sv FOR UPDATE;
     ELSE
@@ -97,7 +98,7 @@ BEGIN
       FROM lop_hoc_phan WHERE ma_lhp = p_ma_lhp;
     END IF;
     IF v_khong_thay THEN SET v_kq = 'TU_CHOI', v_tb = 'Không tìm thấy lớp học phần'; LEAVE xu_ly; END IF;
-    CALL sp_log(v_log, 'READ', CONCAT('Đọc ', p_ma_lhp, ': sĩ số ', v_si_so, '/', v_toi_da));
+    CALL sp_log(v_log, 'READ', CONCAT(IF(p_co_xu_ly, 'Được cấp khoá. ', ''), 'Đọc ', p_ma_lhp, ': sĩ số ', v_si_so, '/', v_toi_da));
 
     -- B3. Kiểm tra nghiệp vụ
     SELECT COUNT(*) INTO v_dem FROM dang_ky WHERE ma_sv = p_ma_sv AND ma_lhp = p_ma_lhp;

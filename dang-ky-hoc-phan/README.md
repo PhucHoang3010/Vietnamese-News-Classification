@@ -40,6 +40,12 @@ Mở http://localhost:3000.
 
 ## 2. Trang web
 
+**Trang "Mô phỏng 2 sinh viên"** (`http://localhost:3000/mo-phong.html`, hoặc nút **Mô phỏng 2 sinh viên →** ở đầu trang): gộp cả 4 trường hợp xung đột vào một màn hình để trình bày.
+- Chọn tình huống: **Tranh slot**, **Trùng lịch đồng thời**, **Trùng học phần**, **Đọc dữ liệu chưa COMMIT**. Sinh viên và lớp được điền sẵn, dữ liệu tự đặt lại.
+- Hai khung **Sinh viên A** và **Sinh viên B** đặt cạnh nhau, mỗi khung có nút Đăng kí riêng: mỗi lần bấm là một giao dịch thật trên một kết nối MySQL riêng.
+- Gạt **CÓ / KHÔNG xử lý**, rồi bấm **Cho A và B bấm cùng lúc** (hoặc tự bấm hai nút trong khoảng xử lý chậm).
+- Trang hiện: giao dịch nào đang chờ, kết quả từng bên, dữ liệu đã COMMIT trong MySQL (sĩ số, ai đã vào lớp), kết luận ✅ / ❌ lấy từ view kiểm tra toàn vẹn, lịch thao tác A/B, nguyên nhân và cách sửa kèm SQL.
+
 **Tab "Đăng kí học phần"**: phần chính, xung đột được mô phỏng ngay trên trang này.
 - Khung **Mô phỏng xung đột trên trang này** có công tắc **CÓ xử lý / KHÔNG xử lý** và ô **xử lý chậm** (0, 3, 5 hoặc 8 giây). Nút Đăng kí gọi `sp_dang_ky_mo_phong(ma_sv, ma_lhp, co_xu_ly, tre)`:
   - CÓ xử lý: khoá dòng sinh viên và dòng lớp bằng `SELECT ... FOR UPDATE`;

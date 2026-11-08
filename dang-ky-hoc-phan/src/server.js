@@ -99,5 +99,8 @@ app.post('/api/kich-ban/:id/dat-lai', boc(async (req, res) => {
   res.json({ ok: true });
 }));
 
+// ---------- Trang mô phỏng 2 sinh viên trên một màn hình ----------
+app.use('/api/mo-phong', require('./mo-phong').router);
+
 const PORT = Number(process.env.PORT || 3000);
 app.listen(PORT, () => console.log(`Đăng kí học phần: http://localhost:${PORT}`));

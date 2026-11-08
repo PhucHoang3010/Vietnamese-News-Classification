@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="vi">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mô phỏng xung đột · 2 sinh viên</title>
+  <link rel="stylesheet" href="mo-phong.css">
+</head>
+<body>
+  <header class="top">
+    <div class="wrap top-inner">
+      <div>
+        <h1>Mô phỏng xung đột: 2 sinh viên cùng đăng kí</h1>
+        <p class="sub">Mỗi lần bấm Đăng kí là một giao dịch thật trên MySQL, chạy trên một kết nối riêng</p>
+      </div>
+      <a class="link-ve" href="/">← Trang đăng kí học phần</a>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <nav class="chon" id="chon" aria-label="Chọn tình huống"></nav>
+
+    <section class="card dieu-khien">
+      <p class="mo-ta" id="mo-ta"></p>
+      <div class="hang">
+        <div class="nhom">
+          <span class="nhan-nho">Xử lý đồng thời</span>
+          <div class="seg" role="group" aria-label="Chế độ xử lý">
+            <button type="button" id="cd-co" data-co="1">✅ CÓ xử lý</button>
+            <button type="button" id="cd-khong" data-co="0">⚠ KHÔNG xử lý</button>
+          </div>
+        </div>
+        <label class="nhom" for="tre"><span class="nhan-nho">Xử lý chậm</span>
+          <select id="tre"><option value="1">1 giây</option><option value="2">2 giây</option><option value="3" selected>3 giây</option><option value="5">5 giây</option></select>
+        </label>
+        <label class="nhom" for="lech"><span class="nhan-nho">B bấm sau A</span>
+          <select id="lech"><option value="200">0,2 giây</option><option value="500" selected>0,5 giây</option><option value="1000">1 giây</option></select>
+        </label>
+        <div class="nhom nut-chinh">
+          <button type="button" class="btn lon" id="btn-cung-luc">▶ Cho A và B bấm cùng lúc</button>
+          <button type="button" class="btn phu" id="btn-dat-lai">↺ Đặt lại dữ liệu</button>
+        </div>
+      </div>
+      <p class="goi-y" id="goi-y"></p>
+    </section>
+
+    <section class="hai-sv">
+      <article class="sv" id="sv-A" data-vai="A"></article>
+      <article class="sv" id="sv-B" data-vai="B"></article>
+    </section>
+
+    <section class="card" aria-live="polite">
+      <div class="card-head"><h2>Dữ liệu trong MySQL</h2><span class="muted">chỉ dữ liệu đã COMMIT · tự cập nhật</span></div>
+      <div id="ket-luan"></div>
+      <div class="trang-thai" id="trang-thai"></div>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Lịch thao tác</h2><span class="muted">thời điểm do MySQL ghi bằng SYSDATE(3)</span></div>
+      <div class="bang" id="lich"><p class="trong">Bấm Đăng kí ở A, ở B, hoặc bấm “Cho A và B bấm cùng lúc”.</p></div>
+    </section>
+
+    <section class="card giai-thich">
+      <div><h3 class="h-loi">Vì sao KHÔNG xử lý thì sai</h3><p id="gt-nn"></p><pre class="sql loi" id="gt-sql-loi"></pre></div>
+      <div><h3 class="h-sua">CÓ xử lý sửa thế nào</h3><p id="gt-cs"></p><pre class="sql sua" id="gt-sql-sua"></pre></div>
+    </section>
+  </main>
+
+  <script src="mo-phong.js"></script>
+</body>
+</html>

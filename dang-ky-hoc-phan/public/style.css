@@ -161,3 +161,5 @@ pre.sql.ok { border-left: 4px solid #4ade80; }
 .mp-huong-dan li { margin: 4px 0; }
 .mp-tbl { margin: 6px 0; font-size: 13px; }
 .btn.cho::before { content: ""; display: inline-block; width: 10px; height: 10px; border: 2px solid #fff; border-right-color: transparent; border-radius: 50%; margin-right: 6px; vertical-align: -1px; animation: xoay .8s linear infinite; }
+
+.tab-noi-bat { text-decoration: none; color: #fff; background: #15203a; border-color: #15203a; display: inline-flex; align-items: center; }
