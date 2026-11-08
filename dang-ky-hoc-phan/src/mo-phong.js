@@ -123,15 +123,19 @@ router.get('/trang-thai', boc(async (req, res) => {
   const pool = layPool();
   const dsSv = [...new Set([th.A.ma_sv, th.B.ma_sv])];
   const [lop] = await pool.query(
-    `SELECT l.ma_lhp, m.ten_mh, l.thu, l.tiet_bd, l.tiet_kt, l.si_so_hien_tai, l.si_so_toi_da,
+    `SELECT l.ma_lhp, m.ten_mh, m.so_tin_chi, l.giang_vien, l.phong, l.thu, l.tiet_bd, l.tiet_kt, l.si_so_hien_tai, l.si_so_toi_da,
             (SELECT COUNT(*) FROM dang_ky d WHERE d.ma_lhp = l.ma_lhp) AS thuc_te,
             (SELECT GROUP_CONCAT(d.ma_sv ORDER BY d.ma_sv SEPARATOR ', ') FROM dang_ky d WHERE d.ma_lhp = l.ma_lhp) AS ds
      FROM lop_hoc_phan l JOIN mon_hoc m ON m.ma_mh = l.ma_mh
      WHERE l.ma_lhp IN (?) ORDER BY l.ma_lhp`, [th.lop]);
   const [dangKy] = await pool.query(
-    `SELECT d.ma_sv, d.ma_lhp, d.ma_mh, l.thu, l.tiet_bd, l.tiet_kt
-     FROM dang_ky d JOIN lop_hoc_phan l ON l.ma_lhp = d.ma_lhp
+    `SELECT d.ma_sv, d.ma_lhp, d.ma_mh, m.ten_mh, m.so_tin_chi, l.phong, l.thu, l.tiet_bd, l.tiet_kt
+     FROM dang_ky d JOIN lop_hoc_phan l ON l.ma_lhp = d.ma_lhp JOIN mon_hoc m ON m.ma_mh = d.ma_mh
      WHERE d.ma_sv IN (?) ORDER BY d.ma_sv, l.thu, l.tiet_bd`, [dsSv]);
+  const [sinhVien] = await pool.query(
+    `SELECT s.ma_sv, s.ho_ten, s.lop, s.tin_chi_toi_da, s.no_hoc_phi, IFNULL(SUM(m.so_tin_chi), 0) AS so_tc
+     FROM sinh_vien s LEFT JOIN dang_ky d ON d.ma_sv = s.ma_sv LEFT JOIN mon_hoc m ON m.ma_mh = d.ma_mh
+     WHERE s.ma_sv IN (?) GROUP BY s.ma_sv`, [dsSv]);
   const [viPham] = await pool.query(
     'SELECT loai, doi_tuong, chi_tiet FROM v_kiem_tra_toan_ven WHERE doi_tuong IN (?) ORDER BY loai',
     [[...th.lop, ...dsSv]]);
@@ -143,7 +147,7 @@ router.get('/trang-thai', boc(async (req, res) => {
       loi.push(`${th.B.ma_sv} không vào được lớp dù ${l.ma_lhp} vẫn còn chỗ (${l.si_so_hien_tai}/${l.si_so_toi_da}): bị từ chối oan vì đã đọc dữ liệu chưa COMMIT của A`);
     }
   }
-  res.json({ lop, dangKy, viPham, loi, dung: loi.length === 0 });
+  res.json({ lop, dangKy, sinhVien: sinhVien.map((x) => ({ ...x, so_tc: Number(x.so_tc), no_hoc_phi: !!x.no_hoc_phi })), viPham, loi, dung: loi.length === 0 });
 }));
 
 module.exports = { router, TINH_HUONG };

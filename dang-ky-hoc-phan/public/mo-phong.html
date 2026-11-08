@@ -3,41 +3,49 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Mô phỏng xung đột đăng kí học phần</title>
+  <title>Cổng đăng kí học phần</title>
   <link rel="stylesheet" href="mo-phong.css">
 </head>
 <body>
-  <header class="dau">
-    <div class="wrap dau-trong">
-      <div>
-        <h1>Xung đột dữ liệu khi đăng kí học phần</h1>
-      </div>
-      <a class="link-nho" href="/day-du.html">Trang đăng kí đầy đủ →</a>
+  <header class="site">
+    <div class="wrap site-trong">
+      <div class="logo"><span class="logo-o">ĐK</span><div><p class="logo-ten">Cổng đăng kí học phần</p><p class="logo-phu">Học kì 1 · Năm học 2026 – 2027</p></div></div>
+      <nav class="site-menu"><a href="/" class="dang-o">Đăng kí học phần</a><a href="/day-du.html">Trang đầy đủ</a></nav>
     </div>
   </header>
 
+  <section class="thanh-demo">
+    <div class="wrap thanh-trong">
+      <div class="nhom-demo">
+        <span class="nhan-demo">Tình huống</span>
+        <div class="tinh-huong" id="tinh-huong" role="tablist" aria-label="Chọn tình huống"></div>
+      </div>
+      <div class="nhom-demo">
+        <span class="nhan-demo">Xử lý xung đột</span>
+        <div class="cong-tac" role="group" aria-label="Xử lý xung đột">
+          <button type="button" id="xl-tat" class="tat">Tắt</button>
+          <button type="button" id="xl-bat" class="bat">Bật</button>
+        </div>
+      </div>
+      <div class="nhom-demo nut-demo">
+        <button type="button" class="nut chinh" id="nut-cung-luc">Hai bạn cùng bấm Đăng kí</button>
+        <button type="button" class="nut phu" id="nut-dat-lai">Đặt lại</button>
+      </div>
+    </div>
+  </section>
+
   <main class="wrap">
-    <nav class="tab" id="tab" aria-label="Chọn trường hợp"></nav>
+    <div class="hai-may">
+      <section class="may" id="may-A" data-vai="A"></section>
+      <section class="may" id="may-B" data-vai="B"></section>
+    </div>
 
-    <section class="san-khau">
-      <p class="cau-chuyen" id="cau-chuyen"></p>
-      <div class="ba-cot">
-        <div class="ban" id="ban-A"></div>
-        <div class="giua" id="giua" aria-live="polite"></div>
-        <div class="ban" id="ban-B"></div>
-      </div>
-      <div class="nut-chay">
-        <button type="button" class="chay sai" id="chay-khong">▶ Chạy khi CHƯA xử lý</button>
-        <button type="button" class="chay dung" id="chay-co">▶ Chạy khi ĐÃ xử lý</button>
-      </div>
-    </section>
+    <section class="kiem-tra" id="kiem-tra" aria-live="polite"></section>
 
-    <section class="ket-luan" id="ket-luan" hidden aria-live="polite"></section>
-
-    <section class="o" id="sau-khi-chay" hidden>
-      <h2>Diễn biến</h2>
+    <details class="nhat-ki" id="nhat-ki" hidden>
+      <summary>Nhật kí giao dịch (thời điểm do MySQL ghi)</summary>
       <ol class="chat" id="dien-bien"></ol>
-    </section>
+    </details>
   </main>
 
   <script src="mo-phong.js"></script>
