@@ -344,7 +344,7 @@ class ReportBuilder:
             self.page_break()
         p = self.doc.add_paragraph(style=f"Heading {level}")
         set_run_font(p.add_run(text))
-        if level <= 3:
+        if level <= 2:
             self.toc_entries.append((level, text))
         return p
 
@@ -357,7 +357,7 @@ class ReportBuilder:
         p.paragraph_format.space_after = Pt(0)
         p.add_run().add_break(WD_BREAK.PAGE)
 
-    def figure(self, key, path, caption, width_cm=16.0, max_h_cm=19.5):
+    def figure(self, key, path, caption, width_cm=16.0, max_h_cm=10.5):
         chapter = caption_chapter(caption)
         n = len([f for f in self.figures if f.startswith(f"Hình {chapter}.")]) + 1
         label = f"Hình {chapter}.{n}. {caption.split('|', 1)[-1]}"
@@ -507,7 +507,7 @@ class ReportBuilder:
         p = self.doc.add_paragraph(style="ONho")
         p.alignment = WD_ALIGN_PARAGRAPH.RIGHT
         set_run_font(p.add_run("Trang"), 13, bold=True)
-        self._toc_field(toc, 'TOC \\o "1-3" \\z \\u', lambda lvl: f"TOC {lvl}")
+        self._toc_field(toc, 'TOC \\o "1-2" \\z \\u', lambda lvl: f"TOC {lvl}")
         self.page_break()
         self.heading(1, "DANH MỤC CÁC BẢNG, HÌNH VẼ, ĐỒ THỊ")
         p = self.doc.add_paragraph(style="Heading 4")
