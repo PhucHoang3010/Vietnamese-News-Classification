@@ -77,9 +77,15 @@ Sau khi chạy bản lỗi, quay lại tab 1 và chọn SV của kịch bản đ
 
 ## 3. Thiết kế CSDL
 
-### ERD
+### ERD (mô hình thực thể – kết hợp, ký hiệu Chen)
 
-![ERD CSDL đăng kí học phần](docs/erd.png)
+![ERD kiểu Chen](docs/erd-chen.png)
+
+Chữ nhật là thực thể, elip là thuộc tính (gạch chân là khoá chính), hình thoi là mối kết hợp. Bản vector: [`docs/erd-chen.svg`](docs/erd-chen.svg).
+
+### Lược đồ quan hệ (ký hiệu Crow's Foot)
+
+![Lược đồ quan hệ](docs/erd.png)
 
 Bản vector để chèn vào báo cáo: [`docs/erd.svg`](docs/erd.svg). Muốn có EER diagram do MySQL Workbench tự vẽ thì chạy `db:init` xong vào *Database → Reverse Engineer…* và chọn schema `dkhp`.
 
@@ -242,7 +248,8 @@ src/server.js            web server (Express) + API
 src/kich-ban.js          định nghĩa kịch bản + bộ chạy giao dịch đồng thời
 src/db.js                kết nối MySQL, chạy file .sql (hiểu lệnh DELIMITER)
 public/                  giao diện (HTML/CSS/JS thuần)
-docs/erd.svg, erd.png    ERD
+docs/erd-chen.*          ERD kiểu Chen
+docs/erd.svg, erd.png    lược đồ quan hệ (Crow's Foot)
 test/                    test tự động (node:test)
 ```
 
