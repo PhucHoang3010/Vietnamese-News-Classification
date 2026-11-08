@@ -108,7 +108,7 @@ def _bullets(section: str, limit: int = 3) -> list[str]:
     raw = [l.strip() for l in section.splitlines()]
     marked = [l for l in raw if l[:1] in "-•*+"]  # ưu tiên các gạch đầu dòng mô tả thành tích
     lines = [l.strip(" -•*+\t") for l in (marked or raw)]
-    lines = [l for l in lines if 25 <= len(l) <= 220]
+    lines = [l for l in lines if 25 <= len(l) <= 220 and not re.match(r"(?i)tổng kinh nghiệm|kinh nghiệm\s*:", l)]
     scored = sorted(lines, key=lambda l: (bool(re.search(r"\d", l)), len(l)), reverse=True)
     return scored[:limit]
 

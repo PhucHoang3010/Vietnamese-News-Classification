@@ -1,0 +1,41 @@
+# Chạy toàn bộ hệ thống: docker compose up --build  →  web: http://localhost:8501, API: http://localhost:8000/docs
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: hr_admin
+      POSTGRES_PASSWORD: hr_admin_pw
+      POSTGRES_DB: recruitment_dw
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U hr_admin -d recruitment_dw"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build: .
+    environment:
+      SERVICE: api
+      DATABASE_URL: postgresql+psycopg://hr_admin:hr_admin_pw@db:5432/recruitment_dw
+      JWT_SECRET: ${JWT_SECRET:-doi-chuoi-bi-mat-khi-trien-khai}
+      ANTHROPIC_API_KEY: ${ANTHROPIC_API_KEY:-}
+      SEED_DEMO: "true"
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+
+  web:
+    build: .
+    environment:
+      SERVICE: web
+      API_BASE_URL: http://api:8000
+    ports:
+      - "8501:8501"
+    depends_on:
+      - api
+
+volumes:
+  pgdata:

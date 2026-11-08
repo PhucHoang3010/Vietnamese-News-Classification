@@ -1,0 +1,46 @@
+# Render Blueprint – triển khai 1 CSDL PostgreSQL + 2 dịch vụ web (API, giao diện).
+# Nếu thư mục này nằm trong repo lớn hơn, khi tạo Blueprint hãy chọn đường dẫn
+# "recruitment-ai-warehouse/render.yaml". Xem docs/DEPLOY.md.
+databases:
+  - name: talentlens-db
+    plan: free
+    databaseName: recruitment_dw
+    user: hr_admin
+
+services:
+  - type: web
+    name: talentlens-api
+    runtime: docker
+    plan: free
+    rootDir: recruitment-ai-warehouse
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /api/health
+    envVars:
+      - key: SERVICE
+        value: api
+      - key: DATABASE_URL
+        fromDatabase:
+          name: talentlens-db
+          property: connectionString
+      - key: JWT_SECRET
+        generateValue: true
+      - key: SEED_DEMO
+        value: "true"
+      - key: ANTHROPIC_API_KEY
+        sync: false
+      - key: ADMIN_PASSWORD
+        sync: false
+
+  - type: web
+    name: talentlens-web
+    runtime: docker
+    plan: free
+    rootDir: recruitment-ai-warehouse
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    envVars:
+      - key: SERVICE
+        value: web
+      - key: API_BASE_URL
+        sync: false   # điền URL của talentlens-api, ví dụ https://talentlens-api.onrender.com

@@ -66,8 +66,8 @@ def show_error(exc: Exception) -> None:
         st.exception(exc)
 
 
-def fmt_dt(value: str | None, with_time: bool = False) -> str:
-    if not value:
+def fmt_dt(value, with_time: bool = False) -> str:
+    if not isinstance(value, str) or not value:  # None / NaN (pandas) → "–"
         return "–"
     dt = datetime.fromisoformat(value)
     return dt.strftime("%d/%m/%Y %H:%M" if with_time else "%d/%m/%Y")

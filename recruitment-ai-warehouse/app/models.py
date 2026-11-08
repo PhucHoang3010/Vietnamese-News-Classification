@@ -67,7 +67,7 @@ class Stage(Base):
 class DateDim(Base):
     __tablename__ = "dim_date"
 
-    date_key: Mapped[int] = mapped_column(Integer, primary_key=True)  # YYYYMMDD
+    date_key: Mapped[int] = mapped_column(Integer, primary_key=True, autoincrement=False)  # YYYYMMDD
     full_date: Mapped[date] = mapped_column(Date, unique=True)
     day: Mapped[int] = mapped_column(Integer)
     month: Mapped[int] = mapped_column(Integer)
