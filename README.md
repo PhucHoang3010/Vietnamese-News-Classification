@@ -59,11 +59,11 @@ python train.py          # huấn luyện, sinh outputs/ và model.joblib
 python build_cache.py    # dự đoán sẵn cho toàn bộ bài + hiệu chỉnh conformal -> data/predictions.json, data/conformal.json
 python predict.py "Bộ Giáo dục công bố điểm chuẩn đại học"
 python eval_summary.py   # đo ROUGE của tóm tắt -> outputs/summary_eval.json
-python make_report.py    # sinh BAO_CAO_DO_AN.docx (khổ giấy và bìa theo mẫu của Khoa CNTT, tóm tắt, mục lục, cơ sở lý thuyết, ảnh website, phân công, phụ lục)
+python make_report.py    # sinh BAO_CAO_DO_AN.docx theo khung của Khoa CNTT: bìa, danh mục ký hiệu, mục lục, danh mục bảng/hình, Mở đầu, Chương 1–3, Kết luận, tài liệu tham khảo [n], phụ lục
 ```
 Báo cáo dùng thêm hai loại ảnh tạo sẵn: sơ đồ hệ thống (`python experiments/ve_so_do_he_thong.py` → `outputs/he_thong.png`) và ảnh màn hình website
 (`node tests/e2e/chup_man_hinh.js outputs/man_hinh`, cần Node.js + Playwright, chạy khi website đang chạy với kho bình luận tạm). Số trang trong mục lục lấy từ
-`outputs/toc_pages.json` (tạo bằng `python experiments/tinh_so_trang_muc_luc.py BAO_CAO_DO_AN.pdf` sau khi xuất báo cáo ra PDF); trong Word có thể bấm chuột phải vào mục lục → Cập nhật trường. Ba trang bìa (bìa chính, bìa phụ, danh sách nhóm kèm ô chữ ký cán bộ chấm thi) không có số trang; số trang bắt đầu từ 1 ở trang Tóm tắt. Logo ở `outputs/bia_logo.jpeg`.
+`outputs/toc_pages.json` (tạo bằng `python experiments/tinh_so_trang_muc_luc.py BAO_CAO_DO_AN.pdf` sau khi xuất báo cáo ra PDF); trong Word có thể bấm chuột phải vào mục lục → Cập nhật trường. Ba trang bìa (bìa chính, bìa phụ, danh sách nhóm kèm ô chữ ký cán bộ chấm thi) không có số trang; số trang bắt đầu từ 1 ở trang Danh mục ký hiệu. Logo ở `outputs/bia_logo.jpeg`. Mục lục, Danh mục bảng và Danh mục hình lấy số trang từ `outputs/toc_pages.json` (mục, bảng, hình).
 `build_cache.py` chấm điểm các bài huấn luyện bằng *cross-fitting* 5 lần (mỗi bài được chấm bởi mô hình chưa thấy nó) để có đủ điểm “chưa thấy” cho hiệu chỉnh;
 kết quả lưu ở `data/oof_train.npz` nên các lần chạy sau nhanh. Mã của phương pháp: `conformal.py`; công cụ tìm kiếm: `search_tools.py`.
 

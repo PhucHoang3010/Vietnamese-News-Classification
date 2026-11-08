@@ -8,8 +8,9 @@ Cách dùng (cần pdftotext của poppler):
   2) xuất BAO_CAO_DO_AN.docx ra PDF (Word: Lưu thành PDF; hoặc LibreOffice)
   3) python experiments/tinh_so_trang_muc_luc.py BAO_CAO_DO_AN.pdf
   4) python make_report.py                         sinh lại, lần này mục lục đã có số trang
-Các trang bìa (bìa chính, bìa phụ, danh sách nhóm) không đánh số; số trang bắt đầu từ 1 ở trang "Tóm tắt" (đề mục đầu tiên), nên số trang
-ghi vào mục lục là số in ở chân trang chứ không phải thứ tự trang trong tệp PDF.
+Các trang bìa (bìa chính, bìa phụ, danh sách nhóm) không đánh số; số trang bắt đầu từ 1 ở đề mục đầu tiên (Danh mục các ký hiệu, chữ viết tắt), nên số trang
+ghi vào mục lục là số in ở chân trang chứ không phải thứ tự trang trong tệp PDF. Tập lệnh cũng tính số trang của từng bảng và hình
+(khóa "Bảng n", "Hình n") cho Danh mục bảng, hình vẽ.
 Số trang tính theo PDF, có thể lệch vài trang so với Word nếu phông chữ khác nhau; khi đó hãy cập nhật trường trong Word.
 """
 import json
@@ -24,7 +25,10 @@ ROOT = Path(__file__).resolve().parent.parent
 pdf = Path(sys.argv[1]) if len(sys.argv) > 1 else ROOT / "BAO_CAO_DO_AN.pdf"
 docx = ROOT / "BAO_CAO_DO_AN.docx"
 
-heads = [p.text for p in Document(docx).paragraphs if p.style.name in ("Heading 1", "Heading 2")]
+_doc = Document(docx)
+heads = [p.text for p in _doc.paragraphs if p.style.name in ("Heading 1", "Heading 2")]
+tabs = [p.text.split(".")[0] for p in _doc.paragraphs if p.style.name == "Caption Table"]     # "Bảng 5"
+figs = [p.text.split(".")[0] for p in _doc.paragraphs if p.style.name == "Caption Figure"]    # "Hình 3"
 text = subprocess.run(["pdftotext", "-layout", str(pdf), "-"], capture_output=True, text=True, check=True).stdout
 pages = [[re.sub(r"\s+", " ", ln).strip() for ln in pg.split("\n")] for pg in text.split("\f")]
 if pages and not any(pages[-1]):
@@ -50,5 +54,16 @@ for h in heads:
         first = found                     # trang của đề mục đầu tiên = trang số 1 (các trang bìa phía trước không có số)
     out[h] = found - first + 1
     cur = found
+# chú thích bảng, hình: dòng bắt đầu bằng "Bảng n." / "Hình n." (bỏ qua các dòng của danh mục có dấu chấm dẫn)
+for labels in (tabs, figs):
+    cur = 0
+    for lab in labels:
+        for i in range(cur, len(pages)):
+            if any(ln.startswith(lab + ".") and not is_toc_line(ln) for ln in pages[i]):
+                out[lab] = i - first + 1
+                cur = i
+                break
+        else:
+            print("không tìm thấy chú thích:", lab)
 (ROOT / "outputs" / "toc_pages.json").write_text(json.dumps(out, ensure_ascii=False, indent=1), encoding="utf-8")
-print(f"đã ghi {len(out)}/{len(heads)} đề mục vào outputs/toc_pages.json; tổng {len(pages)} trang")
+print(f"đã ghi {len(out)} mục (đề mục {len(heads)}, bảng {len(tabs)}, hình {len(figs)}) vào outputs/toc_pages.json; tổng {len(pages)} trang")
