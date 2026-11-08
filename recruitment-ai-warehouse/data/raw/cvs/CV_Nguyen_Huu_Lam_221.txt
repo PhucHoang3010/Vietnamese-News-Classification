@@ -1,0 +1,32 @@
+NGUYỄN HỮU LÂM
+Data Analyst
+
+Ngày sinh: 11/12/1992 | Giới tính: Nam
+Điện thoại: 0349 710 750 | Email: lam.nguyen92@gmail.com
+Địa chỉ: Cầu Giấy, TP. Hồ Chí Minh
+
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Chuyên viên Phân tích dữ liệu (Data Analyst), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 5 năm
+Công ty TNHH Dược phẩm Thiên Ân (2025/02 – nay) – Data Analyst
+- Tự động hoá báo cáo Excel bằng Pivot Table và VBA cho phòng kinh doanh
+- Xây dựng 5 dashboard Power BI theo dõi doanh thu và tồn kho cho ban giám đốc
+Công ty TNHH Minh Phát (2024/12 – 2025) – Data Analyst
+- Viết truy vấn SQL tổng hợp dữ liệu bán hàng, giảm 25% thời gian lập báo cáo tuần
+- Thiết kế báo cáo A/B testing chiến dịch khuyến mãi, kiểm định thống kê kết quả
+Công ty CP Thương mại điện tử VietShop (2023/05 – 2024) – Data Analyst
+- Xây dựng 4 dashboard Power BI theo dõi doanh thu và tồn kho cho ban giám đốc
+- Làm sạch và phân tích dữ liệu khách hàng bằng Python (Pandas), phân khúc 8 nhóm khách hàng
+
+HỌC VẤN
+ĐH Sư phạm Kỹ thuật TP.HCM – Cao đẳng Khoa học dữ liệu (2010 – 2014)
+
+KỸ NĂNG
+- Python, Power BI, Excel nâng cao, Thống kê, Pandas, Giao tiếp
+- Giải quyết vấn đề, Làm việc nhóm
+
+CHỨNG CHỈ
+- Google Data Analytics Certificate

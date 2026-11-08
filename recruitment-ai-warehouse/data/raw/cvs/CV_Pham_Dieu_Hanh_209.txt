@@ -1,0 +1,26 @@
+PHẠM DIỆU HẠNH
+UI Developer
+
+Ngày sinh: 05/07/2003 | Giới tính: Nữ
+Điện thoại: 0944 646 240 | Email: hanh.pham03@yahoo.com
+Địa chỉ: Cầu Giấy, Hà Nội
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Frontend (ReactJS), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 0.5 năm
+Công ty TNHH Minh Phát (2025/10 – nay) – UI Developer
+- Tối ưu hiệu năng trang chủ, tăng điểm Lighthouse lên 58
+- Phát triển website thương mại điện tử bằng Next.js
+
+HỌC VẤN
+ĐH Cần Thơ – Đại học Thiết kế đa phương tiện (2021 – 2025)
+
+KỸ NĂNG
+- JavaScript, ReactJS, Git, UI/UX
+- Làm việc nhóm, Quản lý thời gian
+
+CHỨNG CHỈ
+- Meta Front-End Developer Certificate

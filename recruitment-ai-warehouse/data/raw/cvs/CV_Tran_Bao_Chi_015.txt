@@ -1,0 +1,29 @@
+TRẦN BẢO CHI
+Backend Developer
+
+Ngày sinh: 28/10/1999 | Giới tính: Nữ
+Điện thoại: 0581 953 918 | Email: chi.tran99@hotmail.com
+Địa chỉ: Thủ Đức, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Backend (Python), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 3 năm
+FinViet JSC (2025/06 – nay) – Backend Developer
+- Phát triển RESTful API bằng FastAPI phục vụ 2 nghìn request/ngày
+- Viết unit test đạt độ phủ 30% và thiết lập CI/CD với GitHub Actions
+Công ty TNHH Minh Phát (2024/08 – 2025) – Backend Developer
+- Tích hợp Redis cache và hàng đợi xử lý bất đồng bộ
+- Phát triển RESTful API bằng FastAPI phục vụ 3 nghìn request/ngày
+
+HỌC VẤN
+ĐH Bách khoa Hà Nội – Đại học Khoa học máy tính (2017 – 2021)
+
+KỸ NĂNG
+- Python, FastAPI, PostgreSQL, REST API, Git, Docker
+- Giải quyết vấn đề, Quản lý thời gian
+
+CHỨNG CHỈ
+- TOEIC 700

@@ -1,0 +1,32 @@
+TRẦN THÀNH TÙNG
+Machine Learning Engineer
+
+Ngày sinh: 04/04/1992 | Giới tính: Nam
+Điện thoại: 0749 912 955 | Email: tung.tran92@outlook.com
+Địa chỉ: Quận 3, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư AI/Machine Learning, ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 5 năm
+Công ty TNHH Logistics Hải Âu (2025/07 – nay) – Machine Learning Engineer
+- Triển khai mô hình Machine Learning dự báo nhu cầu, giảm 56% sai số
+- Thiết lập quy trình MLOps với MLflow và Docker
+Ngân hàng TMCP Phương Nam (giả lập) (2024/08 – 2025) – Machine Learning Engineer
+- Thiết lập quy trình MLOps với MLflow và Docker
+- Triển khai mô hình Machine Learning dự báo nhu cầu, giảm 46% sai số
+Công ty CP Bán lẻ An Khang Mart (2023/02 – 2024) – Machine Learning Engineer
+- Thiết lập quy trình MLOps với MLflow và Docker
+- Xây dựng chatbot RAG tích hợp LLM phục vụ 5 nghìn người dùng
+
+HỌC VẤN
+ĐH Tôn Đức Thắng – Đại học Khoa học máy tính (2010 – 2014)
+
+KỸ NĂNG
+- Python, Machine Learning, NLP, PyTorch, TensorFlow
+- Giao tiếp, Làm việc nhóm
+
+CHỨNG CHỈ
+- Bài báo hội nghị RIVF

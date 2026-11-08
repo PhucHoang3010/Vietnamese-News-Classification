@@ -1,0 +1,29 @@
+NGUYỄN KIM TIÊN
+Chuyên viên báo cáo
+
+Ngày sinh: 03/01/1989 | Giới tính: Nữ
+Điện thoại: 0326 627 973 | Email: tien.nguyen89@gmail.com
+Địa chỉ: Quận 7, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Chuyên viên Phân tích dữ liệu (Data Analyst), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 4.5 năm
+Công ty TNHH Phần mềm Đông Á (2024/08 – nay) – Chuyên viên báo cáo
+- Xây dựng 4 dashboard Power BI theo dõi doanh thu và tồn kho cho ban giám đốc
+- Làm sạch và phân tích dữ liệu khách hàng bằng Python (Pandas), phân khúc 5 nhóm khách hàng
+GreenData Solutions (2022/09 – 2024) – Chuyên viên báo cáo
+- Thiết kế báo cáo A/B testing chiến dịch khuyến mãi, kiểm định thống kê kết quả
+- Làm sạch và phân tích dữ liệu khách hàng bằng Python (Pandas), phân khúc 2 nhóm khách hàng
+
+HỌC VẤN
+ĐH Bách khoa – ĐHQG TP.HCM – Đại học Thống kê (2007 – 2011)
+
+KỸ NĂNG
+- SQL, Python, Power BI, Thống kê, Pandas
+- Giải quyết vấn đề, Thuyết trình
+
+CHỨNG CHỈ
+- Microsoft PL-300 (Power BI)

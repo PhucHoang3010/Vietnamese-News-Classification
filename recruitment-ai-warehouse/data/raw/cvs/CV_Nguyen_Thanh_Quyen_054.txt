@@ -1,0 +1,29 @@
+NGUYỄN THANH QUYÊN
+Business Analyst
+
+Ngày sinh: 26/12/1994 | Giới tính: Nữ
+Điện thoại: 0954 620 554 | Email: quyen.nguyen94@gmail.com
+Địa chỉ: Quận 7, Hà Nội
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Chuyên viên Phân tích dữ liệu (Data Analyst), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 2.5 năm
+FinViet JSC (2025/12 – nay) – Business Analyst
+- Tự động hoá báo cáo Excel bằng Pivot Table và VBA cho phòng kinh doanh
+- Xây dựng 5 dashboard Power BI theo dõi doanh thu và tồn kho cho ban giám đốc
+GreenData Solutions (2024/04 – 2025) – Business Analyst
+- Tự động hoá báo cáo Excel bằng Pivot Table và VBA cho phòng kinh doanh
+- Viết truy vấn SQL tổng hợp dữ liệu bán hàng, giảm 16% thời gian lập báo cáo tuần
+
+HỌC VẤN
+ĐH Cần Thơ – Đại học Khoa học dữ liệu (2012 – 2016)
+
+KỸ NĂNG
+- Python, Power BI, Excel nâng cao, Thống kê, Pandas, Giao tiếp
+- Làm việc nhóm, Quản lý thời gian
+
+CHỨNG CHỈ
+- TOEIC 750

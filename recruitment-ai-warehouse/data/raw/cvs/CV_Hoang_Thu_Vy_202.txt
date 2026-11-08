@@ -1,0 +1,26 @@
+HOÀNG THU VY
+Backend Developer
+
+Ngày sinh: 20/12/2002 | Giới tính: Nữ
+Điện thoại: 0721 691 146 | Email: vy.hoang02@gmail.com
+Địa chỉ: Hải Châu, Đà Nẵng
+
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Backend (Python), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 1.5 năm
+FinViet JSC (2025/02 – nay) – Backend Developer
+- Viết unit test đạt độ phủ 20% và thiết lập CI/CD với GitHub Actions
+- Phát triển RESTful API bằng FastAPI phục vụ 9 nghìn request/ngày
+
+HỌC VẤN
+ĐH Ngoại thương – Đại học Công nghệ thông tin (2020 – 2024)
+
+KỸ NĂNG
+- Django, PostgreSQL, REST API, Git, Docker
+- Giải quyết vấn đề, Thuyết trình
+
+CHỨNG CHỈ
+- TOEIC 700

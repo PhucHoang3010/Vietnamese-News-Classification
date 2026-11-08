@@ -1,0 +1,26 @@
+HỒ THÀNH TUẤN
+Python Developer
+
+Ngày sinh: 02/09/1990 | Giới tính: Nam
+Điện thoại: 0592 446 578 | Email: tuan.ho90@gmail.com
+Địa chỉ: Cầu Giấy, Đồng Nai
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Backend (Python), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 1.5 năm
+Công ty TNHH Logistics Hải Âu (2025/06 – nay) – Python Developer
+- Phát triển RESTful API bằng FastAPI phục vụ 8 nghìn request/ngày
+- Viết unit test đạt độ phủ 56% và thiết lập CI/CD với GitHub Actions
+
+HỌC VẤN
+ĐH Đà Nẵng – Đại học Công nghệ thông tin (2008 – 2012)
+
+KỸ NĂNG
+- Python, FastAPI, Redis
+- Giải quyết vấn đề, Giao tiếp
+
+CHỨNG CHỈ
+- Chứng chỉ Python PCAP

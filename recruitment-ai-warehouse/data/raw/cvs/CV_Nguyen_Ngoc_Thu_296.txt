@@ -1,0 +1,26 @@
+NGUYỄN NGỌC THƯ
+Frontend Developer
+
+Ngày sinh: 28/11/1999 | Giới tính: Nữ
+Điện thoại: 0723 299 580 | Email: thu.nguyen99@outlook.com
+Địa chỉ: Quận 3, Đà Nẵng
+
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Frontend (ReactJS), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 1 năm
+FinViet JSC (2025/07 – nay) – Frontend Developer
+- Tối ưu hiệu năng trang chủ, tăng điểm Lighthouse lên 54
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+
+HỌC VẤN
+ĐH Công nghệ Thông tin – ĐHQG TP.HCM – Đại học Kỹ thuật phần mềm (2017 – 2021)
+
+KỸ NĂNG
+- TypeScript, ReactJS, HTML/CSS, Git, Next.js, UI/UX, Vue.js
+- Làm việc nhóm, Quản lý thời gian
+
+CHỨNG CHỈ
+- Meta Front-End Developer Certificate

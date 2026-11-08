@@ -1,0 +1,29 @@
+NGÔ THỊ NHI
+QA Engineer
+
+Ngày sinh: 21/06/1996 | Giới tính: Nữ
+Điện thoại: 0547 636 683 | Email: nhi.ngo96@gmail.com
+Địa chỉ: Quận 7, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư Kiểm thử phần mềm (QA/Tester), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 2 năm
+Công ty CP Công nghệ Sao Việt (2025/06 – nay) – QA Engineer
+- Xây dựng bộ automation test bằng Selenium, giảm 37% thời gian regression
+- Kiểm thử thủ công (manual testing) các luồng thanh toán
+Công ty TNHH Phần mềm Đông Á (2024/05 – 2025) – QA Engineer
+- Viết và thực thi hơn 90 test case cho ứng dụng ngân hàng di động
+- Kiểm thử API bằng Postman và quản lý lỗi trên Jira
+
+HỌC VẤN
+ĐH Bách khoa Hà Nội – Đại học Công nghệ thông tin (2014 – 2018)
+
+KỸ NĂNG
+- Kiểm thử thủ công (manual testing), Viết test case, SQL, Automation test, Selenium, Postman, Jira
+- Thuyết trình, Làm việc nhóm
+
+CHỨNG CHỈ
+- ISTQB Foundation Level

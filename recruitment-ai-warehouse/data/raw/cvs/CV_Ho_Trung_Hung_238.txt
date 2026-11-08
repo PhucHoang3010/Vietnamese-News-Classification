@@ -1,0 +1,29 @@
+HỒ TRUNG HƯNG
+ETL Developer
+
+Ngày sinh: 01/03/1998 | Giới tính: Nam
+Điện thoại: 0395 738 995 | Email: hung.ho98@gmail.com
+Địa chỉ: Quận 3, TP. Hồ Chí Minh
+
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư Dữ liệu (Data Engineer), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 2 năm
+Công ty CP Truyền thông Mặt Trời (2025/07 – nay) – ETL Developer
+- Tối ưu job Spark giúp giảm 34% thời gian xử lý dữ liệu log
+- Thiết kế kho dữ liệu lược đồ hình sao phục vụ 3 dashboard báo cáo
+GreenData Solutions (2024/09 – 2025) – ETL Developer
+- Tối ưu job Spark giúp giảm 19% thời gian xử lý dữ liệu log
+- Đóng gói pipeline bằng Docker, triển khai trên AWS (S3, EC2)
+
+HỌC VẤN
+ĐH Sư phạm Kỹ thuật TP.HCM – Cao đẳng Kỹ thuật phần mềm (2016 – 2020)
+
+KỸ NĂNG
+- Python, SQL, Airflow, Spark, Docker, AWS
+- Thuyết trình, Giải quyết vấn đề
+
+CHỨNG CHỈ
+- Google Cloud Data Engineer

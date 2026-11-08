@@ -1,0 +1,29 @@
+NGÔ MAI UYÊN
+Data Analyst
+
+Ngày sinh: 19/08/1994 | Giới tính: Nữ
+Điện thoại: 0510 331 905 | Email: uyen.ngo94@hotmail.com
+Địa chỉ: Bình Thạnh, Hà Nội
+
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Chuyên viên Phân tích dữ liệu (Data Analyst), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 4 năm
+Công ty TNHH Phần mềm Đông Á (2024/08 – nay) – Data Analyst
+- Làm sạch và phân tích dữ liệu khách hàng bằng Python (Pandas), phân khúc 2 nhóm khách hàng
+- Tự động hoá báo cáo Excel bằng Pivot Table và VBA cho phòng kinh doanh
+Công ty TNHH Logistics Hải Âu (2022/08 – 2024) – Data Analyst
+- Xây dựng 5 dashboard Power BI theo dõi doanh thu và tồn kho cho ban giám đốc
+- Tự động hoá báo cáo Excel bằng Pivot Table và VBA cho phòng kinh doanh
+
+HỌC VẤN
+ĐH Đà Nẵng – Đại học Hệ thống thông tin quản lý (2012 – 2016)
+
+KỸ NĂNG
+- SQL, Python, Excel nâng cao, Thống kê, Tableau, Looker Studio, Giao tiếp, Thuyết trình
+- Giao tiếp, Giải quyết vấn đề
+
+CHỨNG CHỈ
+- Microsoft PL-300 (Power BI)

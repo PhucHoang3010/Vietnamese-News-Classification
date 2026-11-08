@@ -1,0 +1,29 @@
+NGUYỄN TRUNG ĐẠT
+Software Engineer
+
+Ngày sinh: 01/10/1998 | Giới tính: Nam
+Điện thoại: 0576 256 173 | Email: dat.nguyen98@gmail.com
+Địa chỉ: Thủ Đức, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Backend (Python), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 4 năm
+Công ty TNHH Dược phẩm Thiên Ân (2024/05 – nay) – Software Engineer
+- Tích hợp Redis cache và hàng đợi xử lý bất đồng bộ
+- Thiết kế CSDL PostgreSQL và tối ưu truy vấn giảm 21% thời gian phản hồi
+Công ty CP Bán lẻ An Khang Mart (2022/08 – 2024) – Software Engineer
+- Phát triển RESTful API bằng FastAPI phục vụ 5 nghìn request/ngày
+- Viết unit test đạt độ phủ 33% và thiết lập CI/CD với GitHub Actions
+
+HỌC VẤN
+ĐH Bách khoa Hà Nội – Đại học Công nghệ thông tin (2016 – 2020)
+
+KỸ NĂNG
+- Python, FastAPI, Django, PostgreSQL, REST API, Git, Docker, Redis, MySQL
+- Thuyết trình, Quản lý thời gian
+
+CHỨNG CHỈ
+- Chứng chỉ Python PCAP

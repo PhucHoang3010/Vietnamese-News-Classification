@@ -1,0 +1,32 @@
+LÊ KIM KHÁNH
+Backend Developer
+
+Ngày sinh: 17/02/1992 | Giới tính: Nữ
+Điện thoại: 0901 250 299 | Email: khanh.le92@outlook.com
+Địa chỉ: Cầu Giấy, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư Dữ liệu (Data Engineer), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 5 năm
+Công ty CP Bán lẻ An Khang Mart (2025/06 – nay) – Backend Developer
+- Thiết kế kho dữ liệu lược đồ hình sao phục vụ 3 dashboard báo cáo
+- Đóng gói pipeline bằng Docker, triển khai trên AWS (S3, EC2)
+Công ty CP Bán lẻ An Khang Mart (2024/04 – 2025) – Backend Developer
+- Tối ưu job Spark giúp giảm 15% thời gian xử lý dữ liệu log
+- Thiết kế kho dữ liệu lược đồ hình sao phục vụ 3 dashboard báo cáo
+Ngân hàng TMCP Phương Nam (giả lập) (2023/12 – 2024) – Backend Developer
+- Xây dựng pipeline ETL bằng Python và Airflow nạp 6 triệu bản ghi/ngày vào PostgreSQL
+- Thiết kế kho dữ liệu lược đồ hình sao phục vụ 7 dashboard báo cáo
+
+HỌC VẤN
+ĐH Bách khoa Hà Nội – Đại học Hệ thống thông tin (2010 – 2014)
+
+KỸ NĂNG
+- Python, ETL, PostgreSQL, Airflow, Spark, AWS
+- Giao tiếp, Quản lý thời gian
+
+CHỨNG CHỈ
+- IELTS 6.0

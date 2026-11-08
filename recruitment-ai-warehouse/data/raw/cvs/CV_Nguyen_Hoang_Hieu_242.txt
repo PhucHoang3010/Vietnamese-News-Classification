@@ -1,0 +1,29 @@
+NGUYỄN HOÀNG HIẾU
+QA Engineer
+
+Ngày sinh: 01/09/1995 | Giới tính: Nam
+Điện thoại: 0589 578 150 | Email: hieu.nguyen95@hotmail.com
+Địa chỉ: Bình Thạnh, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư Kiểm thử phần mềm (QA/Tester), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 4.5 năm
+Công ty TNHH Phần mềm Đông Á (2024/02 – nay) – QA Engineer
+- Viết và thực thi hơn 80 test case cho ứng dụng ngân hàng di động
+- Xây dựng bộ automation test bằng Selenium, giảm 51% thời gian regression
+Công ty TNHH Logistics Hải Âu (2022/04 – 2024) – QA Engineer
+- Kiểm thử API bằng Postman và quản lý lỗi trên Jira
+- Kiểm thử thủ công (manual testing) các luồng thanh toán
+
+HỌC VẤN
+ĐH Khoa học Tự nhiên – ĐHQG TP.HCM – Đại học Hệ thống thông tin (2013 – 2017)
+
+KỸ NĂNG
+- Kiểm thử thủ công (manual testing), SQL, Automation test, Selenium, Postman
+- Thuyết trình, Giải quyết vấn đề
+
+CHỨNG CHỈ
+- ISTQB Foundation Level

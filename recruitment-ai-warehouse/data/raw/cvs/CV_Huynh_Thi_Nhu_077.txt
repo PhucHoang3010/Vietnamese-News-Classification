@@ -1,0 +1,32 @@
+HUỲNH THỊ NHƯ
+Web Developer
+
+Ngày sinh: 22/08/1991 | Giới tính: Nữ
+Điện thoại: 0711 577 631 | Email: nhu.huynh91@yahoo.com
+Địa chỉ: Bình Thạnh, Đồng Nai
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Frontend (ReactJS), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 5.5 năm
+FinViet JSC (2025/11 – nay) – Web Developer
+- Xây dựng giao diện quản trị bằng ReactJS và TypeScript cho 3 module
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+FinViet JSC (2024/03 – 2025) – Web Developer
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+- Tối ưu hiệu năng trang chủ, tăng điểm Lighthouse lên 38
+Công ty TNHH Phần mềm Đông Á (2023/02 – 2024) – Web Developer
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+- Xây dựng giao diện quản trị bằng ReactJS và TypeScript cho 6 module
+
+HỌC VẤN
+ĐH Công nghệ Thông tin – ĐHQG TP.HCM – Đại học Thiết kế đa phương tiện (2009 – 2013)
+
+KỸ NĂNG
+- JavaScript, TypeScript, HTML/CSS, Vue.js
+- Giải quyết vấn đề, Làm việc nhóm
+
+CHỨNG CHỈ
+- Meta Front-End Developer Certificate

@@ -1,0 +1,29 @@
+NGÔ THANH LINH
+Web Developer
+
+Ngày sinh: 08/01/1993 | Giới tính: Nữ
+Điện thoại: 0538 589 775 | Email: linh.ngo93@gmail.com
+Địa chỉ: Quận 7, TP. Hồ Chí Minh
+
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Frontend (ReactJS), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 4 năm
+Công ty TNHH Phần mềm Đông Á (2024/08 – nay) – Web Developer
+- Tối ưu hiệu năng trang chủ, tăng điểm Lighthouse lên 21
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+Công ty CP Bán lẻ An Khang Mart (2022/04 – 2024) – Web Developer
+- Xây dựng giao diện quản trị bằng ReactJS và TypeScript cho 9 module
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+
+HỌC VẤN
+ĐH Sư phạm Kỹ thuật TP.HCM – Đại học Kỹ thuật phần mềm (2011 – 2015)
+
+KỸ NĂNG
+- JavaScript, ReactJS, HTML/CSS, Git, Next.js, UI/UX
+- Giao tiếp, Quản lý thời gian
+
+CHỨNG CHỈ
+- TOEIC 650

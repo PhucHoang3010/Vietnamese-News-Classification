@@ -1,0 +1,32 @@
+LÊ THÀNH BÌNH
+Chuyên viên báo cáo
+
+Ngày sinh: 10/10/2002 | Giới tính: Nam
+Điện thoại: 0907 911 357 | Email: binh.le02@gmail.com
+Địa chỉ: Thủ Đức, Đà Nẵng
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Chuyên viên Phân tích dữ liệu (Data Analyst), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 6 năm
+Công ty TNHH Phần mềm Đông Á (2024/12 – nay) – Chuyên viên báo cáo
+- Thiết kế báo cáo A/B testing chiến dịch khuyến mãi, kiểm định thống kê kết quả
+- Xây dựng 9 dashboard Power BI theo dõi doanh thu và tồn kho cho ban giám đốc
+Công ty CP Thương mại điện tử VietShop (2022/10 – 2024) – Chuyên viên báo cáo
+- Tự động hoá báo cáo Excel bằng Pivot Table và VBA cho phòng kinh doanh
+- Làm sạch và phân tích dữ liệu khách hàng bằng Python (Pandas), phân khúc 3 nhóm khách hàng
+Công ty TNHH Logistics Hải Âu (2020/07 – 2022) – Chuyên viên báo cáo
+- Làm sạch và phân tích dữ liệu khách hàng bằng Python (Pandas), phân khúc 7 nhóm khách hàng
+- Viết truy vấn SQL tổng hợp dữ liệu bán hàng, giảm 48% thời gian lập báo cáo tuần
+
+HỌC VẤN
+ĐH Bách khoa Hà Nội – Đại học Thống kê (2020 – 2024)
+
+KỸ NĂNG
+- Python, Power BI, Thống kê
+- Thuyết trình, Quản lý thời gian
+
+CHỨNG CHỈ
+- Microsoft PL-300 (Power BI)

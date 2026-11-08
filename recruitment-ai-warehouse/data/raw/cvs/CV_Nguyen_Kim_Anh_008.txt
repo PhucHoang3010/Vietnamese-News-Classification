@@ -1,0 +1,26 @@
+NGUYỄN KIM ANH
+Data Scientist
+
+Ngày sinh: 12/07/2003 | Giới tính: Nữ
+Điện thoại: 0580 258 220 | Email: anh.nguyen03@hotmail.com
+Địa chỉ: Thủ Đức, Cần Thơ
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư AI/Machine Learning, ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 1 năm
+Công ty TNHH Logistics Hải Âu (2025/06 – nay) – Data Scientist
+- Huấn luyện mô hình phân loại văn bản tiếng Việt (NLP) bằng PyTorch đạt F1 34%
+- Thiết lập quy trình MLOps với MLflow và Docker
+
+HỌC VẤN
+ĐH FPT – Đại học Trí tuệ nhân tạo (2021 – 2025)
+
+KỸ NĂNG
+- Machine Learning, Deep Learning, NLP, PyTorch, TensorFlow, LLM, MLOps
+- Làm việc nhóm, Thuyết trình
+
+CHỨNG CHỈ
+- Bài báo hội nghị RIVF

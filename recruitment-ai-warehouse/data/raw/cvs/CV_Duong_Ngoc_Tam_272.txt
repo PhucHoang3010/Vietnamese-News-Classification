@@ -1,0 +1,26 @@
+DƯƠNG NGỌC TÂM
+Frontend Developer
+
+Ngày sinh: 07/06/2003 | Giới tính: Nữ
+Điện thoại: 0723 880 078 | Email: tam.duong03@yahoo.com
+Địa chỉ: Cầu Giấy, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Frontend (ReactJS), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 1 năm
+Ngân hàng TMCP Phương Nam (giả lập) (2025/07 – nay) – Frontend Developer
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+- Phát triển website thương mại điện tử bằng Next.js
+
+HỌC VẤN
+ĐH Bách khoa – ĐHQG TP.HCM – Đại học Kỹ thuật phần mềm (2021 – 2025)
+
+KỸ NĂNG
+- JavaScript, TypeScript, ReactJS, HTML/CSS, Git, Next.js, Vue.js
+- Giao tiếp, Thuyết trình
+
+CHỨNG CHỈ
+- TOEIC 650

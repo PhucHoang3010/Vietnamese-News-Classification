@@ -1,0 +1,29 @@
+ĐINH MINH TRÂM
+Data Engineer
+
+Ngày sinh: 26/05/1998 | Giới tính: Nữ
+Điện thoại: 0908 719 515 | Email: tram.dinh98@gmail.com
+Địa chỉ: Thủ Đức, Hà Nội
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư Dữ liệu (Data Engineer), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 4 năm
+Công ty TNHH Phần mềm Đông Á (2024/03 – nay) – Data Engineer
+- Xây dựng pipeline ETL bằng Python và Airflow nạp 9 triệu bản ghi/ngày vào PostgreSQL
+- Thiết kế kho dữ liệu lược đồ hình sao phục vụ 2 dashboard báo cáo
+Công ty TNHH Dược phẩm Thiên Ân (2022/03 – 2024) – Data Engineer
+- Đóng gói pipeline bằng Docker, triển khai trên AWS (S3, EC2)
+- Thiết kế kho dữ liệu lược đồ hình sao phục vụ 4 dashboard báo cáo
+
+HỌC VẤN
+ĐH Bách khoa – ĐHQG TP.HCM – Đại học Khoa học máy tính (2016 – 2020)
+
+KỸ NĂNG
+- Python, SQL, ETL, PostgreSQL, AWS, Kafka, Git
+- Làm việc nhóm, Thuyết trình
+
+CHỨNG CHỈ
+- Google Cloud Data Engineer

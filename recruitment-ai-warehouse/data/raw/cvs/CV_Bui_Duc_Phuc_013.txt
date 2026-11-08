@@ -1,0 +1,32 @@
+BÙI ĐỨC PHÚC
+ETL Developer
+
+Ngày sinh: 23/06/1990 | Giới tính: Nam
+Điện thoại: 0323 636 082 | Email: phuc.bui90@gmail.com
+Địa chỉ: Thủ Đức, Hà Nội
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư Dữ liệu (Data Engineer), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 7 năm
+GreenData Solutions (2024/07 – nay) – ETL Developer
+- Tối ưu job Spark giúp giảm 47% thời gian xử lý dữ liệu log
+- Thiết kế kho dữ liệu lược đồ hình sao phục vụ 3 dashboard báo cáo
+EduSmart JSC (2022/01 – 2024) – ETL Developer
+- Thiết kế kho dữ liệu lược đồ hình sao phục vụ 5 dashboard báo cáo
+- Đóng gói pipeline bằng Docker, triển khai trên AWS (S3, EC2)
+Công ty CP Truyền thông Mặt Trời (2020/01 – 2022) – ETL Developer
+- Đóng gói pipeline bằng Docker, triển khai trên AWS (S3, EC2)
+- Tối ưu job Spark giúp giảm 31% thời gian xử lý dữ liệu log
+
+HỌC VẤN
+ĐH FPT – Đại học Hệ thống thông tin (2008 – 2012)
+
+KỸ NĂNG
+- SQL, ETL, PostgreSQL, Airflow, Kafka
+- Giao tiếp, Giải quyết vấn đề
+
+CHỨNG CHỈ
+- AWS Certified Data Engineer – Associate

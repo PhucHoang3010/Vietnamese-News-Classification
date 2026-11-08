@@ -1,0 +1,32 @@
+NGÔ NHẬT PHÚC
+Frontend Developer
+
+Ngày sinh: 07/02/1991 | Giới tính: Nam
+Điện thoại: 0559 617 394 | Email: phuc.ngo91@gmail.com
+Địa chỉ: Quận 3, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Frontend (ReactJS), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 6.5 năm
+GreenData Solutions (2024/06 – nay) – Frontend Developer
+- Phát triển website thương mại điện tử bằng Next.js
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+EduSmart JSC (2022/04 – 2024) – Frontend Developer
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+- Tối ưu hiệu năng trang chủ, tăng điểm Lighthouse lên 15
+Công ty TNHH Minh Phát (2020/02 – 2022) – Frontend Developer
+- Xây dựng giao diện quản trị bằng ReactJS và TypeScript cho 5 module
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+
+HỌC VẤN
+ĐH FPT – Đại học Công nghệ thông tin (2009 – 2013)
+
+KỸ NĂNG
+- JavaScript, TypeScript, ReactJS, HTML/CSS, Git, Next.js, UI/UX
+- Làm việc nhóm, Giao tiếp
+
+CHỨNG CHỈ
+- Meta Front-End Developer Certificate

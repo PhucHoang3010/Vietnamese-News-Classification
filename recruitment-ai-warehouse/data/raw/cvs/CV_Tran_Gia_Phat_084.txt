@@ -1,0 +1,32 @@
+TRẦN GIA PHÁT
+Business Analyst
+
+Ngày sinh: 22/01/1996 | Giới tính: Nam
+Điện thoại: 0747 633 558 | Email: phat.tran96@gmail.com
+Địa chỉ: Hải Châu, Hà Nội
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Chuyên viên Phân tích dữ liệu (Data Analyst), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 5.5 năm
+TechNova Việt Nam (2025/12 – nay) – Business Analyst
+- Thiết kế báo cáo A/B testing chiến dịch khuyến mãi, kiểm định thống kê kết quả
+- Tự động hoá báo cáo Excel bằng Pivot Table và VBA cho phòng kinh doanh
+Công ty TNHH Logistics Hải Âu (2024/11 – 2025) – Business Analyst
+- Tự động hoá báo cáo Excel bằng Pivot Table và VBA cho phòng kinh doanh
+- Làm sạch và phân tích dữ liệu khách hàng bằng Python (Pandas), phân khúc 2 nhóm khách hàng
+Công ty TNHH Dược phẩm Thiên Ân (2023/07 – 2024) – Business Analyst
+- Xây dựng 3 dashboard Power BI theo dõi doanh thu và tồn kho cho ban giám đốc
+- Tự động hoá báo cáo Excel bằng Pivot Table và VBA cho phòng kinh doanh
+
+HỌC VẤN
+ĐH Kinh tế TP.HCM – Đại học Hệ thống thông tin quản lý (2014 – 2018)
+
+KỸ NĂNG
+- SQL, Python, Power BI, Thống kê, Tableau, Looker Studio
+- Giao tiếp, Giải quyết vấn đề
+
+CHỨNG CHỈ
+- Microsoft PL-300 (Power BI)

@@ -1,0 +1,32 @@
+NGUYỄN MAI LINH
+ETL Developer
+
+Ngày sinh: 10/05/1991 | Giới tính: Nữ
+Điện thoại: 0960 856 517 | Email: linh.nguyen91@outlook.com
+Địa chỉ: Hải Châu, Cần Thơ
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư Dữ liệu (Data Engineer), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 6 năm
+Công ty TNHH Logistics Hải Âu (2024/04 – nay) – ETL Developer
+- Đóng gói pipeline bằng Docker, triển khai trên AWS (S3, EC2)
+- Xây dựng pipeline ETL bằng Python và Airflow nạp 4 triệu bản ghi/ngày vào PostgreSQL
+Công ty CP Công nghệ Sao Việt (2022/10 – 2024) – ETL Developer
+- Đóng gói pipeline bằng Docker, triển khai trên AWS (S3, EC2)
+- Xây dựng pipeline ETL bằng Python và Airflow nạp 3 triệu bản ghi/ngày vào PostgreSQL
+GreenData Solutions (2020/12 – 2022) – ETL Developer
+- Tối ưu job Spark giúp giảm 29% thời gian xử lý dữ liệu log
+- Đóng gói pipeline bằng Docker, triển khai trên AWS (S3, EC2)
+
+HỌC VẤN
+ĐH Công nghiệp TP.HCM – Đại học Kỹ thuật phần mềm (2009 – 2013)
+
+KỸ NĂNG
+- SQL, ETL, PostgreSQL, Airflow, Spark, Kafka
+- Làm việc nhóm, Quản lý thời gian
+
+CHỨNG CHỈ
+- IELTS 6.0

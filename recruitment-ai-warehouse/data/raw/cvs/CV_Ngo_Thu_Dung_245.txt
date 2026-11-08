@@ -1,0 +1,32 @@
+NGÔ THU DUNG
+Frontend Developer
+
+Ngày sinh: 09/08/1993 | Giới tính: Nữ
+Điện thoại: 0711 413 520 | Email: dung.ngo93@gmail.com
+Địa chỉ: Cầu Giấy, Hà Nội
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Frontend (ReactJS), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 6.5 năm
+TechNova Việt Nam (2024/09 – nay) – Frontend Developer
+- Tối ưu hiệu năng trang chủ, tăng điểm Lighthouse lên 25
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+FinViet JSC (2022/10 – 2024) – Frontend Developer
+- Phát triển website thương mại điện tử bằng Next.js
+- Tối ưu hiệu năng trang chủ, tăng điểm Lighthouse lên 18
+Công ty TNHH Dược phẩm Thiên Ân (2020/04 – 2022) – Frontend Developer
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+- Xây dựng giao diện quản trị bằng ReactJS và TypeScript cho 5 module
+
+HỌC VẤN
+Học viện Hàng không Việt Nam – Cao đẳng Thiết kế đa phương tiện (2011 – 2015)
+
+KỸ NĂNG
+- JavaScript, TypeScript, ReactJS, HTML/CSS, Git, UI/UX
+- Làm việc nhóm, Thuyết trình
+
+CHỨNG CHỈ
+- Meta Front-End Developer Certificate

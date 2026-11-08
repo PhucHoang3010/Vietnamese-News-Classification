@@ -1,0 +1,32 @@
+ĐỖ HOÀNG ĐẠT
+ETL Developer
+
+Ngày sinh: 09/03/2000 | Giới tính: Nam
+Điện thoại: 0933 022 087 | Email: dat.do00@hotmail.com
+Địa chỉ: Quận 3, Hà Nội
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư Dữ liệu (Data Engineer), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 6 năm
+Công ty TNHH Logistics Hải Âu (2024/12 – nay) – ETL Developer
+- Xây dựng pipeline ETL bằng Python và Airflow nạp 2 triệu bản ghi/ngày vào PostgreSQL
+- Thiết kế kho dữ liệu lược đồ hình sao phục vụ 9 dashboard báo cáo
+Ngân hàng TMCP Phương Nam (giả lập) (2022/05 – 2024) – ETL Developer
+- Tối ưu job Spark giúp giảm 58% thời gian xử lý dữ liệu log
+- Đóng gói pipeline bằng Docker, triển khai trên AWS (S3, EC2)
+GreenData Solutions (2020/03 – 2022) – ETL Developer
+- Xây dựng pipeline ETL bằng Python và Airflow nạp 7 triệu bản ghi/ngày vào PostgreSQL
+- Tối ưu job Spark giúp giảm 15% thời gian xử lý dữ liệu log
+
+HỌC VẤN
+ĐH Công nghệ Thông tin – ĐHQG TP.HCM – Đại học Hệ thống thông tin (2018 – 2022)
+
+KỸ NĂNG
+- SQL, Airflow, Spark, Kafka
+- Làm việc nhóm, Quản lý thời gian
+
+CHỨNG CHỈ
+- IELTS 6.0

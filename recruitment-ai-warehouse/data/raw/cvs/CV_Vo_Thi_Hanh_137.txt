@@ -1,0 +1,26 @@
+VÕ THỊ HẠNH
+Frontend Developer
+
+Ngày sinh: 27/11/1990 | Giới tính: Nữ
+Điện thoại: 0719 304 287 | Email: hanh.vo90@gmail.com
+Địa chỉ: Thủ Đức, Cần Thơ
+
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Frontend (ReactJS), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 1 năm
+FinViet JSC (2025/06 – nay) – Frontend Developer
+- Xây dựng giao diện quản trị bằng ReactJS và TypeScript cho 9 module
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+
+HỌC VẤN
+ĐH Tôn Đức Thắng – Đại học Thiết kế đa phương tiện (2008 – 2012)
+
+KỸ NĂNG
+- JavaScript, TypeScript, ReactJS, HTML/CSS, Next.js
+- Làm việc nhóm, Giao tiếp
+
+CHỨNG CHỈ
+- TOEIC 650

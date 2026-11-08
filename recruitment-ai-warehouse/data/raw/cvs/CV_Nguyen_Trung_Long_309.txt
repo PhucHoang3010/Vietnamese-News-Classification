@@ -1,0 +1,29 @@
+NGUYỄN TRUNG LONG
+Tester
+
+Ngày sinh: 24/06/2000 | Giới tính: Nam
+Điện thoại: 0523 082 786 | Email: long.nguyen00@gmail.com
+Địa chỉ: Bình Thạnh, Hà Nội
+
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư Kiểm thử phần mềm (QA/Tester), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 4 năm
+Công ty CP Công nghệ Sao Việt (2024/01 – nay) – Tester
+- Xây dựng bộ automation test bằng Selenium, giảm 17% thời gian regression
+- Kiểm thử API bằng Postman và quản lý lỗi trên Jira
+Công ty TNHH Logistics Hải Âu (2022/12 – 2024) – Tester
+- Kiểm thử API bằng Postman và quản lý lỗi trên Jira
+- Kiểm thử thủ công (manual testing) các luồng thanh toán
+
+HỌC VẤN
+ĐH Bách khoa Hà Nội – Đại học Hệ thống thông tin (2018 – 2022)
+
+KỸ NĂNG
+- Kiểm thử thủ công (manual testing), Viết test case, SQL, Automation test, Jira
+- Thuyết trình, Quản lý thời gian
+
+CHỨNG CHỈ
+- ISTQB Foundation Level

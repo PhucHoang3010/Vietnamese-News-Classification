@@ -1,0 +1,32 @@
+TRẦN VĂN KHANG
+Software Engineer
+
+Ngày sinh: 13/10/1996 | Giới tính: Nam
+Điện thoại: 0906 766 136 | Email: khang.tran96@yahoo.com
+Địa chỉ: Bình Thạnh, Đồng Nai
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Backend (Python), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 6.5 năm
+Công ty CP Công nghệ Sao Việt (2024/07 – nay) – Software Engineer
+- Viết unit test đạt độ phủ 60% và thiết lập CI/CD với GitHub Actions
+- Thiết kế CSDL PostgreSQL và tối ưu truy vấn giảm 31% thời gian phản hồi
+Công ty TNHH Dược phẩm Thiên Ân (2022/09 – 2024) – Software Engineer
+- Thiết kế CSDL PostgreSQL và tối ưu truy vấn giảm 38% thời gian phản hồi
+- Tích hợp Redis cache và hàng đợi xử lý bất đồng bộ
+FinViet JSC (2020/07 – 2022) – Software Engineer
+- Thiết kế CSDL PostgreSQL và tối ưu truy vấn giảm 33% thời gian phản hồi
+- Phát triển RESTful API bằng FastAPI phục vụ 2 nghìn request/ngày
+
+HỌC VẤN
+ĐH Đà Nẵng – Đại học Khoa học máy tính (2014 – 2018)
+
+KỸ NĂNG
+- Python, FastAPI, Django, PostgreSQL, REST API, Git, Docker, MySQL, Linux
+- Giải quyết vấn đề, Quản lý thời gian
+
+CHỨNG CHỈ
+- Chứng chỉ Python PCAP

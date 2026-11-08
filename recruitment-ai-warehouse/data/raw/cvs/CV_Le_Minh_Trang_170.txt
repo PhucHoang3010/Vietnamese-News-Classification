@@ -1,0 +1,32 @@
+LÊ MINH TRANG
+Business Analyst
+
+Ngày sinh: 12/03/1991 | Giới tính: Nữ
+Điện thoại: 0530 103 617 | Email: trang.le91@gmail.com
+Địa chỉ: Cầu Giấy, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Chuyên viên Phân tích dữ liệu (Data Analyst), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 8 năm
+Công ty TNHH Logistics Hải Âu (2024/06 – nay) – Business Analyst
+- Làm sạch và phân tích dữ liệu khách hàng bằng Python (Pandas), phân khúc 9 nhóm khách hàng
+- Thiết kế báo cáo A/B testing chiến dịch khuyến mãi, kiểm định thống kê kết quả
+Công ty CP Thương mại điện tử VietShop (2022/10 – 2024) – Business Analyst
+- Xây dựng 6 dashboard Power BI theo dõi doanh thu và tồn kho cho ban giám đốc
+- Thiết kế báo cáo A/B testing chiến dịch khuyến mãi, kiểm định thống kê kết quả
+Công ty TNHH Phần mềm Đông Á (2020/03 – 2022) – Business Analyst
+- Xây dựng 7 dashboard Power BI theo dõi doanh thu và tồn kho cho ban giám đốc
+- Tự động hoá báo cáo Excel bằng Pivot Table và VBA cho phòng kinh doanh
+
+HỌC VẤN
+ĐH Bách khoa – ĐHQG TP.HCM – Đại học Hệ thống thông tin quản lý (2009 – 2013)
+
+KỸ NĂNG
+- SQL, Python, Power BI, Excel nâng cao, Thống kê, Looker Studio, Giao tiếp, Thuyết trình
+- Giao tiếp, Quản lý thời gian
+
+CHỨNG CHỈ
+- IELTS 6.5

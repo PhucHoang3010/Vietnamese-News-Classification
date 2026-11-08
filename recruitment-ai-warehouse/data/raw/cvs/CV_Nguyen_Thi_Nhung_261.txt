@@ -1,0 +1,26 @@
+NGUYỄN THỊ NHUNG
+Python Developer
+
+Ngày sinh: 22/02/2000 | Giới tính: Nữ
+Điện thoại: 0395 238 059 | Email: nhung.nguyen00@yahoo.com
+Địa chỉ: Cầu Giấy, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Backend (Python), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 1.5 năm
+Ngân hàng TMCP Phương Nam (giả lập) (2025/05 – nay) – Python Developer
+- Viết unit test đạt độ phủ 31% và thiết lập CI/CD với GitHub Actions
+- Phát triển RESTful API bằng FastAPI phục vụ 2 nghìn request/ngày
+
+HỌC VẤN
+ĐH Sư phạm Kỹ thuật TP.HCM – Thạc sĩ Khoa học máy tính (2018 – 2022)
+
+KỸ NĂNG
+- Python, REST API, Docker, Linux
+- Làm việc nhóm, Giải quyết vấn đề
+
+CHỨNG CHỈ
+- TOEIC 700

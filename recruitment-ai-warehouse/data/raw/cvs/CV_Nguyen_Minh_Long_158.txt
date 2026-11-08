@@ -1,0 +1,29 @@
+NGUYỄN MINH LONG
+ETL Developer
+
+Ngày sinh: 06/02/1998 | Giới tính: Nam
+Điện thoại: 0970 446 864 | Email: long.nguyen98@gmail.com
+Địa chỉ: Hải Châu, Hà Nội
+Tình trạng hôn nhân: Đã kết hôn
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư Dữ liệu (Data Engineer), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 3.5 năm
+TechNova Việt Nam (2025/06 – nay) – ETL Developer
+- Thiết kế kho dữ liệu lược đồ hình sao phục vụ 6 dashboard báo cáo
+- Xây dựng pipeline ETL bằng Python và Airflow nạp 6 triệu bản ghi/ngày vào PostgreSQL
+Công ty CP Truyền thông Mặt Trời (2024/01 – 2025) – ETL Developer
+- Đóng gói pipeline bằng Docker, triển khai trên AWS (S3, EC2)
+- Tối ưu job Spark giúp giảm 16% thời gian xử lý dữ liệu log
+
+HỌC VẤN
+ĐH Kinh tế Quốc dân – Đại học Khoa học máy tính (2016 – 2020)
+
+KỸ NĂNG
+- SQL, PostgreSQL, Airflow, Spark, Docker, AWS
+- Thuyết trình, Giao tiếp
+
+CHỨNG CHỈ
+- AWS Certified Data Engineer – Associate

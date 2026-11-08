@@ -1,0 +1,32 @@
+BÙI NHẬT SƠN
+Machine Learning Engineer
+
+Ngày sinh: 04/09/1996 | Giới tính: Nam
+Điện thoại: 0791 231 196 | Email: son.bui96@hotmail.com
+Địa chỉ: Quận 3, Hà Nội
+
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Kỹ sư AI/Machine Learning, ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 8.5 năm
+GreenData Solutions (2024/09 – nay) – Machine Learning Engineer
+- Triển khai mô hình Machine Learning dự báo nhu cầu, giảm 41% sai số
+- Thiết lập quy trình MLOps với MLflow và Docker
+Công ty CP Bán lẻ An Khang Mart (2022/07 – 2024) – Machine Learning Engineer
+- Thiết lập quy trình MLOps với MLflow và Docker
+- Huấn luyện mô hình phân loại văn bản tiếng Việt (NLP) bằng PyTorch đạt F1 37%
+TechNova Việt Nam (2020/12 – 2022) – Machine Learning Engineer
+- Thiết lập quy trình MLOps với MLflow và Docker
+- Xây dựng chatbot RAG tích hợp LLM phục vụ 7 nghìn người dùng
+
+HỌC VẤN
+ĐH Ngoại thương – Đại học Toán ứng dụng (2014 – 2018)
+
+KỸ NĂNG
+- Python, Machine Learning, NLP, PyTorch, LLM, Docker, Scikit-learn
+- Quản lý thời gian, Giao tiếp
+
+CHỨNG CHỈ
+- Deep Learning Specialization

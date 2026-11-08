@@ -1,0 +1,29 @@
+NGUYỄN GIA HÙNG
+Web Developer
+
+Ngày sinh: 05/08/1991 | Giới tính: Nam
+Điện thoại: 0751 438 668 | Email: hung.nguyen91@gmail.com
+Địa chỉ: Cầu Giấy, TP. Hồ Chí Minh
+Tình trạng hôn nhân: Độc thân
+
+MỤC TIÊU NGHỀ NGHIỆP
+Mong muốn phát triển ở vị trí Lập trình viên Frontend (ReactJS), ứng dụng kinh nghiệm thực tế để tạo ra giá trị đo lường được cho doanh nghiệp.
+
+KINH NGHIỆM LÀM VIỆC
+Tổng kinh nghiệm: 2 năm
+Ngân hàng TMCP Phương Nam (giả lập) (2025/12 – nay) – Web Developer
+- Xây dựng giao diện quản trị bằng ReactJS và TypeScript cho 5 module
+- Phát triển website thương mại điện tử bằng Next.js
+EduSmart JSC (2024/12 – 2025) – Web Developer
+- Tối ưu hiệu năng trang chủ, tăng điểm Lighthouse lên 30
+- Chuyển đổi thiết kế Figma thành giao diện responsive bằng HTML/CSS (Tailwind)
+
+HỌC VẤN
+ĐH Sư phạm Kỹ thuật TP.HCM – Đại học Kỹ thuật phần mềm (2009 – 2013)
+
+KỸ NĂNG
+- JavaScript, TypeScript, ReactJS, Git, UI/UX, Vue.js
+- Giao tiếp, Giải quyết vấn đề
+
+CHỨNG CHỈ
+- Meta Front-End Developer Certificate
